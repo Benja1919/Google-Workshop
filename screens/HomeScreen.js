@@ -22,7 +22,7 @@ const posts = [
     id: '4',
     imageUrl: 'https://engineering.tau.ac.il/sites/engineering.tau.ac.il/files/styles/research_teaser_image_180_x_180/public/guyaven.png?itok=9wiARZp1',
     text: 'Akash Jog 7',
-  },
+  }
   
   // הוסף פוסטים נוספים לפי הצורך
 ];
