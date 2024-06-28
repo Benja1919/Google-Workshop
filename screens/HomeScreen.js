@@ -13,6 +13,11 @@ const posts = [
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdtfVeXniJ_NY4ZLvnAHlDgqI2RzNAJUK2sw&s',
     text: 'Loved the dessert at Restaurant 2!',
   },
+  {
+    id: '3',
+    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUNgR19yyBvpU38PzemDmZ1-rcQf-zc2uZFA&s',
+    text: 'Akash Jog 7',
+  },
   // הוסף פוסטים נוספים לפי הצורך
 ];
 
