@@ -19,9 +19,9 @@ const posts = [
     text: 'Akash Jog 7',
   },
   {
-    id: '4',
+    id: '1111',
     imageUrl: 'https://engineering.tau.ac.il/sites/engineering.tau.ac.il/files/styles/research_teaser_image_180_x_180/public/guyaven.png?itok=9wiARZp1',
-    text: 'Akash Jog 7',
+    text: 'Geven',
   }
   
   // הוסף פוסטים נוספים לפי הצורך
