@@ -23,6 +23,12 @@ const posts = [
     imageUrl: 'https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcRoeUqD7lgiXavof_C8DW2QeI-BHIzGPLKRPCWinurLGGMBT7GSml0le6bQro8yWjAa',
     text: 'Not Kosher! לא כשר',
   },
+  {
+    id: '1111',
+    imageUrl: 'https://engineering.tau.ac.il/sites/engineering.tau.ac.il/files/styles/research_teaser_image_180_x_180/public/guyaven.png?itok=9wiARZp1',
+    text: 'Geven',
+  }
+  
   // הוסף פוסטים נוספים לפי הצורך
 ];
 
