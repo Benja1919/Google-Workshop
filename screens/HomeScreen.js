@@ -1,6 +1,21 @@
 import React from 'react';
 import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
 
+// רשימה של פוסטים לדוגמה
+const posts = [
+  {
+    id: '1',
+    imageUrl: 'https://example.com/restaurant1.jpg',
+    text: 'Amazing dinner at Restaurant 1!',
+  },
+  {
+    id: '2',
+    imageUrl: 'https://example.com/restaurant2.jpg',
+    text: 'Loved the dessert at Restaurant 2!',
+  },
+  // הוסף פוסטים נוספים לפי הצורך
+];
+
 const HomeScreen = () => {
   return (
     <View style={styles.container}>
