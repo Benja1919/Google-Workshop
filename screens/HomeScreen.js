@@ -1,7 +1,7 @@
+// screens/HomeScreen.js
 import React from 'react';
-import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
+import { View, Text, Button, FlatList, Image, StyleSheet } from 'react-native';
 
-// רשימה של פוסטים לדוגמה
 const posts = [
   {
     id: '1',
@@ -16,19 +16,31 @@ const posts = [
   // הוסף פוסטים נוספים לפי הצורך
 ];
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Foodies Social App</Text>
       <FlatList
-        data={posts} // array of post objects
+        data={posts}
         renderItem={({ item }) => (
           <View style={styles.post}>
             <Image source={{ uri: item.imageUrl }} style={styles.image} />
             <Text>{item.text}</Text>
+            <Button
+              title="Go to Profile"
+              onPress={() => navigation.navigate('UserProfile')}
+            />
           </View>
         )}
         keyExtractor={item => item.id}
+      />
+      <Button
+        title="Go to Profile"
+        onPress={() => navigation.navigate('UserProfile')}
+      />
+      <Button
+        title="Go to Restaurant"
+        onPress={() => navigation.navigate('Restaurant')}
       />
     </View>
   );
