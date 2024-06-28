@@ -5,12 +5,12 @@ import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
 const posts = [
   {
     id: '1',
-    imageUrl: 'https://example.com/restaurant1.jpg',
+    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6zPr-CuuHQBPmKg7yn66hCFdA3wmS58Og9g&s',
     text: 'Amazing dinner at Restaurant 1!',
   },
   {
     id: '2',
-    imageUrl: 'https://example.com/restaurant2.jpg',
+    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdtfVeXniJ_NY4ZLvnAHlDgqI2RzNAJUK2sw&s',
     text: 'Loved the dessert at Restaurant 2!',
   },
   // הוסף פוסטים נוספים לפי הצורך
