@@ -18,6 +18,11 @@ const posts = [
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUNgR19yyBvpU38PzemDmZ1-rcQf-zc2uZFA&s',
     text: 'Akash Jog 7',
   },
+  {
+    id: '4',
+    imageUrl: 'https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcRoeUqD7lgiXavof_C8DW2QeI-BHIzGPLKRPCWinurLGGMBT7GSml0le6bQro8yWjAa',
+    text: 'Not Kosher! לא כשר',
+  },
   // הוסף פוסטים נוספים לפי הצורך
 ];
 
