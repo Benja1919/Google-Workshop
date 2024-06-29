@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import PostsScreen from './PostsScreen';
 
 const usersData = {
   'User123': {
@@ -14,7 +15,7 @@ const usersData = {
     visitedRestaurants: ['Restaurant 2'],
     wishlistRestaurants: ['Restaurant 1', 'Restaurant 3'],
   },
-  // הוסף נתוני יוזרים נוספים כאן
+  // Add more users data here...
 };
 
 const UserProfileScreen = ({ route, navigation }) => {
@@ -33,12 +34,6 @@ const UserProfileScreen = ({ route, navigation }) => {
     navigation.navigate('Restaurant', { restaurantName });
   };
 
-  const renderRestaurant = ({ item }) => (
-    <TouchableOpacity onPress={() => navigateToRestaurant(item)}>
-      <Text style={styles.restaurant}>{item}</Text>
-    </TouchableOpacity>
-  );
-
   return (
     <View style={styles.container}>
       <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
@@ -48,16 +43,26 @@ const UserProfileScreen = ({ route, navigation }) => {
       <Text style={styles.subHeader}>Visited Restaurants:</Text>
       <FlatList
         data={user.visitedRestaurants}
-        renderItem={renderRestaurant}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => navigateToRestaurant(item)}>
+            <Text style={styles.restaurant}>{item}</Text>
+          </TouchableOpacity>
+        )}
         keyExtractor={(item) => item}
       />
 
       <Text style={styles.subHeader}>Wishlist Restaurants:</Text>
       <FlatList
         data={user.wishlistRestaurants}
-        renderItem={renderRestaurant}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => navigateToRestaurant(item)}>
+            <Text style={styles.restaurant}>{item}</Text>
+          </TouchableOpacity>
+        )}
         keyExtractor={(item) => item}
       />
+
+      <PostsScreen navigation={navigation} route={{ params: { filterUserName: userName } }} />
     </View>
   );
 };
