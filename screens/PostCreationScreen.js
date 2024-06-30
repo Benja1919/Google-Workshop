@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-
+import DB from './MockDB';
 const PostCreationScreen = ({ navigation, route }) => {
   const [restaurantName, setRestaurantName] = useState('');
   const [stars, setStars] = useState(0);
@@ -16,9 +16,7 @@ const PostCreationScreen = ({ navigation, route }) => {
     };
 
     // בדוק אם פונקציית onCreatePost קיימת לפני שמפעילים אותה
-    if (route.params?.onCreatePost) {
-      route.params.onCreatePost(newPost);
-    }
+    DB().AddPost(newPost);
     navigation.goBack(); // חזרה למסך הקודם אחרי הצלחת יצירת הפוסט
   };
 
