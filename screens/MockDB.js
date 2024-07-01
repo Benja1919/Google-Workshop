@@ -22,11 +22,34 @@ let posts = [
       userName: 'FoodieJohn',
       restaurantName: 'Restaurant 2',
       content: 'Loved the atmosphere at Restaurant 2',
-      stars: 4,
+      stars: 3,
       imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ80n9Sb3nwyIZy2Xq7j1TLtQwbqbClzTmverAEzmrPkgj8KgnNskiY5iUQ3r_USAM6hHo&usqp=CAU',
       profileImageUrl: 'https://media.licdn.com/dms/image/D4D03AQGJqUJqrC6OlQ/profile-displayphoto-shrink_200_200/0/1714751209049?e=2147483647&v=beta&t=yHaqR0QYWP4kdNUcVZp0sGsrq-uW-qehrZESEG1nAao',
   },
 ];
+const restaurantData = {
+    'Restaurant 1': {
+      name: 'Restaurant 1',
+      description: 'Best restaurant in town!',
+      chefDescription: 'Our guest chef this month is preparing unique dishes.',
+      happyHour: 'Every day from 5 PM to 7 PM.',
+      specialDish: 'Introducing our new special dish: Seafood Pasta!',
+      profileImageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Tom%27s_Restaurant%2C_NYC.jpg/640px-Tom%27s_Restaurant%2C_NYC.jpg',
+      starcount : 5,
+      reviewcount : 1,
+    },
+    'Restaurant 2': {
+      name: 'Restaurant 2',
+      description: 'Great place for dessert!',
+      chefDescription: 'Join us for our guest chef’s delicious creations.',
+      happyHour: 'Weekdays from 4 PM to 6 PM.',
+      specialDish: 'Try our new special: Chocolate Lava Cake!',
+      profileImageUrl: 'https://media-cdn.tripadvisor.com/media/photo-s/1a/18/3a/cb/restaurant-le-47.jpg',
+      starcount : 7,
+      reviewcount : 2,
+    },
+    // Add more restaurant data here...
+};
 
 const DB = () => {
   const GetPosts = () => {
@@ -42,12 +65,17 @@ const DB = () => {
           content: post.content,
           imageUrl: post.imageUrl // נוסיף את imageUrl
       };
+      GetRestaurant(post.restaurantName).starcount += post.stars;
+      GetRestaurant(post.restaurantName).reviewcount += 1;
       posts.push(newPost);
   };
-
+  const GetRestaurant = (rest) =>{
+    return restaurantData[rest];
+  }
   return {
       GetPosts,
-      AddPost
+      AddPost,
+      GetRestaurant,
   };
 };
 

@@ -3,30 +3,11 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import PostsScreen from './PostsScreen';
-
-const restaurantData = {
-  'Restaurant 1': {
-    name: 'Restaurant 1',
-    description: 'Best restaurant in town!',
-    chefDescription: 'Our guest chef this month is preparing unique dishes.',
-    happyHour: 'Every day from 5 PM to 7 PM.',
-    specialDish: 'Introducing our new special dish: Seafood Pasta!',
-    profileImageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Tom%27s_Restaurant%2C_NYC.jpg/640px-Tom%27s_Restaurant%2C_NYC.jpg',
-  },
-  'Restaurant 2': {
-    name: 'Restaurant 2',
-    description: 'Great place for dessert!',
-    chefDescription: 'Join us for our guest chef’s delicious creations.',
-    happyHour: 'Weekdays from 4 PM to 6 PM.',
-    specialDish: 'Try our new special: Chocolate Lava Cake!',
-    profileImageUrl: 'https://media-cdn.tripadvisor.com/media/photo-s/1a/18/3a/cb/restaurant-le-47.jpg',
-  },
-  // Add more restaurant data here...
-};
+import DB from './MockDB';
 
 const RestaurantScreen = ({ route, navigation }) => {
   const { restaurantName } = route.params;
-  const restaurant = restaurantData[restaurantName];
+  const restaurant = DB().GetRestaurant(restaurantName);
 
   if (!restaurant) {
     return (
@@ -51,6 +32,9 @@ const RestaurantScreen = ({ route, navigation }) => {
 
         <Text style={styles.detailsHeader}>New Special Dish:</Text>
         <Text style={styles.detailsText}>{restaurant.specialDish}</Text>
+
+        <Text style={styles.detailsHeader}>Avarage Rating:</Text>
+        <Text style={styles.detailsText}>{restaurant.starcount / restaurant.reviewcount} ({restaurant.reviewcount})</Text>
 
       </View>
 
