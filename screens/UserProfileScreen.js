@@ -1,6 +1,6 @@
+// UserProfileScreen.js
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-
 import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
 import reviewsIcon from '../assets/icons/reviews.png';
@@ -33,7 +33,11 @@ const UserProfileScreen = ({ route, navigation }) => {
   }
 
   const navigateToScreen = (screen) => {
-    navigation.navigate(screen, { userName });
+    if (screen === 'Posts') {
+      navigation.navigate(screen, { filterUserName: userName });
+    } else {
+      navigation.navigate(screen, { userName });
+    }
   };
 
   const buttons = [
