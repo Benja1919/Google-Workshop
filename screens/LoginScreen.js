@@ -1,0 +1,72 @@
+import React, { useContext, useState } from 'react';
+import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
+import { AuthContext } from './AuthContext';
+import DB from './MockDB'; // Import the mock database
+
+const LoginScreen = ({navigation}) => {
+  const [userName, setUserName] = useState('');
+  const [password, setPassword] = useState('');
+  const { login } = useContext(AuthContext);
+
+  const handleLogin = () => {
+    if (userName === '' || password === '') {
+      Alert.alert('Error', 'Please fill in both fields');
+      return;
+    }
+    const user = DB().GetUserName(userName, password);
+    if (user) {
+        login(user)
+        Alert.alert('Success', `Logged in as: ${user.userName}`);
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('Error', 'Invalid username or password');
+      }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Login</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="User Name"
+        value={userName}
+        onChangeText={setUserName}
+        keyboardType="default"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <Button title="Login" onPress={handleLogin} />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+});
+
+export default LoginScreen;

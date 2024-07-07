@@ -5,6 +5,8 @@ import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
 import reviewsIcon from '../assets/icons/reviews.png';
 import recipesIcon from '../assets/icons/recipes.png';
+import { AuthContext } from './AuthContext';
+
 
 const usersData = {
   'User123': {
