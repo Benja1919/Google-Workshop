@@ -33,7 +33,7 @@ const RestaurantScreen = ({ route, navigation }) => {
         <Text style={styles.detailsHeader}>New Special Dish:</Text>
         <Text style={styles.detailsText}>{restaurant.specialDish}</Text>
 
-        <Text style={styles.detailsHeader}>Avarage Rating:</Text>
+        <Text style={styles.detailsHeader}>Average Rating:</Text>
         <Text style={styles.detailsText}>{restaurant.starcount / restaurant.reviewcount} ({restaurant.reviewcount})</Text>
 
       </View>
