@@ -27,7 +27,7 @@ const MyListsScreen = ({ route }) => {
 
   const goToRestaurant = (restaurantName) => {
     // Navigate to the restaurant screen with the restaurant ID or other necessary params
-    navigation.navigate('MockDB', { restaurantName });
+    navigation.navigate('Restaurant', { restaurantName });
   };
 
   return (
