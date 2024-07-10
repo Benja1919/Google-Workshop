@@ -1,79 +1,155 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Button, Alert, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-/**
- * MyListsScreen component
- *
- * Displays a user's wish list and "been to" list of restaurants. 
- * Each list item is clickable and navigates to the restaurant's page.
- *
- * @param {Object} route - The route object containing navigation parameters.
- * @param {Object} route.params - The route parameters.
- * @param {string} route.params.userName - The username to display lists for.
- * @returns {JSX.Element} The rendered component.
- */
 const MyListsScreen = ({ route }) => {
   const { userName } = route.params;
   const navigation = useNavigation();
+  const [lists, setLists] = useState({
+    'Wish List': [
+      { id: '1', name: 'Restaurant 1' },
+      { id: '2', name: 'Restaurant B' },
+      { id: '3', name: 'Restaurant C' },
+    ],
+    'Been To': [
+      { id: '1', name: 'Restaurant X' },
+      { id: '2', name: 'Restaurant Y' },
+      { id: '3', name: 'Restaurant Z' },
+    ],
+  });
+  const [newListName, setNewListName] = useState('');
+  const [newItemName, setNewItemName] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentEditList, setCurrentEditList] = useState('');
+  const [currentEditItem, setCurrentEditItem] = useState(null);
 
-  // Example data for wish list and been to list
-  const wishList = [
-    { id: '1', name: 'Restaurant 1' },
-    { id: '2', name: 'Restaurant B' },
-    { id: '3', name: 'Restaurant C' },
-  ];
-
-  const beenToList = [
-    { id: '1', name: 'Restaurant X' },
-    { id: '2', name: 'Restaurant Y' },
-    { id: '3', name: 'Restaurant Z' },
-  ];
-
-  /**
-   * Renders a single item in the list.
-   *
-   * @param {Object} item - The list item to render.
-   * @returns {JSX.Element} The rendered list item.
-   */
-  const renderListItem = ({ item }) => (
-    <TouchableOpacity style={styles.listItem} onPress={() => goToRestaurant(item.id)}>
+  const renderListItem = ({ item, listName }) => (
+    <TouchableOpacity style={styles.listItem} onPress={() => goToRestaurant(item.name)} onLongPress={() => openEditModal(listName, item)}>
       <Text style={styles.itemText}>{item.name}</Text>
     </TouchableOpacity>
   );
 
-  /**
-   * Navigates to the restaurant's page.
-   *
-   * @param {string} restaurantId - The ID of the restaurant to navigate to.
-   */
-  const goToRestaurant = (restaurantId) => {
-    navigation.navigate('RestaurantScreen', { restaurantId });
+  const goToRestaurant = (restaurantName) => {
+    navigation.navigate('RestaurantScreen', { restaurantName });
+  };
+
+  const addNewList = () => {
+    if (newListName.trim() === '') {
+      Alert.alert('Error', 'List name cannot be empty');
+      return;
+    }
+    if (lists[newListName]) {
+      Alert.alert('Error', 'List with this name already exists');
+      return;
+    }
+
+    setLists({
+      ...lists,
+      [newListName]: [],
+    });
+    setNewListName('');
+  };
+
+  const addItemToList = (listName) => {
+    if (newItemName.trim() === '') {
+      Alert.alert('Error', 'Item name cannot be empty');
+      return;
+    }
+
+    const updatedList = [...lists[listName], { id: `${Date.now()}`, name: newItemName }];
+    setLists({
+      ...lists,
+      [listName]: updatedList,
+    });
+    setNewItemName('');
+  };
+
+  const openEditModal = (listName, item) => {
+    setCurrentEditList(listName);
+    setCurrentEditItem(item);
+    setNewItemName(item.name);  // Set the newItemName to the current item name for editing
+    setModalVisible(true);
+  };
+
+  const handleEditItem = () => {
+    if (newItemName.trim() === '') {
+      Alert.alert('Error', 'Item name cannot be empty');
+      return;
+    }
+
+    const updatedList = lists[currentEditList].map((item) =>
+      item.id === currentEditItem.id ? { ...item, name: newItemName } : item
+    );
+    setLists({
+      ...lists,
+      [currentEditList]: updatedList,
+    });
+    setModalVisible(false);
+    setNewItemName('');
+  };
+
+  const handleDeleteItem = () => {
+    const updatedList = lists[currentEditList].filter((item) => item.id !== currentEditItem.id);
+    setLists({
+      ...lists,
+      [currentEditList]: updatedList,
+    });
+    setModalVisible(false);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Lists for {userName}</Text>
 
-      <View style={styles.listContainer}>
-        <Text style={styles.listTitle}>Wish List</Text>
-        <FlatList
-          data={wishList}
-          renderItem={renderListItem}
-          keyExtractor={item => item.id}
-          style={styles.list}
+      {Object.keys(lists).map((listName) => (
+        <View key={listName} style={styles.listContainer}>
+          <Text style={styles.listTitle}>{listName}</Text>
+          <FlatList
+            data={lists[listName]}
+            renderItem={({ item }) => renderListItem({ item, listName })}
+            keyExtractor={(item) => item.id}
+            style={styles.list}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="New item name"
+            value={newItemName}
+            onChangeText={setNewItemName}
+          />
+          <Button title="Add Item" onPress={() => addItemToList(listName)} />
+        </View>
+      ))}
+
+      <View style={styles.addListContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="New list name"
+          value={newListName}
+          onChangeText={setNewListName}
         />
+        <Button title="Add List" onPress={addNewList} />
       </View>
 
-      <View style={styles.listContainer}>
-        <Text style={styles.listTitle}>Been To</Text>
-        <FlatList
-          data={beenToList}
-          renderItem={renderListItem}
-          keyExtractor={item => item.id}
-          style={styles.list}
-        />
-      </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <TextInput
+            style={styles.input}
+            placeholder="Edit item name"
+            value={newItemName}
+            onChangeText={setNewItemName}
+          />
+          <View style={styles.modalButtonContainer}>
+            <Button title="Save" onPress={handleEditItem} />
+            <Button title="Delete" onPress={handleDeleteItem} color="red" />
+            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -118,6 +194,40 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 16,
     color: '#333',
+  },
+  addListContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 8,
+    marginRight: 8,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 16,
   },
 });
 

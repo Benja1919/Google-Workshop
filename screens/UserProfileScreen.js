@@ -3,8 +3,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
-import reviewsIcon from '../assets/icons/reviews.png';
-import recipesIcon from '../assets/icons/recipes.png';
+import myNetworkIcon from '../assets/icons/network.png';
 import { AuthContext } from './AuthContext';
 
 
@@ -12,7 +11,7 @@ const usersData = {
   'User123': {
     profileImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUNgR19yyBvpU38PzemDmZ1-rcQf-zc2uZFA&s',
     bio: 'Food lover. Always exploring new restaurants!',
-    ranks: ['Verified', 'Top 10 Reviewer', 'Top Rated Recipe Creator'],
+    ranks: ['Verified', 'Top 10 Reviewer', '300 connections'],
   },
   'FoodieJohn': {
     profileImageUrl: 'https://media.licdn.com/dms/image/D4D03AQGJqUJqrC6OlQ/profile-displayphoto-shrink_200_200/0/1714751209049?e=2147483647&v=beta&t=yHaqR0QYWP4kdNUcVZp0sGsrq-uW-qehrZESEG1nAao',
@@ -45,8 +44,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   const buttons = [
     { label: 'Posts', screen: 'Posts', icon: postsIcon },
     { label: 'My Lists', screen: 'MyLists', icon: myListsIcon },
-    { label: 'Reviews', screen: 'Reviews', icon: reviewsIcon },
-    { label: 'Recipes', screen: 'Recipes', icon: recipesIcon },
+    { label: 'My Network', screen: 'Network', icon: myNetworkIcon },
   ];
 
   const screenWidth = Dimensions.get('window').width;

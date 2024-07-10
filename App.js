@@ -7,7 +7,7 @@ import RestaurantScreen from './screens/RestaurantScreen';
 import PostsScreen from './screens/PostsScreen';
 import PostCreationScreen from './screens/PostCreationScreen';
 import MyListsScreen from './screens/MyListsScreen';
-import ReviewsScreen from './screens/ReviewsScreen';
+import NetworkScreen from './screens/NetworkScreen';
 import RecipesScreen from './screens/RecipesScreen';
 import LoginScreen from './screens/LoginScreen'
 import { AuthProvider } from './screens/AuthContext';
@@ -23,7 +23,7 @@ const App = () => {
           <Stack.Screen name="UserProfile" component={UserProfileScreen} />
           <Stack.Screen name="Restaurant" component={RestaurantScreen} />
           <Stack.Screen name="MyLists" component={MyListsScreen} />
-          <Stack.Screen name="Reviews" component={ReviewsScreen} />
+          <Stack.Screen name="Network" component={NetworkScreen} />
           <Stack.Screen name="Recipes" component={RecipesScreen} />
           <Stack.Screen name="PostCreation" component={PostCreationScreen} />
           <Stack.Screen name="Posts" component={PostsScreen} />
