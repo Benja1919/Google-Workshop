@@ -2,11 +2,22 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+/**
+ * MyListsScreen component
+ *
+ * Displays a user's wish list and "been to" list of restaurants. 
+ * Each list item is clickable and navigates to the restaurant's page.
+ *
+ * @param {Object} route - The route object containing navigation parameters.
+ * @param {Object} route.params - The route parameters.
+ * @param {string} route.params.userName - The username to display lists for.
+ * @returns {JSX.Element} The rendered component.
+ */
 const MyListsScreen = ({ route }) => {
   const { userName } = route.params;
   const navigation = useNavigation();
 
-  // Example data
+  // Example data for wish list and been to list
   const wishList = [
     { id: '1', name: 'Restaurant 1' },
     { id: '2', name: 'Restaurant B' },
@@ -19,15 +30,25 @@ const MyListsScreen = ({ route }) => {
     { id: '3', name: 'Restaurant Z' },
   ];
 
+  /**
+   * Renders a single item in the list.
+   *
+   * @param {Object} item - The list item to render.
+   * @returns {JSX.Element} The rendered list item.
+   */
   const renderListItem = ({ item }) => (
-    <TouchableOpacity style={styles.listItem} onPress={() => goToRestaurant(item.name)}>
+    <TouchableOpacity style={styles.listItem} onPress={() => goToRestaurant(item.id)}>
       <Text style={styles.itemText}>{item.name}</Text>
     </TouchableOpacity>
   );
 
-  const goToRestaurant = (restaurantName) => {
-    // Navigate to the restaurant screen with the restaurant ID or other necessary params
-    navigation.navigate('Restaurant', { restaurantName });
+  /**
+   * Navigates to the restaurant's page.
+   *
+   * @param {string} restaurantId - The ID of the restaurant to navigate to.
+   */
+  const goToRestaurant = (restaurantId) => {
+    navigation.navigate('RestaurantScreen', { restaurantId });
   };
 
   return (

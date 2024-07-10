@@ -1,71 +1,112 @@
 import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import PostComponent from './PostComponent'; // נוודא שמסלול היבוא נכון
+import PostComponent from './PostComponent'; // Ensure the import path is correct
 import DB from './MockDB';
-// Mock function to fetch posts
+
+/**
+ * fetchPosts
+ *
+ * Mock function to fetch posts from the mock database.
+ *
+ * @returns {Promise<Array>} A promise that resolves to an array of posts.
+ */
 const fetchPosts = async () => {
   return DB().GetPosts();
 };
 
+/**
+ * PostsScreen
+ *
+ * A screen component that displays a list of posts. It supports filtering posts by restaurant name or user name.
+ *
+ * @param {Object} navigation - The navigation object provided by React Navigation.
+ * @param {Object} route - The route object provided by React Navigation, containing route parameters for filtering.
+ *
+ * @returns {JSX.Element} The rendered posts screen component.
+ */
 const PostsScreen = ({ navigation, route }) => {
-    const [posts, setPosts] = React.useState([]);
-  
-    React.useEffect(() => {
-        const loadPosts = async () => {
-          try {
-            const allPosts = await fetchPosts();
-            const filterRestaurantName = route?.params?.filterrestaurantName; // Optional chaining
-            const filterUserName = route?.params?.filterUserName; // Optional chaining
-      
-            let filteredPosts = allPosts;
-      
-            if (filterRestaurantName) {
-              filteredPosts = filteredPosts.filter(post => post.restaurantName === filterRestaurantName);
-            }
-      
-            if (filterUserName) {
-              filteredPosts = filteredPosts.filter(post => post.userName === filterUserName);
-            }
-      
-            setPosts(filteredPosts);
-          } catch (error) {
-            console.error('Error loading posts:', error);
-          }
-        };
-      
-        loadPosts();
-      }, [route]);
-      
-  
-    const navigateToProfile = (userName) => {
-      navigation.navigate('UserProfile', { userName });
+  const [posts, setPosts] = React.useState([]);
+
+  React.useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const allPosts = await fetchPosts();
+        const filterRestaurantName = route?.params?.filterrestaurantName; // Optional chaining
+        const filterUserName = route?.params?.filterUserName; // Optional chaining
+
+        let filteredPosts = allPosts;
+
+        if (filterRestaurantName) {
+          filteredPosts = filteredPosts.filter(post => post.restaurantName === filterRestaurantName);
+        }
+
+        if (filterUserName) {
+          filteredPosts = filteredPosts.filter(post => post.userName === filterUserName);
+        }
+
+        setPosts(filteredPosts);
+      } catch (error) {
+        console.error('Error loading posts:', error);
+      }
     };
-  
-    const navigateToRestaurant = (restaurantName) => {
-      navigation.navigate('Restaurant', { restaurantName });
-    };
-  
-    const renderPost = ({ item }) => (
-      <PostComponent
-        post={item}
-        navigateToProfile={navigateToProfile}
-        navigateToRestaurant={navigateToRestaurant}
-      />
-    );
-  
-    return (
-      <View style={styles.container}>
-        <FlatList
-          data={posts}
-          renderItem={renderPost}
-          keyExtractor={(item) => item.id}
-        />
-      </View>
-    );
+
+    loadPosts();
+  }, [route]);
+
+  /**
+   * navigateToProfile
+   *
+   * Navigates to the user's profile screen.
+   *
+   * @param {string} userName - The user name to navigate to.
+   */
+  const navigateToProfile = (userName) => {
+    navigation.navigate('UserProfile', { userName });
   };
-  
-  const styles = StyleSheet.create({
-    container: { flex: 1, padding: 10 },
-  });
-  
-  export default PostsScreen;
+
+  /**
+   * navigateToRestaurant
+   *
+   * Navigates to the restaurant's screen.
+   *
+   * @param {string} restaurantName - The restaurant name to navigate to.
+   */
+  const navigateToRestaurant = (restaurantName) => {
+    navigation.navigate('Restaurant', { restaurantName });
+  };
+
+  /**
+   * renderPost
+   *
+   * Renders a single post component.
+   *
+   * @param {Object} item - The post item to render.
+   * @returns {JSX.Element} The rendered post component.
+   */
+  const renderPost = ({ item }) => (
+    <PostComponent
+      post={item}
+      navigateToProfile={navigateToProfile}
+      navigateToRestaurant={navigateToRestaurant}
+    />
+  );
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={posts}
+        renderItem={renderPost}
+        keyExtractor={(item) => item.id}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+});
+
+export default PostsScreen;

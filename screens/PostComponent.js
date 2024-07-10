@@ -2,6 +2,23 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
+/**
+ * PostComponent
+ *
+ * A component that displays a post with user information, restaurant name, rating, and content.
+ *
+ * @param {Object} post - The post data.
+ * @param {string} post.userName - The username of the post author.
+ * @param {string} post.profileImageUrl - The URL of the post author's profile image.
+ * @param {string} post.restaurantName - The name of the restaurant mentioned in the post.
+ * @param {string} post.imageUrl - The URL of the image included in the post.
+ * @param {string} post.content - The content of the post.
+ * @param {number} post.stars - The rating given to the restaurant.
+ * @param {function} navigateToProfile - Function to navigate to the user's profile.
+ * @param {function} navigateToRestaurant - Function to navigate to the restaurant's page.
+ *
+ * @returns {JSX.Element} The rendered post component.
+ */
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => (
   <View style={styles.postCard}>
     <View style={styles.header}>

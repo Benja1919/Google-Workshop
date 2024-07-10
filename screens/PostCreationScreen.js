@@ -3,12 +3,27 @@ import { View, Text, TextInput, Button, Image, StyleSheet, Alert } from 'react-n
 import * as ImagePicker from 'expo-image-picker';
 import DB from './MockDB';
 
+/**
+ * PostCreationScreen
+ *
+ * A screen component that allows users to create a new post by providing restaurant details, a review, and an image.
+ *
+ * @param {Object} navigation - The navigation object provided by React Navigation.
+ *
+ * @returns {JSX.Element} The rendered post creation screen component.
+ */
 const PostCreationScreen = ({ navigation }) => {
   const [restaurantName, setRestaurantName] = useState('');
   const [stars, setStars] = useState(0);
   const [content, setContent] = useState('');
   const [imageUri, setImageUri] = useState(null);
 
+  /**
+   * pickImage
+   *
+   * Asks for permission to access the media library and allows the user to pick an image.
+   * If the permission is granted and an image is picked, sets the image URI to the state.
+   */
   const pickImage = async () => {
     let result = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!result.granted) {
@@ -33,6 +48,13 @@ const PostCreationScreen = ({ navigation }) => {
     }
   };
 
+  /**
+   * handleSubmit
+   *
+   * Validates the input fields and creates a new post with the provided data.
+   * If any field is missing or invalid, an alert is shown.
+   * Adds the new post to the mock database and navigates back to the previous screen.
+   */
   const handleSubmit = () => {
     console.log('Restaurant Name:', restaurantName);
     console.log('Stars:', stars);
@@ -46,7 +68,7 @@ const PostCreationScreen = ({ navigation }) => {
 
     const newPost = {
       id: Math.random().toString(),
-      userName: 'User123', // כדאי להחליף עם שם משתמש אמיתי
+      userName: 'User123', // Replace with actual username
       restaurantName: restaurantName,
       stars: stars,
       content: content,
