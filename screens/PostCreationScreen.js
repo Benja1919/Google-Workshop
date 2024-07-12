@@ -1,30 +1,32 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Image, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, Image, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import StarRating from 'react-native-star-rating-widget';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import DB from './MockDB';
 
-/**
- * PostCreationScreen
- *
- * A screen component that allows users to create a new post by providing restaurant details, a review, and an image.
- *
- * @param {Object} navigation - The navigation object provided by React Navigation.
- *
- * @returns {JSX.Element} The rendered post creation screen component.
- */
+const GOOGLE_PLACES_API_KEY = 'YOUR_GOOGLE_PLACES_API_KEY'; // Replace with your Google Places API key
+
 const PostCreationScreen = ({ navigation }) => {
   const [restaurantName, setRestaurantName] = useState('');
   const [stars, setStars] = useState(0);
   const [content, setContent] = useState('');
-  const [imageUri, setImageUri] = useState(null);
+  const [mediaUris, setMediaUris] = useState([]);
+  const [mediaType, setMediaType] = useState('');
+  const [location, setLocation] = useState(null);
+  const [places, setPlaces] = useState([]);
 
-  /**
-   * pickImage
-   *
-   * Asks for permission to access the media library and allows the user to pick an image.
-   * If the permission is granted and an image is picked, sets the image URI to the state.
-   */
-  const pickImage = async () => {
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Error', 'Permission to access location is required');
+        return;
+      }
+    })();
+  }, []);
+
+  const pickMedia = async (mediaTypes, type) => {
     let result = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!result.granted) {
       Alert.alert('Error', 'Permission to access gallery is required');
@@ -32,37 +34,64 @@ const PostCreationScreen = ({ navigation }) => {
     }
 
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    console.log('Picker Result:', pickerResult);
-
     if (!pickerResult.canceled) {
-      console.log('Image URI:', pickerResult.assets[0].uri);
-      setImageUri(pickerResult.assets[0].uri);
+      setMediaUris([...mediaUris, pickerResult.assets[0].uri]);
+      setMediaType(type);
     } else {
-      Alert.alert('Error', 'Image selection was canceled');
+      Alert.alert('Error', 'Media selection was canceled');
     }
   };
 
-  /**
-   * handleSubmit
-   *
-   * Validates the input fields and creates a new post with the provided data.
-   * If any field is missing or invalid, an alert is shown.
-   * Adds the new post to the mock database and navigates back to the previous screen.
-   */
-  const handleSubmit = () => {
-    console.log('Restaurant Name:', restaurantName);
-    console.log('Stars:', stars);
-    console.log('Content:', content);
-    console.log('Image URI:', imageUri);
+  const pickImage = () => pickMedia(ImagePicker.MediaTypeOptions.Images, 'image');
+  const pickVideo = () => pickMedia(ImagePicker.MediaTypeOptions.Videos, 'video');
+  const pickGif = () => pickMedia(ImagePicker.MediaTypeOptions.Images, 'gif');
 
-    if (!restaurantName || stars <= 0 || !content || !imageUri) {
-      Alert.alert('Error', 'Please fill in all fields and select an image');
+  const pickLocation = async () => {
+    try {
+      let locationResult = await Location.getCurrentPositionAsync({});
+      setLocation(locationResult);
+
+      fetchPlaces(locationResult.coords.latitude, locationResult.coords.longitude);
+    } catch (error) {
+      Alert.alert('Error', 'Unable to fetch location');
+    }
+  };
+
+  const fetchPlaces = async (latitude, longitude) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=1500&type=restaurant&key=${GOOGLE_PLACES_API_KEY}`
+      );
+      const data = await response.json();
+      setPlaces(data.results);
+    } catch (error) {
+      Alert.alert('Error', 'Unable to fetch nearby places');
+    }
+  };
+
+  const handlePlaceSelect = (place) => {
+    setLocation({
+      coords: {
+        latitude: place.geometry.location.lat,
+        longitude: place.geometry.location.lng,
+      },
+    });
+    setPlaces([]);
+  };
+
+  const handleRemoveMedia = (uri) => {
+    setMediaUris(mediaUris.filter(mediaUri => mediaUri !== uri));
+  };
+
+  const handleSubmit = () => {
+    if (!restaurantName || stars <= 0 || !content || mediaUris.length === 0) {
+      Alert.alert('Error', 'Please fill in all fields and select at least one image, video, or GIF');
       return;
     }
 
@@ -72,7 +101,9 @@ const PostCreationScreen = ({ navigation }) => {
       restaurantName: restaurantName,
       stars: stars,
       content: content,
-      imageUrl: imageUri,
+      mediaUrls: mediaUris,
+      mediaType: mediaType,
+      location: location ? `${location.coords.latitude}, ${location.coords.longitude}` : null,
     };
 
     DB().AddPost(newPost);
@@ -80,7 +111,7 @@ const PostCreationScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.label}>Restaurant Name:</Text>
       <TextInput
         style={styles.input}
@@ -90,12 +121,9 @@ const PostCreationScreen = ({ navigation }) => {
       />
 
       <Text style={styles.label}>Stars:</Text>
-      <TextInput
-        style={styles.input}
-        value={stars.toString()}
-        onChangeText={text => setStars(Number(text))}
-        placeholder="Enter stars (1-5)"
-        keyboardType="numeric"
+      <StarRating
+        rating={stars}
+        onChange={setStars}
       />
 
       <Text style={styles.label}>Content:</Text>
@@ -107,23 +135,59 @@ const PostCreationScreen = ({ navigation }) => {
         multiline
       />
 
-      <Button title="Pick an image" onPress={pickImage} />
+      {/* Media Picker Bar */}
+      <View style={styles.mediaBar}>
+        <TouchableOpacity style={styles.mediaButton} onPress={pickImage}>
+          <Image source={require('../assets/icons/image.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.mediaButton} onPress={pickVideo}>
+          <Image source={require('../assets/icons/video.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.mediaButton} onPress={pickGif}>
+          <Image source={require('../assets/icons/gif.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.mediaButton} onPress={pickLocation}>
+          <Image source={require('../assets/icons/location.png')} style={styles.icon} />
+        </TouchableOpacity>
+      </View>
 
-      {imageUri && (
-        <Image
-          source={{ uri: imageUri }}
-          style={styles.previewImage}
+      <View style={styles.mediaContainer}>
+        {mediaUris.map((uri, index) => (
+          <View key={index} style={styles.mediaPreviewContainer}>
+            <Image source={{ uri }} style={styles.previewImage} />
+            <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveMedia(uri)}>
+              <Text style={styles.removeButtonText}>X</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+
+      {location && (
+        <Text>Location: {location.coords.latitude}, {location.coords.longitude}</Text>
+      )}
+
+      {places.length > 0 && (
+        <FlatList
+          data={places}
+          keyExtractor={(item) => item.place_id}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handlePlaceSelect(item)}>
+              <Text style={styles.placeItem}>{item.name}</Text>
+            </TouchableOpacity>
+          )}
         />
       )}
 
-      <Button title="Submit" onPress={handleSubmit} />
-    </View>
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <Text style={styles.submitButtonText}>Submit</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 10,
   },
   label: {
@@ -138,13 +202,71 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-  previewImage: {
-    width: 200,
-    height: 200,
-    resizeMode: 'cover',
+  mediaBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
     marginVertical: 10,
+  },
+  mediaButton: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
+  },
+  icon: {
+    width: 40,
+    height: 30,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  mediaContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginVertical: 10,
+  },
+  mediaPreviewContainer: {
+    position: 'relative',
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  previewImage: {
+    width: 100,
+    height: 100,
+    resizeMode: 'cover',
     borderWidth: 1,
     borderColor: '#ccc',
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: 'rgba(255, 0, 0, 0.7)',
+    borderRadius: 10,
+    padding: 5,
+  },
+  removeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  placeItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  submitButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignSelf: 'center', // מרכז את הכפתור במרכז האופקי של המסך
+    marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
+  },
+  submitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
