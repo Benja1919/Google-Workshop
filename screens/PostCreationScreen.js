@@ -16,6 +16,14 @@ const PostCreationScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [places, setPlaces] = useState([]);
 
+  const navigateToProfile = () => {
+    navigation.navigate('ProfileScreen');
+  };
+
+  const navigateToHome = () => {
+    navigation.navigate('HomeScreen');
+  };
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -138,16 +146,40 @@ const PostCreationScreen = ({ navigation }) => {
       {/* Media Picker Bar */}
       <View style={styles.mediaBar}>
         <TouchableOpacity style={styles.mediaButton} onPress={pickImage}>
-          <Image source={require('../assets/icons/image.png')} style={styles.icon} />
+          <Image source={require('../assets/icons/image.png')} style={styles.mediaicon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.mediaButton} onPress={pickVideo}>
-          <Image source={require('../assets/icons/video.png')} style={styles.icon} />
+          <Image source={require('../assets/icons/video.png')} style={styles.mediaicon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.mediaButton} onPress={pickGif}>
-          <Image source={require('../assets/icons/gif.png')} style={styles.icon} />
+          <Image source={require('../assets/icons/gif.png')} style={styles.mediaicon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.mediaButton} onPress={pickLocation}>
-          <Image source={require('../assets/icons/location.png')} style={styles.icon} />
+          <Image source={require('../assets/icons/location.png')} style={styles.mediaicon} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom bar */}
+      <View style={styles.bottomBar}>
+        
+        {/* Button for home */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
+        <Image source={require('../assets/icons/home.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button for search */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={() => console.log('Search button pressed')}>
+          <Image source={require('../assets/icons/search.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button to navigate to post creation */}
+        <TouchableOpacity style={styles.bottomBarButton}>
+        <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button for profile */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
+          <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
 
@@ -202,6 +234,28 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff', // צבע רקע לפס הרציף
+    elevation: 10, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
+  },
+  bottomBarButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 7,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  icon: {
+    width: 25,
+    height: 25,
+  },
   mediaBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -213,7 +267,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
-  icon: {
+  mediaicon: {
     width: 40,
     height: 30,
   },
