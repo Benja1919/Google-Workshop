@@ -20,6 +20,10 @@ const PostCreationScreen = ({ navigation }) => {
     navigation.navigate('ProfileScreen');
   };
 
+  const navigateToSearch = () => {
+    navigation.navigate('Search');
+  };
+
   const navigateToHome = () => {
     navigation.navigate('HomeScreen');
   };
@@ -168,7 +172,7 @@ const PostCreationScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Button for search */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={() => console.log('Search button pressed')}>
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
           <Image source={require('../assets/icons/search.png')} style={styles.icon} />
         </TouchableOpacity>
 
@@ -312,7 +316,7 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: '#4CAF50',
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     borderRadius: 8,
     alignSelf: 'center', // מרכז את הכפתור במרכז האופקי של המסך
     marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
