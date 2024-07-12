@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     position: 'absolute',
-    top: 5,
-    right: 20,
+    top: 0,
+    right: 0,
     backgroundColor: '#4CAF50',
     paddingVertical: 10,
     paddingHorizontal: 15,
