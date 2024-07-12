@@ -4,7 +4,6 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'rea
 import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
 import myNetworkIcon from '../assets/icons/network.png';
-import users from './MockDB';
 
 
 const usersData = {
@@ -31,6 +30,10 @@ const UserProfileScreen = ({ route, navigation }) => {
   
   const navigateToLoginScreen = () => {
     navigation.navigate('LoginScreen');
+  };
+
+  const navigateToSearch = () => {
+    navigation.navigate('Search');
   };
   
   const navigateToProfile = () => {
@@ -117,7 +120,7 @@ const UserProfileScreen = ({ route, navigation }) => {
           </TouchableOpacity>
   
           {/* Button for search */}
-          <TouchableOpacity style={styles.bottomBarButton} onPress={() => console.log('Search button pressed')}>
+          <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
             <Image source={require('../assets/icons/search.png')} style={styles.icon} />
           </TouchableOpacity>
   

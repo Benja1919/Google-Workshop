@@ -10,6 +10,15 @@ const SearchScreen = () => {
   const navigation = useNavigation(); // Initialize navigation hook
   const db = DB(); // Initialize the mock database instance
 
+  const navigateToPostCreation = () => {
+    navigation.navigate('PostCreation');
+  };
+
+  const navigateToHome = () => {
+    navigation.navigate('HomeScreen');
+  };
+
+
   const handleSearch = (query) => {
     const users = Object.values(db.GetUsers());
     const posts = db.GetPosts();
@@ -46,7 +55,7 @@ const SearchScreen = () => {
         <TouchableOpacity onPress={() => handleUserPress(item.userName)}>
           <View style={styles.userItem}>
             <Image source={{ uri: item.profileImageUrl }} style={styles.profileImage} />
-            <Text>User: {item.userName}</Text>
+            <Text>{item.userName}</Text>
           </View>
         </TouchableOpacity>
       );
@@ -76,27 +85,27 @@ const SearchScreen = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
           <View>
-            <Image source={require('../assets/icons/fire.png')} style={styles.icon} />
+            <Image source={require('../assets/icons/fire.png')} style={styles.searchicon} />
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('burger')}>
           <View>
-            <Image source={require('../assets/icons/burger.png')} style={styles.icon} />
+            <Image source={require('../assets/icons/burger.png')} style={styles.searchicon} />
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('pizza')}>
           <View>
-            <Image source={require('../assets/icons/pizza.png')} style={styles.icon} />
+            <Image source={require('../assets/icons/pizza.png')} style={styles.searchicon} />
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('sushi')}>
           <View>
-            <Image source={require('../assets/icons/sushi.png')} style={styles.icon} />
+            <Image source={require('../assets/icons/sushi.png')} style={styles.searchicon} />
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('cake')}>
           <View>
-            <Image source={require('../assets/icons/cake.png')} style={styles.icon} />
+            <Image source={require('../assets/icons/cake.png')} style={styles.searchicon} />
           </View>
         </TouchableOpacity>
       </View>
@@ -112,7 +121,7 @@ const SearchScreen = () => {
           style={styles.searchButton}
           onPress={() => handleSearch(searchQuery)}
         >
-          <Image source={require('../assets/icons/search.png')} style={styles.searchIcon} />
+          <Image source={require('../assets/icons/search.png')} style={styles.searchbarIcon} />
         </TouchableOpacity>
       </View>
       
@@ -126,6 +135,30 @@ const SearchScreen = () => {
         keyExtractor={(item) => item.id ? item.id.toString() : item.userName}
         renderItem={renderResultItem}
       />
+
+        {/* Bottom bar */}
+        <View style={styles.bottomBar}>
+        
+        {/* Button for home */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
+          <Image source={require('../assets/icons/home.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button for search */}
+        <TouchableOpacity style={styles.bottomBarButton} >
+          <Image source={require('../assets/icons/search.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button to navigate to post creation */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
+        <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button for profile */}
+        <TouchableOpacity style={styles.bottomBarButton} >
+          <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -160,13 +193,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 5,
   },
-  searchIcon: {
+  searchbarIcon: {
     width: 20,
     height: 20,
   },
-  icon: {
+  searchicon: {
     width: 30,
     height: 30,
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff', // צבע רקע לפס הרציף
+    elevation: 10, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
+  },
+  bottomBarButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 7,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  icon: {
+    width: 25,
+    height: 25,
   },
   userItem: {
     flexDirection: 'row',
