@@ -108,7 +108,7 @@ const DB = () => {
 		};
 		GetRestaurant(post.restaurantName).starcount += post.stars;
 		GetRestaurant(post.restaurantName).reviewcount += 1;
-		posts.push(newPost);
+		posts.unshift(newPost);
 	};
 
 	/**
