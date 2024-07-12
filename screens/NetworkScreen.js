@@ -1,78 +1,297 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import Svg, { Circle, Line, Text as SvgText, Path } from 'react-native-svg';
-import * as shape from 'd3-shape';
+import React, { useState } from 'react'
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  Dimensions,
+  Modal,
+  ScrollView,
+} from 'react-native'
 
-const { width, height } = Dimensions.get('window');
+export default Users = () => {
+  const data = [
+    {
+      id: 1,
+      name: 'Mark Doe',
+      position: 'CEO',
+      image: 'https://bootdey.com/img/Content/avatar/avatar7.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 2,
+      name: 'John Doe',
+      position: 'CTO',
+      image: 'https://bootdey.com/img/Content/avatar/avatar1.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 3,
+      name: 'Clark Man',
+      position: 'Creative designer',
+      image: 'https://bootdey.com/img/Content/avatar/avatar6.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 4,
+      name: 'Jaden Boor',
+      position: 'Front-end dev',
+      image: 'https://bootdey.com/img/Content/avatar/avatar5.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 5,
+      name: 'Srick Tree',
+      position: 'Backend-end dev',
+      image: 'https://bootdey.com/img/Content/avatar/avatar4.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 6,
+      name: 'John Doe',
+      position: 'Creative designer',
+      image: 'https://bootdey.com/img/Content/avatar/avatar3.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 7,
+      name: 'John Doe',
+      position: 'Manager',
+      image: 'https://bootdey.com/img/Content/avatar/avatar2.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 8,
+      name: 'John Doe',
+      position: 'IOS dev',
+      image: 'https://bootdey.com/img/Content/avatar/avatar1.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 9,
+      name: 'John Doe',
+      position: 'Web dev',
+      image: 'https://bootdey.com/img/Content/avatar/avatar4.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+    {
+      id: 10,
+      name: 'John Doe',
+      position: 'Analyst',
+      image: 'https://bootdey.com/img/Content/avatar/avatar7.png',
+      about:
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
+    },
+  ]
 
-const nodes = [
-  { id: '1', name: 'User 1', x: 50, y: 50 },
-  { id: '2', name: 'User 2', x: 150, y: 150 },
-  { id: '3', name: 'User 3', x: 250, y: 50 },
-  { id: '4', name: 'User 4', x: 350, y: 150 },
-  { id: '5', name: 'User 5', x: 450, y: 50 },
-];
+  const [users, setUsers] = useState(data)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [userSelected, setUserSelected] = useState([])
 
-const links = [
-  { source: '1', target: '2' },
-  { source: '1', target: '3' },
-  { source: '2', target: '4' },
-  { source: '3', target: '4' },
-  { source: '4', target: '5' },
-];
-
-const NetworkScreen = () => {
-  const lineGenerator = shape.line()
-    .curve(shape.curveBundle.beta(1));
+  const selectUser = user => {
+    setUserSelected(user)
+    setModalVisible(true)
+  }
 
   return (
     <View style={styles.container}>
-      <Svg width={width} height={height}>
-        {links.map((link, index) => {
-          const source = nodes.find(node => node.id === link.source);
-          const target = nodes.find(node => node.id === link.target);
-          const linePath = lineGenerator([[source.x, source.y], [target.x, target.y]]);
-
+      <FlatList
+        style={styles.userList}
+        columnWrapperStyle={styles.listContainer}
+        data={users}
+        keyExtractor={item => {
+          return item.id
+        }}
+        renderItem={({ item }) => {
           return (
-            <Path
-              key={index}
-              d={linePath}
-              stroke="yellow"
-              strokeWidth="2"
-              fill="none"
-            />
-          );
-        })}
-        {nodes.map((node, index) => (
-          <React.Fragment key={index}>
-            <Circle
-              cx={node.x}
-              cy={node.y}
-              r={20}
-              fill="brown"
-            />
-            <SvgText
-              x={node.x}
-              y={node.y}
-              fill="white"
-              fontSize="10"
-              textAnchor="middle"
-              dy=".3em"
-            >
-              {node.name}
-            </SvgText>
-          </React.Fragment>
-        ))}
-      </Svg>
+            <TouchableOpacity style={styles.card} onPress={() => selectUser(item)}>
+              <Image style={styles.image} source={{ uri: item.image }} />
+              <View style={styles.cardContent}>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.position}>{item.position}</Text>
+                <TouchableOpacity
+                  style={styles.followButton}
+                  onPress={() => selectUser(item)}>
+                  <Text style={styles.followButtonText}>Follow</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          )
+        }}
+      />
+
+      <Modal
+        animationType={'fade'}
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+        visible={modalVisible}>
+        <View style={styles.popupOverlay}>
+          <View style={styles.popup}>
+            <View style={styles.popupContent}>
+              <ScrollView contentContainerStyle={styles.modalInfo}>
+                <Image style={styles.image} source={{ uri: userSelected.image }} />
+                <Text style={styles.name}>{userSelected.name}</Text>
+                <Text style={styles.position}>{userSelected.position}</Text>
+                <Text style={styles.about}>{userSelected.about}</Text>
+              </ScrollView>
+            </View>
+            <View style={styles.popupButtons}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(false)
+                }}
+                style={styles.btnClose}>
+                <Text style={styles.txtClose}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
+    marginTop: 20,
+    backgroundColor: '#eeeeee',
   },
-});
+  header: {
+    backgroundColor: '#00CED1',
+    height: 200,
+  },
+  headerContent: {
+    padding: 30,
+    alignItems: 'center',
+    flex: 1,
+  },
+  detailContent: {
+    top: 80,
+    height: 500,
+    width: Dimensions.get('screen').width - 90,
+    marginHorizontal: 30,
+    flexDirection: 'row',
+    position: 'absolute',
+    backgroundColor: '#ffffff',
+  },
+  userList: {
+    flex: 1,
+  },
+  cardContent: {
+    marginLeft: 20,
+    marginTop: 10,
+  },
+  image: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+  },
 
-export default NetworkScreen;
+  card: {
+    shadowColor: '#00000021',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    elevation: 12,
+
+    marginVertical: 10,
+    marginHorizontal: 20,
+    backgroundColor: 'white',
+    flexBasis: '46%',
+    padding: 10,
+    flexDirection: 'row',
+  },
+
+  name: {
+    fontSize: 18,
+    flex: 1,
+    alignSelf: 'center',
+    color: '#008080',
+    fontWeight: 'bold',
+  },
+  position: {
+    fontSize: 14,
+    flex: 1,
+    alignSelf: 'center',
+    color: '#696969',
+  },
+  about: {
+    marginHorizontal: 10,
+  },
+
+  followButton: {
+    marginTop: 10,
+    height: 35,
+    width: 100,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 30,
+    backgroundColor: '#00BFFF',
+  },
+  followButtonText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+  },
+  /************ modals ************/
+  popup: {
+    backgroundColor: 'white',
+    marginTop: 80,
+    marginHorizontal: 20,
+    borderRadius: 7,
+  },
+  popupOverlay: {
+    backgroundColor: '#00000057',
+    flex: 1,
+    marginTop: 30,
+  },
+  popupContent: {
+    //alignItems: 'center',
+    margin: 5,
+    height: 250,
+  },
+  popupHeader: {
+    marginBottom: 45,
+  },
+  popupButtons: {
+    marginTop: 15,
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderColor: '#eee',
+    justifyContent: 'center',
+  },
+  popupButton: {
+    flex: 1,
+    marginVertical: 16,
+  },
+  btnClose: {
+    flex:1,
+    height: 40,
+    backgroundColor: '#20b2aa',
+    padding:5,
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  modalInfo: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  txtClose:{
+    color:'white'
+  }
+})

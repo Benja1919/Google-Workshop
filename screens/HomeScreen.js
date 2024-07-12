@@ -1,39 +1,27 @@
-// HomeScreen.js
-
 import React, { useContext } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
 import PostsScreen from './PostsScreen';
 import { AuthContext } from './AuthContext';
 
-/**
- * HomeScreen component that displays the home screen with posts, 
- * a button to navigate to post creation, and a login/logout button.
- *
- * @param {Object} navigation - The navigation prop used for navigating between screens.
- */
 const HomeScreen = ({ navigation }) => {
-  
-  /**
-   * Navigates to the PostCreation screen.
-   */
+  const { isLoggedIn, logout } = useContext(AuthContext);
+
   const navigateToPostCreation = () => {
     navigation.navigate('PostCreation');
   };
 
-  /**
-   * Navigates to the LoginScreen.
-   */
   const navigateToLoginScreen = () => {
     navigation.navigate('LoginScreen');
   };
 
-  // Get authentication state and logout function from AuthContext
-  const { isLoggedIn, logout } = useContext(AuthContext);
+  const navigateToProfile = () => {
+    navigation.navigate('ProfileScreen');
+  };
 
-  /**
-   * Handles the press event for the login/logout button.
-   * If the user is logged in, logs out the user. Otherwise, navigates to the login screen.
-   */
+  const navigateToHome = () => {
+    navigation.navigate('HomeScreen');
+  };
+
   const handlePress = () => {
     if (isLoggedIn) {
       logout();
@@ -44,18 +32,36 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Display the posts screen */}
       <PostsScreen navigation={navigation} />
 
-      {/* Button to navigate to post creation */}
-      <TouchableOpacity style={styles.circularButton} onPress={navigateToPostCreation}>
-        <Text style={styles.buttonText}>+</Text>
-      </TouchableOpacity>
-
-      {/* Button to login/logout */}
+      {/* Top right corner for login/logout */}
       <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
         <Text style={styles.loginButtonText}>{isLoggedIn ? 'Logout' : 'Login'}</Text>
       </TouchableOpacity>
+
+      {/* Bottom bar */}
+      <View style={styles.bottomBar}>
+        
+        {/* Button for home */}
+        <TouchableOpacity style={styles.bottomBarButton} >
+          <Image source={require('../assets/icons/home.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button for search */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={() => console.log('Search button pressed')}>
+          <Image source={require('../assets/icons/search.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button to navigate to post creation */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
+        <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button for profile */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
+          <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -66,32 +72,41 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     padding: 10,
   },
-  circularButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#0f69ff',
-    justifyContent: 'center',
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
     position: 'absolute',
     bottom: 20,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff', // צבע רקע לפס הרציף
+    elevation: 10, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
+  },
+  bottomBarButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 7,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  loginButton: {
+    position: 'absolute',
+    top: 20,
     right: 20,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+  icon: {
+    width: 25,
+    height: 25,
   },
   buttonText: {
     color: 'white',
     fontSize: 24,
     fontWeight: 'bold',
-  },
-  loginButton: {
-    position: 'absolute',
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#4CAF50',
-    justifyContent: 'center',
-    alignItems: 'center',
-    bottom: 20,
-    right: 90,
   },
   loginButtonText: {
     color: '#fff',
