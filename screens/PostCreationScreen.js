@@ -265,11 +265,11 @@ const styles = StyleSheet.create({
   mediaButton: {
     backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 10,
   },
   mediaicon: {
-    width: 40,
-    height: 30,
+    width: 50,
+    height: 35,
   },
   buttonText: {
     color: 'white',
