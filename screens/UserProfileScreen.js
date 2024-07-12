@@ -4,7 +4,8 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'rea
 import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
 import myNetworkIcon from '../assets/icons/network.png';
-import { AuthContext } from './AuthContext';
+import users from './MockDB';
+
 
 const usersData = {
   'User123': {

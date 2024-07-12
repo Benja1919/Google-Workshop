@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
 import PostsScreen from './PostsScreen';
 import { AuthContext } from './AuthContext';
+import SearchScreen from './SearchScreen';
 
 const HomeScreen = ({ navigation }) => {
   const { isLoggedIn, logout } = useContext(AuthContext);
@@ -18,8 +19,8 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('ProfileScreen');
   };
 
-  const navigateToHome = () => {
-    navigation.navigate('HomeScreen');
+  const navigateToSearch = () => {
+    navigation.navigate('Search');
   };
 
   const handlePress = () => {
@@ -48,7 +49,7 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Button for search */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={() => console.log('Search button pressed')}>
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
           <Image source={require('../assets/icons/search.png')} style={styles.icon} />
         </TouchableOpacity>
 

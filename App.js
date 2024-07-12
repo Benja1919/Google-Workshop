@@ -11,6 +11,7 @@ import MyListsScreen from './screens/MyListsScreen';
 import NetworkScreen from './screens/NetworkScreen';
 import RecipesScreen from './screens/RecipesScreen';
 import LoginScreen from './screens/LoginScreen'
+import SearchScreen from './screens/SearchScreen'
 import { AuthProvider } from './screens/AuthContext';
 
 
@@ -40,6 +41,7 @@ const App = () => {
           <Stack.Screen name="Network" component={NetworkScreen} />
           <Stack.Screen name="Recipes" component={RecipesScreen} />
           <Stack.Screen name="PostCreation" component={PostCreationScreen} />
+          <Stack.Screen name="Search" component={SearchScreen} />
           <Stack.Screen name="Posts" component={PostsScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
         </Stack.Navigator>

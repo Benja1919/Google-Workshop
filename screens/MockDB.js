@@ -1,7 +1,3 @@
-/**
- * Array of post objects representing user reviews for restaurants.
- * Each post includes an id, userName, restaurantName, content, star rating, image URL, and profile image URL.
- */
 let posts = [
 	{
 		id: '0',
@@ -32,10 +28,6 @@ let posts = [
 	},
 ];
 
-/**
- * Object representing restaurant data.
- * Each restaurant includes a name, description, guest chef description, happy hour times, special dish description, profile image URL, star count, and review count.
- */
 const restaurantData = {
 	'Restaurant 1': {
 		name: 'Restaurant 1',
@@ -57,13 +49,8 @@ const restaurantData = {
 		starcount: 7,
 		reviewcount: 2,
 	},
-	// Add more restaurant data here...
 };
 
-/**
- * Object representing user data.
- * Each user includes a username, password, profile image URL, and a list of friends.
- */
 const users = {
 	'user123': {
 		userName: 'User123',
@@ -79,24 +66,11 @@ const users = {
 	}
 }
 
-/**
- * Mock database module to handle operations related to posts, restaurants, and users.
- */
 const DB = () => {
-	/**
-	 * Retrieves all posts from the database.
-	 *
-	 * @returns {Array} Array of post objects.
-	 */
 	const GetPosts = () => {
 		return posts;
 	};
 
-	/**
-	 * Adds a new post to the database.
-	 *
-	 * @param {Object} post - The post object to add.
-	 */
 	const AddPost = (post) => {
 		const newPost = {
 			id: posts.length.toString(),
@@ -104,30 +78,17 @@ const DB = () => {
 			restaurantName: post.restaurantName,
 			stars: post.stars,
 			content: post.content,
-			imageUrl: post.imageUrl // Adds the imageUrl
+			imageUrl: post.imageUrl
 		};
 		GetRestaurant(post.restaurantName).starcount += post.stars;
 		GetRestaurant(post.restaurantName).reviewcount += 1;
 		posts.unshift(newPost);
 	};
 
-	/**
-	 * Retrieves restaurant data by name.
-	 *
-	 * @param {string} rest - The name of the restaurant.
-	 * @returns {Object} The restaurant object.
-	 */
 	const GetRestaurant = (rest) => {
 		return restaurantData[rest];
 	};
 
-	/**
-	 * Retrieves user data by username and password.
-	 *
-	 * @param {string} userName - The username.
-	 * @param {string} password - The password.
-	 * @returns {Object|null} The user object if credentials are valid, otherwise null.
-	 */
 	const GetUserName = (userName, password) => {
 		const user = users[userName.toLowerCase()];
 		if (user && user.password === password) {
@@ -137,11 +98,17 @@ const DB = () => {
 		}
 	};
 
+    // Add this function to get all users
+    const GetUsers = () => {
+        return users;
+    };
+
 	return {
 		GetPosts,
 		AddPost,
 		GetRestaurant,
-		GetUserName
+		GetUserName,
+        GetUsers  // Export the new function
 	};
 };
 

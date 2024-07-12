@@ -1,234 +1,216 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Button, Alert, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
 
-const MyListsScreen = ({ route }) => {
-  const { userName } = route.params;
-  const navigation = useNavigation();
-  const [lists, setLists] = useState({
-    'Wish List': [
-      { id: '1', name: 'Restaurant 1' },
-      { id: '2', name: 'Restaurant B' },
-      { id: '3', name: 'Restaurant C' },
-    ],
-    'Been To': [
-      { id: '1', name: 'Restaurant X' },
-      { id: '2', name: 'Restaurant Y' },
-      { id: '3', name: 'Restaurant Z' },
-    ],
-  });
+const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEditing, editItemText, setEditItemText }) => {
+  if (isEditing) {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+        <TextInput
+          style={{ flex: 1, height: 40, borderColor: 'gray', borderWidth: 1, padding: 5 }}
+          value={editItemText}
+          onChangeText={text => setEditItemText(text)}
+        />
+        <TouchableOpacity
+          style={{ backgroundColor: 'green', padding: 5, marginLeft: 10, borderRadius: 5 }}
+          onPress={onSave}
+        >
+          <Text style={{ color: 'white' }}>Save</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ backgroundColor: 'red', padding: 5, marginLeft: 10, borderRadius: 5 }}
+          onPress={onCancel}
+        >
+          <Text style={{ color: 'white' }}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  } else {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+        <Text style={{ flex: 1, marginLeft: 10 }}>{item.name}</Text>
+        <TouchableOpacity
+          style={{ backgroundColor: 'blue', padding: 5, marginLeft: 10, borderRadius: 5 }}
+          onPress={onStartEdit}
+        >
+          <Text style={{ color: 'white' }}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ backgroundColor: 'red', padding: 5, marginLeft: 10, borderRadius: 5 }}
+          onPress={onDelete}
+        >
+          <Text style={{ color: 'white' }}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+};
+
+const MyListsScreen = () => {
+  const [lists, setLists] = useState([]);
   const [newListName, setNewListName] = useState('');
-  const [newItemName, setNewItemName] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [currentEditList, setCurrentEditList] = useState('');
-  const [currentEditItem, setCurrentEditItem] = useState(null);
+  const [newItemText, setNewItemText] = useState('');
+  const [editItemId, setEditItemId] = useState(null);
+  const [editItemText, setEditItemText] = useState('');
 
-  const renderListItem = ({ item, listName }) => (
-    <TouchableOpacity style={styles.listItem} onPress={() => goToRestaurant(item.name)} onLongPress={() => openEditModal(listName, item)}>
-      <Text style={styles.itemText}>{item.name}</Text>
-    </TouchableOpacity>
-  );
-
-  const goToRestaurant = (restaurantName) => {
-    navigation.navigate('RestaurantScreen', { restaurantName });
-  };
-
-  const addNewList = () => {
+  const createNewList = () => {
     if (newListName.trim() === '') {
-      Alert.alert('Error', 'List name cannot be empty');
+      alert('Please enter a valid list name');
       return;
     }
-    if (lists[newListName]) {
-      Alert.alert('Error', 'List with this name already exists');
-      return;
-    }
-
-    setLists({
-      ...lists,
-      [newListName]: [],
-    });
+    const newList = { id: Date.now().toString(), name: newListName, items: [] };
+    setLists([...lists, newList]);
     setNewListName('');
   };
 
-  const addItemToList = (listName) => {
-    if (newItemName.trim() === '') {
-      Alert.alert('Error', 'Item name cannot be empty');
+  const addItemToList = (listId) => {
+    if (newItemText.trim() === '') {
+      alert('Please enter a valid item name');
       return;
     }
-
-    const updatedList = [...lists[listName], { id: `${Date.now()}`, name: newItemName }];
-    setLists({
-      ...lists,
-      [listName]: updatedList,
-    });
-    setNewItemName('');
-  };
-
-  const openEditModal = (listName, item) => {
-    setCurrentEditList(listName);
-    setCurrentEditItem(item);
-    setNewItemName(item.name);  // Set the newItemName to the current item name for editing
-    setModalVisible(true);
-  };
-
-  const handleEditItem = () => {
-    if (newItemName.trim() === '') {
-      Alert.alert('Error', 'Item name cannot be empty');
-      return;
-    }
-
-    const updatedList = lists[currentEditList].map((item) =>
-      item.id === currentEditItem.id ? { ...item, name: newItemName } : item
+    const updatedLists = lists.map(list =>
+      list.id === listId ? { ...list, items: [...list.items, { id: Date.now().toString(), name: newItemText }] } : list
     );
-    setLists({
-      ...lists,
-      [currentEditList]: updatedList,
-    });
-    setModalVisible(false);
-    setNewItemName('');
+    setLists(updatedLists);
+    setNewItemText('');
   };
 
-  const handleDeleteItem = () => {
-    const updatedList = lists[currentEditList].filter((item) => item.id !== currentEditItem.id);
-    setLists({
-      ...lists,
-      [currentEditList]: updatedList,
-    });
-    setModalVisible(false);
+  const startEditItem = (itemId, itemName) => {
+    setEditItemId(itemId);
+    setEditItemText(itemName);
+  };
+
+  const saveEditItem = () => {
+    const updatedLists = lists.map(list =>
+      list.id === editItemId ? { ...list, items: list.items.map(item =>
+        item.id === editItemId ? { ...item, name: editItemText } : item
+      ) } : list
+    );
+    setLists(updatedLists);
+    setEditItemId(null);
+    setEditItemText('');
+  };
+
+  const cancelEditItem = () => {
+    setEditItemId(null);
+    setEditItemText('');
+  };
+
+  const deleteItem = (listId, itemId) => {
+    const updatedLists = lists.map(list =>
+      list.id === listId ? { ...list, items: list.items.filter(item => item.id !== itemId) } : list
+    );
+    setLists(updatedLists);
+  };
+
+  const createTop10List = (title, items) => {
+    const top10List = {
+      id: Date.now().toString(),
+      name: title,
+      items: items.map((item, index) => ({ id: index.toString(), name: `${index + 1}. ${item}` })),
+    };
+    setLists([...lists, top10List]);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Lists for {userName}</Text>
+    <View style={{ flex: 1, padding: 20 }}>
+      <Text style={{ fontSize: 24, marginBottom: 20 }}>My Lists</Text>
 
-      {Object.keys(lists).map((listName) => (
-        <View key={listName} style={styles.listContainer}>
-          <Text style={styles.listTitle}>{listName}</Text>
-          <FlatList
-            data={lists[listName]}
-            renderItem={({ item }) => renderListItem({ item, listName })}
-            keyExtractor={(item) => item.id}
-            style={styles.list}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="New item name"
-            value={newItemName}
-            onChangeText={setNewItemName}
-          />
-          <Button title="Add Item" onPress={() => addItemToList(listName)} />
-        </View>
-      ))}
-
-      <View style={styles.addListContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="New list name"
-          value={newListName}
-          onChangeText={setNewListName}
-        />
-        <Button title="Add List" onPress={addNewList} />
-      </View>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+      {/* Input for new list name */}
+      <TextInput
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 5 }}
+        placeholder="Enter new list name"
+        value={newListName}
+        onChangeText={text => setNewListName(text)}
+      />
+      <TouchableOpacity
+        style={{ backgroundColor: 'blue', padding: 10, alignItems: 'center', borderRadius: 5 }}
+        onPress={createNewList}
       >
-        <View style={styles.modalView}>
-          <TextInput
-            style={styles.input}
-            placeholder="Edit item name"
-            value={newItemName}
-            onChangeText={setNewItemName}
-          />
-          <View style={styles.modalButtonContainer}>
-            <Button title="Save" onPress={handleEditItem} />
-            <Button title="Delete" onPress={handleDeleteItem} color="red" />
-            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+        <Text style={{ color: 'white' }}>Create New List</Text>
+      </TouchableOpacity>
+
+      {/* Predefined Lists */}
+      <TouchableOpacity
+        style={{ backgroundColor: 'green', padding: 10, alignItems: 'center', borderRadius: 5, marginTop: 10 }}
+        onPress={() => createTop10List('Top 10 Burgers', [
+          'Cheeseburger',
+          'Bacon Burger',
+          'Mushroom Swiss Burger',
+          'BBQ Burger',
+          'Guacamole Burger',
+          'Double Cheeseburger',
+          'Veggie Burger',
+          'Turkey Burger',
+          'Black Bean Burger',
+          'Buffalo Chicken Burger',
+        ])}
+      >
+        <Text style={{ color: 'white' }}>Create Top 10 Burgers</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{ backgroundColor: 'green', padding: 10, alignItems: 'center', borderRadius: 5, marginTop: 10 }}
+        onPress={() => createTop10List('Top 10 Pizzas', [
+          'Margherita Pizza',
+          'Pepperoni Pizza',
+          'Hawaiian Pizza',
+          'BBQ Chicken Pizza',
+          'Vegetarian Pizza',
+          'Meat Lovers Pizza',
+          'Buffalo Chicken Pizza',
+          'Mushroom Pizza',
+          'White Pizza',
+          'Pesto Pizza',
+        ])}
+      >
+        <Text style={{ color: 'white' }}>Create Top 10 Pizzas</Text>
+      </TouchableOpacity>
+
+      {/* Display lists */}
+      <FlatList
+        style={{ marginTop: 20 }}
+        data={lists}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View style={{ marginBottom: 15 }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.name}</Text>
+            {/* Display items */}
+            <FlatList
+              data={item.items}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <EditableListItem
+                  item={item}
+                  onSave={saveEditItem}
+                  onCancel={cancelEditItem}
+                  onStartEdit={() => startEditItem(item.id, item.name)}
+                  onDelete={() => deleteItem(item.id, item.id)}
+                  isEditing={editItemId === item.id}
+                  editItemText={editItemText}
+                  setEditItemText={setEditItemText}
+                />
+              )}
+            />
+            {/* Input for new item */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+              <TextInput
+                style={{ flex: 1, height: 40, borderColor: 'gray', borderWidth: 1, padding: 5 }}
+                placeholder="Enter new item"
+                value={newItemText}
+                onChangeText={text => setNewItemText(text)}
+              />
+              <TouchableOpacity
+                style={{ backgroundColor: 'blue', padding: 10, marginLeft: 10, borderRadius: 5 }}
+                onPress={() => addItemToList(item.id)}
+              >
+                <Text style={{ color: 'white' }}>Add Item</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        )}
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#333',
-    textAlign: 'center',
-  },
-  listContainer: {
-    marginBottom: 16,
-  },
-  listTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#555',
-  },
-  list: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  listItem: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  itemText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  addListContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 8,
-    marginRight: 8,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 16,
-  },
-});
 
 export default MyListsScreen;
