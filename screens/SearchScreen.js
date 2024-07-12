@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 import DB from './MockDB'; // Assuming MockDB.js is in the same directory
@@ -7,6 +7,7 @@ const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isUserSearch, setIsUserSearch] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]);
   const navigation = useNavigation(); // Initialize navigation hook
   const db = DB(); // Initialize the mock database instance
 
@@ -18,7 +19,7 @@ const SearchScreen = () => {
     navigation.navigate('HomeScreen');
   };
 
-
+  // Function to handle search
   const handleSearch = (query) => {
     const users = Object.values(db.GetUsers());
     const posts = db.GetPosts();
@@ -38,6 +39,34 @@ const SearchScreen = () => {
       setSearchResults(filteredPosts);
       setIsUserSearch(false);
     }
+
+    // Update recent searches
+    updateRecentSearches(query);
+  };
+
+  // Function to update recent searches
+  const updateRecentSearches = (query) => {
+    if (query && !recentSearches.includes(query)) {
+      const updatedSearches = [query, ...recentSearches.slice(0, 4)]; // Add query to the beginning and limit to 5 recent searches
+      setRecentSearches(updatedSearches);
+    }
+  };
+
+  // Load recent searches on component mount
+  useEffect(() => {
+    // Load recent searches from storage or initialize if empty
+    // Example using AsyncStorage:
+    // const loadRecentSearches = async () => {
+    //   const searches = await AsyncStorage.getItem('recentSearches');
+    //   setRecentSearches(searches ? JSON.parse(searches) : []);
+    // };
+    // loadRecentSearches();
+  }, []);
+
+  // Function to handle click on recent search item
+  const handleRecentSearchPress = (query) => {
+    setSearchQuery(query);
+    handleSearch(query);
   };
 
   const handleUserPress = (userName) => {
@@ -79,9 +108,19 @@ const SearchScreen = () => {
     </View>
   );
 
+  const renderRecentSearches = () => (
+    <View style={styles.recentSearchesContainer}>
+      <Text style={styles.recentSearchesTitle}>Recent Searches</Text>
+      {recentSearches.map((query, index) => (
+        <TouchableOpacity key={index} onPress={() => handleRecentSearchPress(query)}>
+          <Text style={styles.recentSearch}>{query}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+
   return (
     <View style={{ flex: 1, padding: 20 }}>
-     
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
           <View>
@@ -125,10 +164,14 @@ const SearchScreen = () => {
         </TouchableOpacity>
       </View>
       
-      {searchResults.length === 0 && (
+      {searchResults.length === 0 && recentSearches.length > 0 && (
+        renderRecentSearches()
+      )}
+
+      {searchResults.length === 0 && recentSearches.length === 0 && (
         renderNoResults()
       )}
-      
+
       <FlatList
         style={{ marginTop: 20 }}
         data={searchResults}
@@ -136,9 +179,8 @@ const SearchScreen = () => {
         renderItem={renderResultItem}
       />
 
-        {/* Bottom bar */}
-        <View style={styles.bottomBar}>
-        
+      {/* Bottom bar */}
+      <View style={styles.bottomBar}>
         {/* Button for home */}
         <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
           <Image source={require('../assets/icons/home.png')} style={styles.icon} />
@@ -151,7 +193,7 @@ const SearchScreen = () => {
 
         {/* Button to navigate to post creation */}
         <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
-        <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
+          <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
         </TouchableOpacity>
 
         {/* Button for profile */}
@@ -210,8 +252,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 20,
-    backgroundColor: '#fff', // צבע רקע לפס הרציף
-    elevation: 10, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
+    backgroundColor: '#fff',
+    elevation: 10,
   },
   bottomBarButton: {
     backgroundColor: '#fff',
@@ -249,6 +291,19 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 18,
     color: 'gray',
+  },
+  recentSearchesContainer: {
+    marginTop: 20,
+  },
+  recentSearchesTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  recentSearch: {
+    fontSize: 14,
+    color: 'blue',
+    marginBottom: 5,
   },
 });
 
