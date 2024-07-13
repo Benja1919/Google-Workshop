@@ -3,19 +3,28 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import PostsScreen from './PostsScreen';
-import { firestoreDB } from './Firebase-config';
+import { firestoreDB } from './FirebaseDB';
 
 const RestaurantScreen = ({ route, navigation }) => {
   const [restaurant, setRestaurant] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { restaurantName } = route.params;
-  console.log(restaurantName)
   useEffect(() => {
     const fetchRestaurant = async () => {
       setRestaurant(await firestoreDB().GetRestaurant(restaurantName));
+      setLoading(false);
     };
 
     fetchRestaurant();
   }, [restaurantName]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.header}>LOADING</Text>
+      </View>
+    );
+  }
 
   if (!restaurant) {
     return (

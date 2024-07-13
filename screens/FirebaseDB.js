@@ -39,8 +39,6 @@ export const firestoreDB = () => {
 		};
         const postsCollectionRef = collection(firestore, 'posts');
         const docRef = await addDoc(postsCollectionRef, newPost);
-        console.log('Document written with ID: ', docRef.id);
-		
 		GetRestaurant(post.restaurantName).starcount += post.stars;
 		GetRestaurant(post.restaurantName).reviewcount += 1;
 	};

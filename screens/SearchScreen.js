@@ -4,7 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } 
 import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import { firestoreDB } from './Firebase-config';
+import { firestoreDB } from './FirebaseDB';
 
 const SearchScreen = () => {
   const { isLoggedIn} = useContext(AuthContext);

@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import { firestoreDB } from './Firebase-config';
+import { firestoreDB } from './FirebaseDB';
 /**
  * LoginScreen component that allows users to log in by entering their username and password.
  *

@@ -6,7 +6,7 @@ import * as Location from 'expo-location';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { AuthContext } from './AuthContext';
-import { firestoreDB } from './Firebase-config';
+import { firestoreDB } from './FirebaseDB';
 
 const GOOGLE_PLACES_API_KEY = 'YOUR_GOOGLE_PLACES_API_KEY'; // Replace with your Google Places API key
 
