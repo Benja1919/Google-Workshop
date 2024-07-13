@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import Video from 'react-native-video';
-import Carousel from 'react-native-reanimated-carousel';
-
-const { width: viewportWidth } = Dimensions.get('window');
 
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [paused, setPaused] = useState(false);
     const [videoError, setVideoError] = useState(null);
-    const [activeSlide, setActiveSlide] = useState(0);
 
     const mediaItems = Array.isArray(post.mediaUrls)
         ? post.mediaUrls.map((url, index) => ({
@@ -26,6 +22,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                     resizeMode="cover"
                     controls={true}
                     paused={paused}
+                    onLoad={() => setPaused(false)}
                     onBuffer={({ isBuffering }) => setPaused(isBuffering)}
                     onError={(error) => {
                         console.log('Video Error:', error);
@@ -50,30 +47,16 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
             <TouchableOpacity onPress={() => navigateToRestaurant(post.restaurantName)}>
                 <Text style={styles.restaurantName}>{post.restaurantName}</Text>
             </TouchableOpacity>
-            {mediaItems.length > 1 ? (
-                <>
-                    <Carousel
-                        data={mediaItems}
-                        renderItem={renderItem}
-                        width={viewportWidth}
-                        height={200}
-                        onSnapToItem={(index) => setActiveSlide(index)}
-                    />
-                    <View style={styles.paginationContainer}>
-                        {mediaItems.map((_, index) => (
-                            <View
-                                key={index}
-                                style={[
-                                    styles.paginationDot,
-                                    { opacity: index === activeSlide ? 1 : 0.4 }
-                                ]}
-                            />
-                        ))}
-                    </View>
-                </>
-            ) : (
-                renderItem({ item: mediaItems[0] })
-            )}
+            <FlatList
+                data={mediaItems}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                snapToAlignment="center"
+                decelerationRate="fast"
+            />
             {videoError && <Text style={styles.errorText}>{videoError}</Text>}
             <Text style={styles.content}>{post.content}</Text>
         </View>
@@ -123,9 +106,11 @@ const styles = StyleSheet.create({
         color: '#ffd700',
     },
     media: {
-        width: viewportWidth,
+        width: Dimensions.get('window').width - 30, // Reduce width to accommodate padding
         height: 200,
         borderRadius: 8,
+        marginRight: 10,
+        marginBottom: 10,
     },
     content: {
         fontSize: 16,
@@ -135,19 +120,6 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 14,
         marginTop: 10,
-    },
-    paginationContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginVertical: 10,
-    },
-    paginationDot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        marginHorizontal: 4,
     },
 });
 
