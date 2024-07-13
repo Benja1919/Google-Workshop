@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, Button, Image, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
-
+import { useNavigationState } from '@react-navigation/native';
+import { AuthContext } from '../AuthContext';
 const BottomBarComponent = ({ navigation }) => {
+    const route = useNavigationState(state => state.routes[state.index]);
+    const {isLoggedIn} = useContext(AuthContext);
     const navigateToPostCreation = () => {
-        navigation.navigate('PostCreation');
+        if(isLoggedIn){
+            navigation.navigate('PostCreation');
+        }
       };
     
       const navigateToLoginScreen = () => {
@@ -12,7 +17,12 @@ const BottomBarComponent = ({ navigation }) => {
       };
     
       const navigateToProfile = () => {
-        navigation.navigate('ProfileScreen');
+        if(isLoggedIn){
+            navigation.navigate('ProfileScreen');
+        }
+        else{
+            navigation.navigate('LoginScreen');
+        }
       };
     
       const navigateToSearch = () => {
@@ -27,23 +37,23 @@ const BottomBarComponent = ({ navigation }) => {
       <View style={styles.bottomBar}>
         
         {/* Button for home */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
+        <TouchableOpacity style={route.name != "HomeScreen" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToHome}>
           <Image source={require('../../assets/icons/home.png')} style={styles.icon} />
         </TouchableOpacity>
 
         {/* Button for search */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
+        <TouchableOpacity style={route.name != "Search" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToSearch}>
           <Image source={require('../../assets/icons/search.png')} style={styles.icon} />
         </TouchableOpacity>
 
         {/* Button to navigate to post creation */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
-        <Image source={require('../../assets/icons/plus.png')} style={styles.icon} />
+        <TouchableOpacity style={(isLoggedIn && route.name != "PostCreation") ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToPostCreation}>
+        <Image source={require('../../assets/icons/plus4.png')} style={styles.icon} />
         </TouchableOpacity>
 
         {/* Button for profile */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
-          <Image source={require('../../assets/icons/profile.png')} style={styles.icon} />
+        <TouchableOpacity style={route.name != "LoginScreen" && route.name != "ProfileScreen" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToProfile}>
+          <Image source={isLoggedIn ? require('../../assets/icons/profile.png') : require('../../assets/icons/login2.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
     </View>
@@ -73,8 +83,14 @@ const styles = StyleSheet.create({
       paddingHorizontal: 15,
       borderRadius: 8,
     },
+    bottomBarButtondisabled: {
+        backgroundColor: '#ccc',
+        paddingVertical: 7,
+        paddingHorizontal: 15,
+        borderRadius: 0,
+      },
     icon: {
-      width: 25,
+      width: 26,
       height: 25,
     },
     buttonText: {

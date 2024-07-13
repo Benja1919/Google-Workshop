@@ -1,9 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 import DB from './MockDB'; // Assuming MockDB.js is in the same directory
 import BottomBarComponent from './components/BottomBar';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 const SearchScreen = () => {
+  const { isLoggedIn} = useContext(AuthContext);
+  const onGestureEvent = (event) => {
+    if (event.nativeEvent.translationX < -100) {
+      if(isLoggedIn){
+        navigation.navigate('PostCreation');
+      }
+      else{
+        navigation.navigate('LoginScreen');
+      }
+    }
+    else if (event.nativeEvent.translationX > 100) {
+      navigation.navigate('HomeScreen');
+    }
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isUserSearch, setIsUserSearch] = useState(false);
@@ -63,6 +79,7 @@ const SearchScreen = () => {
   };
 
   const handleUserPress = (userName) => {
+
     navigation.navigate('UserProfile', { userName });
   };
 
@@ -113,6 +130,9 @@ const SearchScreen = () => {
   );
 
   return (
+    <PanGestureHandler
+      onGestureEvent={onGestureEvent}
+    >
     <View style={{ flex: 1, padding: 20 }}>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
@@ -175,6 +195,7 @@ const SearchScreen = () => {
       <View Push style={styles.Pusher}/>
       <BottomBarComponent navigation={navigation}/>
     </View>
+    </PanGestureHandler>
   );
 };
 

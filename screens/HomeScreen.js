@@ -4,20 +4,34 @@ import PostsScreen from './PostsScreen';
 import { AuthContext } from './AuthContext';
 import SearchScreen from './SearchScreen';
 import BottomBarComponent from './components/BottomBar';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 const HomeScreen = ({ navigation }) => {
-  const { isLoggedIn, logout } = useContext(AuthContext);
-
+  const { isLoggedIn} = useContext(AuthContext);
+  const onGestureEvent = (event) => {
+    if (event.nativeEvent.translationX < -50) {
+      navigation.navigate('Search');
+    }
+    else if (event.nativeEvent.translationX > 50) {
+      if(isLoggedIn){
+      navigation.navigate('ProfileScreen');
+      }
+      else{
+        navigation.navigate('LoginScreen');
+      }
+    }
+  };
   
 
 
   return (
-    <View style={styles.container}>
-      
-      <PostsScreen navigation={navigation} />
-      <BottomBarComponent navigation={navigation} />
-      
+    <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
+      <View style={styles.container}>
+        <PostsScreen navigation={navigation} />
+        <BottomBarComponent navigation={navigation} />
+        
 
-    </View>
+      </View>
+    </PanGestureHandler>
   );
 };
 

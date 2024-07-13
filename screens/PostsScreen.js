@@ -92,13 +92,11 @@ const PostsScreen = ({ navigation, route }) => {
   );
 
   return (
-    <View style={styles.container}>
       <FlatList
         data={posts}
         renderItem={renderPost}
         keyExtractor={(item) => item.id}
       />
-    </View>
   );
 };
 
