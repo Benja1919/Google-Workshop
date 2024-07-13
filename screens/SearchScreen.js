@@ -2,9 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import navigation hook
-import DB from './MockDB'; // Assuming MockDB.js is in the same directory
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
+import { firestoreDB } from './Firebase-config';
+
 const SearchScreen = () => {
   const { isLoggedIn} = useContext(AuthContext);
   const onGestureEvent = (event) => {
@@ -25,7 +26,7 @@ const SearchScreen = () => {
   const [isUserSearch, setIsUserSearch] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
   const navigation = useNavigation(); // Initialize navigation hook
-  const db = DB(); // Initialize the mock database instance
+  const db = firestoreDB(); // Initialize the mock database instance
 
 
   // Function to handle search

@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Image, Alert } from 'react-native';
 import { AuthContext } from './AuthContext';
-import DB from './MockDB';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
+
 const CurrentUserProfile = ({ navigation }) => {
     const { isLoggedIn, logout, currentUser } = useContext(AuthContext);
     const onGestureEvent = (event) => {

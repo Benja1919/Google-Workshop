@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
 import { AuthContext } from './AuthContext';
-import DB from './MockDB'; // Import the mock database
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { firestoreDB } from './Firebase-config';
 /**
  * LoginScreen component that allows users to log in by entering their username and password.
  *
@@ -29,13 +29,13 @@ const LoginScreen = ({ navigation }) => {
    * Handles the login button press event.
    * Checks if the input fields are filled, validates the user, and logs them in if valid.
    */
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (userName === '' || password === '') {
       Alert.alert('Error', 'Please fill in both fields');
       return;
     }
     
-    const user = DB().GetUserName(userName, password);
+    const user = await firestoreDB().TryLoginUser(userName, password);
     if (user) {
       login(user);
       Alert.alert('Success', `Logged in as: ${user.userName}`);

@@ -3,10 +3,11 @@ import { View, Text, TextInput, Button, Image, StyleSheet, Alert, TouchableOpaci
 import StarRating from 'react-native-star-rating-widget';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import DB from './MockDB';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { AuthContext } from './AuthContext';
+import { firestoreDB } from './Firebase-config';
+
 const GOOGLE_PLACES_API_KEY = 'YOUR_GOOGLE_PLACES_API_KEY'; // Replace with your Google Places API key
 
 const PostCreationScreen = ({ navigation }) => {
@@ -101,7 +102,7 @@ const PostCreationScreen = ({ navigation }) => {
     setMediaUris(mediaUris.filter(mediaUri => mediaUri !== uri));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!restaurantName || stars <= 0 || !content || mediaUris.length === 0) {
       Alert.alert('Error', 'Please fill in all fields and select at least one image, video, or GIF');
       return;
@@ -118,7 +119,7 @@ const PostCreationScreen = ({ navigation }) => {
       location: location ? `${location.coords.latitude}, ${location.coords.longitude}` : null,
     };
 
-    DB().AddPost(newPost);
+    await firestoreDB().AddPost(newPost);
     navigation.goBack();
   };
 

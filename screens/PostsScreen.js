@@ -1,18 +1,7 @@
 import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import PostComponent from './PostComponent'; // Ensure the import path is correct
-import DB from './MockDB';
-
-/**
- * fetchPosts
- *
- * Mock function to fetch posts from the mock database.
- *
- * @returns {Promise<Array>} A promise that resolves to an array of posts.
- */
-const fetchPosts = async () => {
-  return DB().GetPosts();
-};
+import { firestoreDB } from './Firebase-config';
 
 /**
  * PostsScreen
@@ -30,7 +19,7 @@ const PostsScreen = ({ navigation, route }) => {
   React.useEffect(() => {
     const loadPosts = async () => {
       try {
-        const allPosts = await fetchPosts();
+        const allPosts = await firestoreDB().GetPosts();
         const filterRestaurantName = route?.params?.filterrestaurantName; // Optional chaining
         const filterUserName = route?.params?.filterUserName; // Optional chaining
 

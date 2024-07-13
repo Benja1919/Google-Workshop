@@ -1,13 +1,21 @@
 // Updated RestaurantScreen.js
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import PostsScreen from './PostsScreen';
-import DB from './MockDB';
+import { firestoreDB } from './Firebase-config';
 
 const RestaurantScreen = ({ route, navigation }) => {
+  const [restaurant, setRestaurant] = useState(null);
   const { restaurantName } = route.params;
-  const restaurant = DB().GetRestaurant(restaurantName);
+  console.log(restaurantName)
+  useEffect(() => {
+    const fetchRestaurant = async () => {
+      setRestaurant(await firestoreDB().GetRestaurant(restaurantName));
+    };
+
+    fetchRestaurant();
+  }, [restaurantName]);
 
   if (!restaurant) {
     return (

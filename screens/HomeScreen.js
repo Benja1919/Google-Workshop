@@ -5,6 +5,7 @@ import { AuthContext } from './AuthContext';
 import SearchScreen from './SearchScreen';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+
 const HomeScreen = ({ navigation }) => {
   const { isLoggedIn} = useContext(AuthContext);
   const onGestureEvent = (event) => {
