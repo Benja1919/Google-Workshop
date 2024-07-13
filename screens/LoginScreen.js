@@ -30,7 +30,7 @@ const LoginScreen = ({ navigation }) => {
     if (user) {
       login(user);
       Alert.alert('Success', `Logged in as: ${user.userName}`);
-      navigation.navigate('Home');
+      navigation.navigate('HomeScreen');
     } else {
       Alert.alert('Error', 'Invalid username or password');
     }

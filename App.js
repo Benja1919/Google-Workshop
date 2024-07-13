@@ -13,6 +13,7 @@ import RecipesScreen from './screens/RecipesScreen';
 import LoginScreen from './screens/LoginScreen'
 import SearchScreen from './screens/SearchScreen'
 import { AuthProvider } from './screens/AuthContext';
+import CurrentUserProfile from './screens/CurrentUserProfileScreen'
 
 
 const Stack = createStackNavigator();
@@ -36,6 +37,7 @@ const App = () => {
             }}
           />
           <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+          <Stack.Screen name="ProfileScreen" component={CurrentUserProfile} />
           <Stack.Screen name="Restaurant" component={RestaurantScreen} />
           <Stack.Screen name="MyLists" component={MyListsScreen} />
           <Stack.Screen name="Network" component={NetworkScreen} />

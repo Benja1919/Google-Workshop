@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 import DB from './MockDB'; // Assuming MockDB.js is in the same directory
-
+import BottomBarComponent from './components/BottomBar';
 const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -11,13 +11,6 @@ const SearchScreen = () => {
   const navigation = useNavigation(); // Initialize navigation hook
   const db = DB(); // Initialize the mock database instance
 
-  const navigateToPostCreation = () => {
-    navigation.navigate('PostCreation');
-  };
-
-  const navigateToHome = () => {
-    navigation.navigate('HomeScreen');
-  };
 
   // Function to handle search
   const handleSearch = (query) => {
@@ -179,33 +172,16 @@ const SearchScreen = () => {
         renderItem={renderResultItem}
       />
 
-      {/* Bottom bar */}
-      <View style={styles.bottomBar}>
-        {/* Button for home */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
-          <Image source={require('../assets/icons/home.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button for search */}
-        <TouchableOpacity style={styles.bottomBarButton} >
-          <Image source={require('../assets/icons/search.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button to navigate to post creation */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
-          <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button for profile */}
-        <TouchableOpacity style={styles.bottomBarButton} >
-          <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
-        </TouchableOpacity>
-      </View>
+      <View Push style={styles.Pusher}/>
+      <BottomBarComponent navigation={navigation}/>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  Pusher:{
+    flex: 1,
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

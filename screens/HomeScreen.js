@@ -1,68 +1,22 @@
 import React, { useContext } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Image, Alert } from 'react-native';
 import PostsScreen from './PostsScreen';
 import { AuthContext } from './AuthContext';
 import SearchScreen from './SearchScreen';
-
+import BottomBarComponent from './components/BottomBar';
 const HomeScreen = ({ navigation }) => {
   const { isLoggedIn, logout } = useContext(AuthContext);
 
-  const navigateToPostCreation = () => {
-    navigation.navigate('PostCreation');
-  };
+  
 
-  const navigateToLoginScreen = () => {
-    navigation.navigate('LoginScreen');
-  };
-
-  const navigateToProfile = () => {
-    navigation.navigate('ProfileScreen');
-  };
-
-  const navigateToSearch = () => {
-    navigation.navigate('Search');
-  };
-
-  const handlePress = () => {
-    if (isLoggedIn) {
-      logout();
-    } else {
-      navigateToLoginScreen();
-    }
-  };
 
   return (
     <View style={styles.container}>
+      
       <PostsScreen navigation={navigation} />
+      <BottomBarComponent navigation={navigation} />
+      
 
-      {/* Top right corner for login/logout */}
-      <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
-        <Text style={styles.loginButtonText}>{isLoggedIn ? 'Logout' : 'Login'}</Text>
-      </TouchableOpacity>
-
-      {/* Bottom bar */}
-      <View style={styles.bottomBar}>
-        
-        {/* Button for home */}
-        <TouchableOpacity style={styles.bottomBarButton} >
-          <Image source={require('../assets/icons/home.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button for search */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
-          <Image source={require('../assets/icons/search.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button to navigate to post creation */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
-        <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button for profile */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
-          <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };

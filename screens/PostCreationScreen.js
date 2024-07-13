@@ -4,7 +4,7 @@ import StarRating from 'react-native-star-rating-widget';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import DB from './MockDB';
-
+import BottomBarComponent from './components/BottomBar';
 const GOOGLE_PLACES_API_KEY = 'YOUR_GOOGLE_PLACES_API_KEY'; // Replace with your Google Places API key
 
 const PostCreationScreen = ({ navigation }) => {
@@ -16,17 +16,7 @@ const PostCreationScreen = ({ navigation }) => {
   const [location, setLocation] = useState(null);
   const [places, setPlaces] = useState([]);
 
-  const navigateToProfile = () => {
-    navigation.navigate('ProfileScreen');
-  };
-
-  const navigateToSearch = () => {
-    navigation.navigate('Search');
-  };
-
-  const navigateToHome = () => {
-    navigation.navigate('HomeScreen');
-  };
+  
 
   useEffect(() => {
     (async () => {
@@ -163,29 +153,7 @@ const PostCreationScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Bottom bar */}
-      <View style={styles.bottomBar}>
-        
-        {/* Button for home */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
-        <Image source={require('../assets/icons/home.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button for search */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
-          <Image source={require('../assets/icons/search.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button to navigate to post creation */}
-        <TouchableOpacity style={styles.bottomBarButton}>
-        <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button for profile */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
-          <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
-        </TouchableOpacity>
-      </View>
+      
 
       <View style={styles.mediaContainer}>
         {mediaUris.map((uri, index) => (
@@ -217,7 +185,10 @@ const PostCreationScreen = ({ navigation }) => {
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
+      <View Push style={styles.Pusher}/>
+      <BottomBarComponent navigation={navigation}/>
     </ScrollView>
+    
   );
 };
 
@@ -225,6 +196,9 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 10,
+  },
+  Pusher:{
+    flex: 1,
   },
   label: {
     fontSize: 18,
@@ -239,16 +213,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 20,
+    bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: 20,
     backgroundColor: '#fff', // צבע רקע לפס הרציף
-    elevation: 10, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
+    elevation: -300, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
   },
   bottomBarButton: {
     backgroundColor: '#fff',
