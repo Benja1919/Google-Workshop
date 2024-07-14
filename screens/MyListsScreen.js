@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet } from 'react-native';
 
-// EditableListItem רכיב לעריכת פריט ברשימה
 const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEditing, editItemText, setEditItemText }) => {
   if (isEditing) {
     return (
@@ -46,14 +45,13 @@ const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEdi
   }
 };
 
-// MyListsScreen רכיב עבור עמוד הרשימות של היוזר
 const MyListsScreen = ({ route }) => {
-  const { user } = route.params; // הנתונים של היוזר מועברים דרך ה-params
+  const { user } = route.params;
   const [lists, setLists] = useState([
-    { id: '1', Image: require('../assets/icons/burgerlists.png')},
-    { id: '2', Image: require('../assets/icons/pizzalists.png') },
-    { id: '3', Image: require('../assets/icons/check.png')},
-    { id: '4', Image: require('../assets/icons/wish.png')}
+    { id: '1', Image: require('../assets/icons/burgerlists.png'), items: [] },
+    { id: '2', Image: require('../assets/icons/pizzalists.png'), items: [] },
+    { id: '3', Image: require('../assets/icons/check.png'), items: [] },
+    { id: '4', Image: require('../assets/icons/wish.png'), items: [] }
   ]);
   const [newListName, setNewListName] = useState('');
   const [newItemText, setNewItemText] = useState('');
@@ -62,13 +60,14 @@ const MyListsScreen = ({ route }) => {
   const [selectedList, setSelectedList] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [createListModalVisible, setCreateListModalVisible] = useState(false);
+  const [selectedIcon, setSelectedIcon] = useState(null); // State for selected icon
 
-  const createNewList = () => {
+  const createNewList = (icon) => { // Pass selected icon as parameter
     if (newListName.trim() === '') {
       alert('Please enter a valid list name');
       return;
     }
-    const newList = { id: Date.now().toString(), name: newListName, items: [] };
+    const newList = { id: Date.now().toString(), name: newListName, items: [], Image: icon }; // Use selected icon
     setLists([...lists, newList]);
     setNewListName('');
     setCreateListModalVisible(false);
@@ -79,9 +78,17 @@ const MyListsScreen = ({ route }) => {
       alert('Please enter a valid item name');
       return;
     }
-    const updatedLists = lists.map(list =>
-      list.id === listId ? { ...list, items: [...list.items, { id: Date.now().toString(), name: newItemText }] } : list
-    );
+    const updatedLists = lists.map(list => {
+      if (list.id === listId) {
+        const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
+        const updatedList = { ...list, items: updatedItems };
+        if (selectedList && selectedList.id === listId) {
+          setSelectedList(updatedList);
+        }
+        return updatedList;
+      }
+      return list;
+    });
     setLists(updatedLists);
     setNewItemText('');
   };
@@ -131,22 +138,22 @@ const MyListsScreen = ({ route }) => {
         <TouchableOpacity
           key={list.id}
           style={[styles.categoryButtonIcon, {
-            left: 75 + 130 * Math.cos((index * 2 * Math.PI) / lists.length),
-            top: -145 + 130 * Math.sin((index * 2 * Math.PI) / lists.length),
+            left: 165 + 140 * Math.cos((index * 2 * Math.PI) / lists.length),
+            bottom: 340 + 140 * Math.sin((index * 2 * Math.PI) / lists.length),
           }]}
           onPress={() => openList(list)}
         >
           <Image source={list.Image} style={{ width: 30, height: 30 }} />
-          </TouchableOpacity>
+        </TouchableOpacity>
       ))}
       <TouchableOpacity
         style={[styles.categoryButtonIcon, {
-          right: -80,
-          bottom: 500,
+          right: 20,
+          top: -30,
         }]}
         onPress={() => setCreateListModalVisible(true)}
       >
-        <Image source={require('../assets/icons/pluslists.png')} style={styles.categoryButtonIcon}/>
+        <Image source={require('../assets/icons/pluslists.png')} style={styles.categoryButtonIcon} />
       </TouchableOpacity>
     </View>
   );
@@ -156,17 +163,26 @@ const MyListsScreen = ({ route }) => {
       data={selectedList?.items || []}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-          <Text style={{ flex: 1, marginLeft: 10 }}>{item.name}</Text>
-        </View>
+        <EditableListItem
+          item={item}
+          onSave={saveEditItem}
+          onCancel={cancelEditItem}
+          onStartEdit={() => startEditItem(item.id, item.name)}
+          onDelete={() => deleteItem(selectedList.id, item.id)}
+          isEditing={editItemId === item.id}
+          editItemText={editItemText}
+          setEditItemText={setEditItemText}
+        />
       )}
     />
   );
 
+  // Render the main content
   return (
     <View style={styles.container}>
       <Image source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUNgR19yyBvpU38PzemDmZ1-rcQf-zc2uZFA&s' }} style={styles.profileImage} />
       {renderDefaultButtons()}
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -178,22 +194,22 @@ const MyListsScreen = ({ route }) => {
             <Text style={styles.listTitle}>{selectedList?.name}</Text>
             {renderItemList()}
             <TextInput
-              style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 5 }}
+              style={styles.input}
               placeholder="Enter new item"
               value={newItemText}
               onChangeText={text => setNewItemText(text)}
             />
             <TouchableOpacity
-              style={{ backgroundColor: 'blue', padding: 10, marginLeft: 10, borderRadius: 5 }}
+              style={styles.addButton}
               onPress={() => addItemToList(selectedList.id)}
             >
-              <Text style={{ color: 'white' }}>Add Item</Text>
+              <Text style={styles.addButtonText}>Add Item</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{ backgroundColor: 'red', padding: 10, marginTop: 20, borderRadius: 5 }}
+              style={styles.closeButton}
               onPress={closeList}
             >
-              <Text style={{ color: 'white' }}>Close</Text>
+              <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -209,22 +225,34 @@ const MyListsScreen = ({ route }) => {
           <View style={styles.modalContent}>
             <Text style={styles.listTitle}>Create New List</Text>
             <TextInput
-              style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 5 }}
+              style={styles.input}
               placeholder="Enter new list name"
               value={newListName}
               onChangeText={text => setNewListName(text)}
             />
+            {/* Display icons for selection */}
+            <View style={styles.iconSelectionContainer}>
+              {iconData.map((icon, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.iconOption}
+                  onPress={() => setSelectedIcon(icon)}
+                >
+                  <Image source={icon} style={{ width: 30, height: 30 }} />
+                </TouchableOpacity>
+              ))}
+            </View>
             <TouchableOpacity
-              style={{ backgroundColor: 'blue', padding: 10, alignItems: 'center', borderRadius: 5 }}
-              onPress={createNewList}
+              style={styles.createButton}
+              onPress={() => createNewList(selectedIcon)} // Pass selectedIcon to createNewList function
             >
-              <Text style={{ color: 'white' }}>Create New List</Text>
+              <Text style={styles.createButtonText}>Create New List</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{ backgroundColor: 'red', padding: 10, alignItems: 'center', borderRadius: 5, marginTop: 10 }}
+              style={styles.cancelButton}
               onPress={() => setCreateListModalVisible(false)}
             >
-              <Text style={{ color: 'white' }}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -233,12 +261,21 @@ const MyListsScreen = ({ route }) => {
   );
 };
 
+const iconData = [
+  require('../assets/icons/sushilist.png'),
+  require('../assets/icons/drinklist.png'),
+  require('../assets/icons/dessertlist.png'),
+  require('../assets/icons/italianlist.png')
+
+  // Add more icons as needed
+];
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    backgroundColor: '#fff',
   },
   profileImage: {
     width: 200,
@@ -246,41 +283,109 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 20,
   },
-  buttonsContainer: {
-    position: 'relative',
-    height: 200,
-    width: 200,
-  },
-  categoryButtonIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-  },
-  categoryButtonIconText: {
-    color: 'white',
-    fontSize: 24,
-  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 10,
+    backgroundColor: '#fff',
     padding: 20,
-    alignItems: 'center',
+    borderRadius: 10,
+    width: '80%',
+    maxHeight: '80%',
   },
   listTitle: {
-    fontSize: 24,
-    marginBottom: 20,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  addButton: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  createButton: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  createButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: 'gray',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  cancelButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  buttonsContainer: {
+    position: 'absolute',
+    bottom: 0,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    padding: 20,
+  },
+  categoryButtonIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    borderColor: '#ccc',
+    borderWidth: 1,
+  },
+  iconSelectionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  iconOption: {
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
 });
 
 export default MyListsScreen;
+
