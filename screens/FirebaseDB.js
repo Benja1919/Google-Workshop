@@ -28,7 +28,6 @@ export const firestoreDB = () => {
 	const AddPost = async (post) => {
         const currentUser = await GetUserName(post.userName.toLowerCase())
 		const newPost = {
-			id: 3,
 			userName: post.userName,
 			restaurantName: post.restaurantName,
 			stars: post.stars,
