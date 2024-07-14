@@ -79,6 +79,7 @@ export const firestoreDB = () => {
 		GetPosts,
 		AddPost,
 		GetRestaurant,
+		TryLoginUser,
 		GetUserName,
 		GetUsers  // Export the new function
 	};
