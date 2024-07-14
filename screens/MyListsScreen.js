@@ -46,7 +46,7 @@ const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEdi
 };
 
 const MyListsScreen = ({ route }) => {
-  const { user } = route.params;
+  const { user, profileImageUrl } = route.params;
   const [lists, setLists] = useState([
     { id: '1', Image: require('../assets/icons/burgerlists.png'), items: [] },
     { id: '2', Image: require('../assets/icons/pizzalists.png'), items: [] },
@@ -180,7 +180,7 @@ const MyListsScreen = ({ route }) => {
   // Render the main content
   return (
     <View style={styles.container}>
-      <Image source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUNgR19yyBvpU38PzemDmZ1-rcQf-zc2uZFA&s' }} style={styles.profileImage} />
+      <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
       {renderDefaultButtons()}
 
       <Modal
