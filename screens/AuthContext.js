@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   // State to store the current logged-in user
   const [currentUser, setCurrentUser] = useState(null);
 
+  //const [isRestaurant, setisRestaurant] = useState(null);
   /**
    * Function to log in the user.
    *
@@ -28,7 +29,6 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(true);
     setCurrentUser(user);
   };
-
   /**
    * Function to log out the current user.
    */
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, currentUser, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, currentUser, login, logout}}>
       {children}
     </AuthContext.Provider>
   );

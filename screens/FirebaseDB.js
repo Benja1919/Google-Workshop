@@ -1,8 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { collection, getDocs, doc, getDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, addDoc, setDoc } from 'firebase/firestore';
 import { AuthContext } from './AuthContext';
+import { Alert } from 'react-native';
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -41,6 +42,22 @@ export const firestoreDB = () => {
 		GetRestaurant(post.restaurantName).starcount += post.stars;
 		GetRestaurant(post.restaurantName).reviewcount += 1;
 	};
+	const UpdateRestaurantContent = async (RestaurantUser, Title,Data) => {
+		//Alert.alert(RestaurantUser);
+		const userRef = doc(firestore, "users", RestaurantUser);
+
+		// Create the new contents object
+		const updatedData = {
+			ContentTitles: Title,
+			ContentData: Data
+		};
+		try {
+		    await setDoc(userRef, updatedData, { merge: true });
+		} catch (error) {
+			
+		}
+	};
+
 
 	const GetRestaurant = async (restaurantName) => {
         const restaurantDoc = doc(firestore, 'restaurants', restaurantName);
@@ -80,6 +97,7 @@ export const firestoreDB = () => {
 		GetRestaurant,
 		TryLoginUser,
 		GetUserName,
-		GetUsers  // Export the new function
+		UpdateRestaurantContent,
+		GetUsers,  // Export the new function
 	};
 };
