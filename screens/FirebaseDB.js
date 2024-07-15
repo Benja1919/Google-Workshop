@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { collection, getDocs, doc, getDoc, addDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, addDoc, setDoc, query, orderBy } from 'firebase/firestore';
 import { AuthContext } from './AuthContext';
 import { Alert } from 'react-native';
 
@@ -21,7 +21,8 @@ const firestore = getFirestore(firebaseApp);
 export const firestoreDB = () => {
 	const GetPosts = async () => {
         const postsCollection = collection(firestore, 'posts');
-        const postsSnapshot = await getDocs(postsCollection);
+		const q = query(postsCollection, orderBy("__name__", "desc"));
+        const postsSnapshot = await getDocs(q);
         const postsList = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         return postsList
     }
