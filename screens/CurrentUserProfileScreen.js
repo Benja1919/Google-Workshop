@@ -31,6 +31,9 @@ const CurrentUserProfile = ({ navigation }) => {
           navigateToLoginScreen();
         }
       };
+    const navigateToRestaurant = (rid) => {
+        navigation.navigate('Restaurant', { restaurantName: rid });
+    };
     if(isLoggedIn && !currentUser.isRestaurant){
       return (
           <PanGestureHandler onGestureEvent={onGestureEvent} >
@@ -51,13 +54,17 @@ const CurrentUserProfile = ({ navigation }) => {
       return (
         <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
             <View Main style={styles.container}>
-              <Text style={styles.basictext}> Restaurant Profile </Text>
+              <Text style={styles.basictext}>Edit Restaurant Profile </Text>
                 <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
                     <Text style={styles.loginButtonText}> 
                         {isLoggedIn ? 'Logout' : 'Login'}
                     </Text>
                 </TouchableOpacity>
+                <Text>Addional Information</Text>
                 <RestaurantContentComponent RestaurantUser={currentUser}/>
+                <TouchableOpacity onPress={() => navigateToRestaurant(currentUser.RestaurantID)}>
+                  <Text style={styles.basictext}>Go to page</Text>
+                </TouchableOpacity>
                 <View Push style={styles.Pusher}/>
                 <BottomBarComponent navigation={navigation}/>
             </View>
@@ -66,6 +73,7 @@ const CurrentUserProfile = ({ navigation }) => {
     );
     }
 };
+
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,

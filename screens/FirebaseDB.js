@@ -74,14 +74,14 @@ export const firestoreDB = () => {
 			////// pay attention! you must consider the way you Get the list, and how you show ut to the user.
 			////// having a page dedicate to list sounds like the best solution
 	};
-	const UpdateRestaurantContent = async (RestaurantUser, Title,Data) => {
+	const UpdateRestaurantContent = async (Restaurant) => {
 		//Alert.alert(RestaurantUser);
-		const userRef = doc(firestore, "users", RestaurantUser);
+		const userRef = doc(firestore, "restaurants", Restaurant.id);
 
 		// Create the new contents object
 		const updatedData = {
-			ContentTitles: Title,
-			ContentData: Data
+			ContentTitles: Restaurant.ContentTitles,
+			ContentData: Restaurant.ContentData
 		};
 		try {
 		    await setDoc(userRef, updatedData, { merge: true });
@@ -89,7 +89,11 @@ export const firestoreDB = () => {
 			
 		}
 	};
-
+	const GetRestaurantbyOwner = async (user) => {
+        const restaurantDoc = doc(firestore, 'restaurants', user.RestaurantID);
+        const restaurantSnapshot = await getDoc(restaurantDoc);
+        return { id: restaurantSnapshot.id, ...restaurantSnapshot.data() };
+	};
 
 	const GetRestaurant = async (restaurantName) => {
         const restaurantDoc = doc(firestore, 'restaurants', restaurantName);
@@ -128,7 +132,9 @@ export const firestoreDB = () => {
 		AddPost,
 		GetRestaurant,
 		TryLoginUser,
+		UpdateRestaurantContent,
 		GetUserName,
-		GetUsers  // Export the new function
+		GetUsers,  // Export the new function
+		GetRestaurantbyOwner
 	};
 };

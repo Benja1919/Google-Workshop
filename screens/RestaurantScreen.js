@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import PostsScreen from './PostsScreen';
 import { firestoreDB } from './FirebaseDB';
+import { FlatList } from 'react-native-gesture-handler';
 
 const RestaurantScreen = ({ route, navigation }) => {
   const [restaurant, setRestaurant] = useState(null);
@@ -34,6 +35,17 @@ const RestaurantScreen = ({ route, navigation }) => {
     );
   }
 
+  const renderItem = ({ item }) => (
+    <View>
+      <Text style={styles.detailsHeader}>{restaurant.ContentTitles[item]}</Text>
+      <Text style={styles.detailsText}>{restaurant.ContentData[item]}</Text>
+    </View>
+  );
+
+  let arr = [];
+  for (let i = 0; i < restaurant.ContentData.length; i++) {
+      arr.push(i);
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{restaurant.name}</Text>
@@ -41,17 +53,14 @@ const RestaurantScreen = ({ route, navigation }) => {
       <Text style={styles.description}>{restaurant.description}</Text>
 
       <View style={styles.detailsContainer}>
-        <Text style={styles.detailsHeader}>Guest Chef:</Text>
-        <Text style={styles.detailsText}>{restaurant.chefDescription}</Text>
-
-        <Text style={styles.detailsHeader}>Happy Hour:</Text>
-        <Text style={styles.detailsText}>{restaurant.happyHour}</Text>
-
-        <Text style={styles.detailsHeader}>New Special Dish:</Text>
-        <Text style={styles.detailsText}>{restaurant.specialDish}</Text>
+        <FlatList
+          data={arr}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+        />
 
         <Text style={styles.detailsHeader}>Average Rating:</Text>
-        <Text style={styles.detailsText}>{restaurant.starcount / restaurant.reviewcount} ({restaurant.reviewcount})</Text>
+        <Text style={styles.detailsText}>{restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>
 
       </View>
 
