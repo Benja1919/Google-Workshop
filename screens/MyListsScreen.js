@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet,  Alert } from 'react-native';
+import { AuthContext } from './AuthContext';
+import { firestoreDB } from './FirebaseDB';
+import { Timestamp } from 'firebase/firestore';
+
+
 
 const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEditing, editItemText, setEditItemText }) => {
   if (isEditing) {
@@ -61,14 +66,41 @@ const MyListsScreen = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [createListModalVisible, setCreateListModalVisible] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState(null); // State for selected icon
+	
+  const [listDescription, setNewlistDescription] = useState('');
+	const [rank, setListRank] = useState(0);
+	const [restCount, setRestCount] = useState(0);
+	const [savedCount, setSavedCount] = useState(0);
+  const [listPic, setListPic] = useState([]);
+  const [mediaTypes, setMediaTypes] = useState('');
 
-  const createNewList = (icon) => { // Pass selected icon as parameter
+  const [loading, setLoading] = useState(true);
+
+  const {currentUser} = useContext(AuthContext);
+
+  const createNewList = async (icon) => { // Create a new List, store it in the DB
     if (newListName.trim() === '') {
       alert('Please enter a valid list name');
       return;
     }
-    const newList = { id: Date.now().toString(), name: newListName, items: [], Image: icon }; // Use selected icon
-    setLists([...lists, newList]);
+    const newList = {
+      id: Math.random().toString(),
+      userName: "User123",
+      listName: newListName,
+      listDescription : listDescription,
+      rank : rank,
+      restCount : restCount,
+      savedCount : savedCount,
+      listPic : listPic,
+      items: [],
+      Image: icon,
+      profileImageUrl: currentUser.profileImageUrl,
+      createTime: Timestamp.now() 
+
+    };
+
+    await firestoreDB().CreateList(newList);
+    // setLists([...lists, newList]);
     setNewListName('');
     setCreateListModalVisible(false);
   };
@@ -177,13 +209,38 @@ const MyListsScreen = ({ route }) => {
     />
   );
 
+  // const handleSubmit = async () => {
+  //   if (!restaurantName || stars <= 0 || !content || mediaUris.length === 0) {
+  //     Alert.alert('Error', 'Please fill in all fields and select at least one image, video, or GIF');
+  //     return;
+  //   }
+
+  //   const newList = {
+  //     id: Math.random().toString(),
+  //     userName: currentUser.userName,
+  //     ListName: listName,
+  //     listDescription : listDescription,
+	// 		rank: rank,
+	// 		restCount: restCount,
+	// 		savedCount : savedCount,
+  //     stars: stars,
+  //     content: content,
+  //     listPic: listPic,
+  //     mediaType: mediaTypes,
+  //   };
+
+  //   await firestoreDB().CreateList(newList);
+  //   navigation.goBack();
+  // };
+
+
   // Render the main content
   return (
     <View style={styles.container}>
       <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
       {renderDefaultButtons()}
 
-      <Modal
+      <Modal  //List Window
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -215,8 +272,8 @@ const MyListsScreen = ({ route }) => {
         </View>
       </Modal>
 
-      <Modal
-        animationType="slide"
+      <Modal  //Create New List window
+        animationType="slide" 
         transparent={true}
         visible={createListModalVisible}
         onRequestClose={() => setCreateListModalVisible(false)}
@@ -229,6 +286,12 @@ const MyListsScreen = ({ route }) => {
               placeholder="Enter new list name"
               value={newListName}
               onChangeText={text => setNewListName(text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter description"
+              value={listDescription}
+              onChangeText={text => setNewlistDescription(text)}
             />
             {/* Display icons for selection */}
             <View style={styles.iconSelectionContainer}>
