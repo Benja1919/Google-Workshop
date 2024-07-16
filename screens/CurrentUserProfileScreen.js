@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, Image, Alert , TextInput } fr
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-
+import RestaurantContentComponent from './components/RestaurantContents';
 const CurrentUserProfile = ({ navigation }) => {
     const { isLoggedIn, logout, currentUser } = useContext(AuthContext);
     const onGestureEvent = (event) => {
@@ -65,7 +65,7 @@ const CurrentUserProfile = ({ navigation }) => {
         </PanGestureHandler>
     );
 };
-
+};
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
@@ -106,5 +106,5 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
     }
   });
-}
+
 export default CurrentUserProfile;
