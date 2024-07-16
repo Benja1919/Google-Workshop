@@ -9,8 +9,7 @@ const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextCo
             return <View/>
         }
         else{
-            console.log(idx);
-            return (<TouchableOpacity style={styles.MinusCustomButton} onPress={() =>deleteButtonFunction(idx)}>
+            return (<TouchableOpacity style={styles.MinusCustomButton} onPress={() => deleteButtonFunction(idx)}>
                         <Text style={styles.MinusCustomText}> 
                             -
                         </Text>
@@ -82,9 +81,11 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
             forceUpdate(Math.random());
         };
-        const HandleMinusPress = ({idx}) =>{
-            console.log(idx);
-        
+        const HandleMinusPress = (idx) =>{
+            CurrentRestaurantLocal.ContentTitles.splice(idx, 1);
+            CurrentRestaurantLocal.ContentData.splice(idx, 1);
+            firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
+            forceUpdate(Math.random());
         };
         const renderItem = ({ item }) => (
             <View style={styles.item1}>

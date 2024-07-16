@@ -54,6 +54,11 @@ const CurrentUserProfile = ({ navigation }) => {
       return (
         <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
             <View Main style={styles.container}>
+            <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
+              <Text style={styles.loginButtonText}> 
+                  {isLoggedIn ? 'Logout' : 'Login'}
+              </Text>
+            </TouchableOpacity>
               <Text style={styles.BigTitle}>Edit Restaurant Profile </Text>              
                 <RestaurantContentComponent RestaurantUser={currentUser}/>
                 <TouchableOpacity onPress={() => navigateToRestaurant(currentUser.RestaurantID)}>
