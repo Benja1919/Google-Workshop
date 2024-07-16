@@ -8,11 +8,13 @@ import myNetworkIcon from '../assets/icons/network.png';
 
 const usersData = {
   'User123': {
+    userName : 'User123',
     profileImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUNgR19yyBvpU38PzemDmZ1-rcQf-zc2uZFA&s',
     bio: 'Food lover. Always exploring new restaurants!',
     ranks: ['Verified', 'Top 10 Reviewer', '300 connections'],
   },
   'FoodieJohn': {
+    userName : 'foodiejohn',
     profileImageUrl: 'https://media.licdn.com/dms/image/D4D03AQGJqUJqrC6OlQ/profile-displayphoto-shrink_200_200/0/1714751209049?e=2147483647&v=beta&t=yHaqR0QYWP4kdNUcVZp0sGsrq-uW-qehrZESEG1nAao',
     bio: 'Dessert fanatic and food critic.',
     ranks: ['Top 25 Reviewer'],

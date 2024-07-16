@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState,useEffect, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet,  Alert } from 'react-native';
 import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
@@ -52,12 +52,7 @@ const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEdi
 
 const MyListsScreen = ({ route }) => {
   const { user, profileImageUrl } = route.params;
-  const [lists, setLists] = useState([
-    { id: '1', Image: require('../assets/icons/burgerlists.png'), items: [] },
-    { id: '2', Image: require('../assets/icons/pizzalists.png'), items: [] },
-    { id: '3', Image: require('../assets/icons/check.png'), items: [] },
-    { id: '4', Image: require('../assets/icons/wish.png'), items: [] }
-  ]);
+  const [lists, setLists] = useState([]);
   const [newListName, setNewListName] = useState('');
   const [newItemText, setNewItemText] = useState('');
   const [editItemId, setEditItemId] = useState(null);
@@ -85,7 +80,7 @@ const MyListsScreen = ({ route }) => {
     }
     const newList = {
       id: Math.random().toString(),
-      userName: "User123",
+      userName: currentUser.userName.toLowerCase(),
       listName: newListName,
       listDescription : listDescription,
       rank : rank,
@@ -105,54 +100,76 @@ const MyListsScreen = ({ route }) => {
     setCreateListModalVisible(false);
   };
 
-  const addItemToList = (listId) => {
-    if (newItemText.trim() === '') {
-      alert('Please enter a valid item name');
-      return;
-    }
-    const updatedLists = lists.map(list => {
-      if (list.id === listId) {
-        const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
-        const updatedList = { ...list, items: updatedItems };
-        if (selectedList && selectedList.id === listId) {
-          setSelectedList(updatedList);
-        }
-        return updatedList;
+  useEffect(() => { //fetch the list of user from the DB
+    const fetchLists = async () => {
+      if (!currentUser) return;
+      try {
+        const fetchedLists = await firestoreDB().GetUserLists(user.userName);
+        setLists(fetchedLists);
+      } catch (error) {
+        console.error("Error fetching lists: ", error);
+      } finally {
+        setLoading(false);
       }
-      return list;
-    });
-    setLists(updatedLists);
-    setNewItemText('');
-  };
+    };
 
-  const startEditItem = (itemId, itemName) => {
-    setEditItemId(itemId);
-    setEditItemText(itemName);
-  };
+    // Fetch lists immediately
+    fetchLists();
 
-  const saveEditItem = () => {
-    const updatedLists = lists.map(list => ({
-      ...list,
-      items: list.items.map(item =>
-        item.id === editItemId ? { ...item, name: editItemText } : item
-      )
-    }));
-    setLists(updatedLists);
-    setEditItemId(null);
-    setEditItemText('');
-  };
+    // Fetch lists every 60 seconds
+    const intervalId = setInterval(fetchLists, 500);
 
-  const cancelEditItem = () => {
-    setEditItemId(null);
-    setEditItemText('');
-  };
+    // Clear interval on component unmount
+    return () => clearInterval(intervalId);  }, [currentUser]);
 
-  const deleteItem = (listId, itemId) => {
-    const updatedLists = lists.map(list =>
-      list.id === listId ? { ...list, items: list.items.filter(item => item.id !== itemId) } : list
-    );
-    setLists(updatedLists);
-  };
+  // const addItemToList = (listId) => {
+  //   if (newItemText.trim() === '') {
+  //     alert('Please enter a valid item name');
+  //     return;
+  //   }
+  //   const updatedLists = lists.map(list => {
+  //     if (list.id === listId) {
+  //       const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
+  //       const updatedList = { ...list, items: updatedItems };
+  //       if (selectedList && selectedList.id === listId) {
+  //         setSelectedList(updatedList);
+  //       }
+  //       return updatedList;
+  //     }
+  //     return list;
+  //   });
+  //   setLists(updatedLists);
+  //   setNewItemText('');
+  // };
+
+  // const startEditItem = (itemId, itemName) => {
+  //   setEditItemId(itemId);
+  //   setEditItemText(itemName);
+  // };
+
+  // const saveEditItem = () => {
+  //   const updatedLists = lists.map(list => ({
+  //     ...list,
+  //     items: list.items.map(item =>
+  //       item.id === editItemId ? { ...item, name: editItemText } : item
+  //     )
+  //   }));
+  //   setLists(updatedLists);
+  //   setEditItemId(null);
+  //   setEditItemText('');
+  // };
+
+  // const cancelEditItem = () => {
+  //   setEditItemId(null);
+  //   setEditItemText('');
+  // };
+
+  // const deleteItem = (listId, itemId) => {
+  //   const updatedLists = lists.map(list =>
+  //     list.id === listId ? { ...list, items: list.items.filter(item => item.id !== itemId) } : list
+  //   );
+  //   setLists(updatedLists);
+  // };
 
   const openList = (list) => {
     setSelectedList(list);

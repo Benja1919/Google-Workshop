@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, Image, Alert , TextInput } fr
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import RestaurantContentComponent from './components/RestaurantContents';
+
 const CurrentUserProfile = ({ navigation }) => {
     const { isLoggedIn, logout, currentUser } = useContext(AuthContext);
     const onGestureEvent = (event) => {
@@ -54,13 +54,7 @@ const CurrentUserProfile = ({ navigation }) => {
       return (
         <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
             <View Main style={styles.container}>
-              <Text style={styles.BigTitle}>Edit Restaurant Profile </Text>
-                <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
-                    <Text style={styles.loginButtonText}> 
-                        {isLoggedIn ? 'Logout' : 'Login'}
-                    </Text>
-                </TouchableOpacity>
-                
+              <Text style={styles.BigTitle}>Edit Restaurant Profile </Text>              
                 <RestaurantContentComponent RestaurantUser={currentUser}/>
                 <TouchableOpacity onPress={() => navigateToRestaurant(currentUser.RestaurantID)}>
                   <Text style={styles.basictext}>Go to page</Text>
@@ -68,10 +62,8 @@ const CurrentUserProfile = ({ navigation }) => {
                 <View Push style={styles.Pusher}/>
                 <BottomBarComponent navigation={navigation}/>
             </View>
-            
         </PanGestureHandler>
     );
-    }
 };
 
 const styles = StyleSheet.create({
@@ -114,4 +106,5 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
     }
   });
+}
 export default CurrentUserProfile;

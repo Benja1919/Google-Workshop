@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { collection, getDocs, doc, getDoc, addDoc, setDoc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, addDoc, setDoc, query,where, orderBy } from 'firebase/firestore';
 import { AuthContext } from './AuthContext';
 import { Alert } from 'react-native';
 
@@ -46,24 +46,13 @@ export const firestoreDB = () => {
 
 	const CreateList = async (list) => {
         const currentUser = await GetUserName(list.userName.toLowerCase())
-		// const newList = {	
-		// 	userName: list.userName,
-		// 	listName: list.ListtName,
-		// 	listDescription : list.listDescription,
-		// 	rank: list.rank,
-		// 	restCount: list.restCount,
-		// 	savedCount : list.savedCount,
-		// 	// content: list.content,
-		// 	listPic: list.listPic || [], // Assuming post.mediaUrls is an array of URLs
-		// 	// mediaTypes: list.mediaTypes || [], // Assuming post.mediaTypes is an array of types (optional)
-		// 	profileImageUrl: currentUser.profileImageUrl,
-		// };
+
         const usersListsCollectionRef = collection(firestore, 'usersLists');
         const docRef = await addDoc(usersListsCollectionRef, list);
 	};
 
 	const GetUserLists = async (userName) => {
-		const q = query(collection(firestore, 'usersLists'), where('userName', '==', userName));
+		const q = query(collection(firestore, 'usersLists'),  where('userName', '==', userName));
 		const querySnapshot = await getDocs(q);
 		const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 		return lists;
@@ -137,6 +126,9 @@ export const firestoreDB = () => {
 		UpdateRestaurantContent,
 		GetUserName,
 		GetUsers,  // Export the new function
-		GetRestaurantbyOwner
+		GetRestaurantbyOwner,
+		CreateList,
+		GetUserLists,
+		GetUsers 
 	};
 };
