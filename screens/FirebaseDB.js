@@ -81,7 +81,9 @@ export const firestoreDB = () => {
 		// Create the new contents object
 		const updatedData = {
 			ContentTitles: Restaurant.ContentTitles,
-			ContentData: Restaurant.ContentData
+			ContentData: Restaurant.ContentData,
+			description: Restaurant.description
+			
 		};
 		try {
 		    await setDoc(userRef, updatedData, { merge: true });

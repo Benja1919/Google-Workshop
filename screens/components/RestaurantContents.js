@@ -1,8 +1,30 @@
 import React, { useContext, useState, useCallback } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Alert, FlatList, TextInput } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Alert, FlatList, TextInput, Image } from 'react-native';
 import { firestoreDB } from '../FirebaseDB';
 import { AuthContext } from '../AuthContext';
 import { throttle } from 'lodash';
+const CustomTextInput = ({ placeholderTextColor, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
+    return (
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',}}>
+            <Image
+            source={require('../../assets/icons/edit5.png')}
+            style={{...styles.icon,marginRight:3,marginLeft:style.marginLeft}}
+            resizeMode="center"
+            />
+        <TextInput
+            placeholderTextColor={placeholderTextColor}
+            style={[
+            style,
+            {flex:1},
+            { color: valueTextColor },
+            fontWeight && { fontWeight },
+            fontSize && { fontSize },
+            ]}
+            {...rest}
+        />
+      </View>
+    );
+  };
 //let ContentTitles = [];
 //let ContentData = [];
 let CurrentRestaurantUser;
@@ -15,32 +37,35 @@ const setValue = (item,text) =>{
     CurrentRestaurant.ContentData[item] = text;
     firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
 }
-//
-//
+const setDescription = (text) =>{
+    CurrentRestaurant.description = text;
+    firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
+}
+const col2 = '#fbfbfb';
 const renderItem = ({ item }) => (
-    <View style={styles.item}>
-        <TouchableOpacity>
-            <Text style={styles.content}>Title </Text>
-            <TextInput style={styles.input} placeholder={CurrentRestaurant.ContentTitles[item]} onChangeText={text => setKey(item,text)}/>
-            <Text style={styles.content}>Information </Text>
-            <TextInput style={styles.input} placeholder={CurrentRestaurant.ContentData[item]} onChangeText={text => setValue(item,text)}/>
-        </TouchableOpacity>
+    <View style={styles.item1}>
+        <CustomTextInput
+            placeholder={CurrentRestaurant.ContentTitles[item]}
+            placeholderTextColor="black"
+            valueTextColor="black"
+            onChangeText={text => setKey(item,text)}
+            style={{ fontSize: 20, fontWeight: 'bold'}}
+        />
+        <CustomTextInput
+            placeholder={CurrentRestaurant.ContentData[item]}
+            placeholderTextColor="black"
+            valueTextColor="black"
+            onChangeText={text => setValue(item,text)}
+            style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
+        />
+
     </View>
 );
+
 const RestaurantContentComponent = ({ RestaurantUser }) => {
     if(RestaurantUser != null){
         const [CurrentRestaurantLocal, setRestaurant] = React.useState('');
         CurrentRestaurantUser = RestaurantUser;
-        /*
-        React.useEffect(() => {
-            const loadRestaurant = async () => {
-                res =  await firestoreDB().GetRestaurantbyOwner(CurrentRestaurantUser);
-                setRestaurant(res);
-            }
-            
-            useCallback(throttle(loadRestaurant, 2000), []);
-        });
-        */
         const loadRestaurant = useCallback(
             throttle(async () => {
                 const res = await firestoreDB().GetRestaurantbyOwner(RestaurantUser);
@@ -53,8 +78,8 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             loadRestaurant();
         }, [loadRestaurant]);
 
-
-
+        
+        //<TextInput style={styles.input} placeholder={CurrentRestaurantLocal.description} onChangeText={setDescription}/>
         if(CurrentRestaurantLocal != '' ){
             CurrentRestaurant = CurrentRestaurantLocal;
             
@@ -63,11 +88,24 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                 arr.push(i);
             }
             return (
-                <FlatList
-                data={arr}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                />
+                <View>
+                    <Text style={styles.SectionTitle}>Description </Text>
+                    <View style={{...styles.item,padding: 5}}> 
+                        <CustomTextInput
+                            placeholder={CurrentRestaurantLocal.description}
+                            placeholderTextColor="black"
+                            valueTextColor="black"
+                            onChangeText={text => setDescription(text)}
+                            style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
+                        />
+                    </View>
+                    <Text style={styles.SectionTitle}>Addional Information</Text>
+                    <FlatList style={styles.item}
+                    data={arr}
+                    renderItem={renderItem}
+                    keyExtractor={(item, index) => index.toString()}
+                    />
+                </View>
             );
         }
     }
@@ -77,10 +115,11 @@ const styles = StyleSheet.create({
       padding: 10,
     },
     item: {
-      backgroundColor: '#dddddd',
-      padding: 20,
-      marginVertical: 8,
-      borderRadius: 20,
+      backgroundColor: col2,
+      borderRadius: 15,
+    },
+    item1: {
+        padding: 5,
     },
     title: {
       fontSize: 28,
@@ -88,13 +127,25 @@ const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
+    },
+    input2: {
+        borderWidth: 1,
         borderRadius: 4,
         padding: 10,
         marginBottom: 5,
         fontsize: 11,
     },
     content: {
-        fontSize: 23,
-    }
+        fontSize: 20,
+    },
+    SectionTitle: {
+        fontSize: 25,
+        fontWeight: 'bold',
+    },
+    icon: {
+        width: 13,
+        height: 15,
+        
+      },
   });
 export default RestaurantContentComponent;

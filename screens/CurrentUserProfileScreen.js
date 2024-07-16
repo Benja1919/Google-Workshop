@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Image, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Image, Alert , TextInput } from 'react-native';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
@@ -54,13 +54,13 @@ const CurrentUserProfile = ({ navigation }) => {
       return (
         <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
             <View Main style={styles.container}>
-              <Text style={styles.basictext}>Edit Restaurant Profile </Text>
+              <Text style={styles.BigTitle}>Edit Restaurant Profile </Text>
                 <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
                     <Text style={styles.loginButtonText}> 
                         {isLoggedIn ? 'Logout' : 'Login'}
                     </Text>
                 </TouchableOpacity>
-                <Text>Addional Information</Text>
+                
                 <RestaurantContentComponent RestaurantUser={currentUser}/>
                 <TouchableOpacity onPress={() => navigateToRestaurant(currentUser.RestaurantID)}>
                   <Text style={styles.basictext}>Go to page</Text>
@@ -96,9 +96,22 @@ const styles = StyleSheet.create({
       fontSize: 18,
       fontWeight: 'bold',
     },
+    input: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 4,
+      padding: 10,
+      marginBottom: 5,
+      fontsize: 11,
+    },
     basictext:{
       fontSize: 20, 
       textAlign: 'center',
+    },
+    BigTitle:{
+      fontSize: 30, 
+      textAlign: 'center',
+      fontWeight: 'bold',
     }
   });
 export default CurrentUserProfile;
