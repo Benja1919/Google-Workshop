@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Image, Alert , TextInput } from 'react-native';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
-import { PanGestureHandler } from 'react-native-gesture-handler';
+import { PanGestureHandler, ScrollView } from 'react-native-gesture-handler';
 import RestaurantContentComponent from './components/RestaurantContents';
 
 const CurrentUserProfile = ({ navigation }) => {
@@ -54,22 +54,28 @@ const CurrentUserProfile = ({ navigation }) => {
     else{
       return (
         <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
-            <View Main style={styles.container}>
+          <View style={styles.Pusher}>
             
-              <Text style={styles.BigTitle}>Edit Restaurant Profile </Text>   
+            <ScrollView Main style={styles.container}>
               <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
-                <Text style={styles.loginButtonText}> 
-                    {isLoggedIn ? 'Logout' : 'Login'}
-                </Text>
-              </TouchableOpacity>           
+                <Image style={styles.logoutimage}
+                  source ={require("../assets/icons/logout3.png")}        
+                />
+              </TouchableOpacity> 
+              <Text style={styles.BigTitle}>Edit Restaurant Profile </Text>
+              <TouchableOpacity style={styles.ToProfileButton} onPress={() => navigateToRestaurant(currentUser.RestaurantID)}>
+                <Image style={styles.toprofileimage}
+                  source ={require("../assets/icons/toprofile.png")}        
+                />
+              </TouchableOpacity>   
+                        
               <RestaurantContentComponent RestaurantUser={currentUser}/>
-              <TouchableOpacity onPress={() => navigateToRestaurant(currentUser.RestaurantID)}>
-                <Text style={styles.basictext}>Go to page</Text>
-              </TouchableOpacity>
-              <View Push style={styles.Pusher}/>
-              <BottomBarComponent navigation={navigation}/>
-                
-            </View>
+              <Text style={{fontSize:40}}></Text>
+
+            </ScrollView>
+            <View Push style={styles.Pusher}/>
+            <BottomBarComponent navigation={navigation}/>
+          </View>
         </PanGestureHandler>
     );
 };
@@ -85,11 +91,28 @@ const styles = StyleSheet.create({
     loginButton: {
       position: 'absolute',
       top: 0,
+      left: 0,
+      backgroundColor: '#0056b4',
+      paddingVertical: 5,
+      paddingHorizontal: 5,
+      borderRadius: 10,
+    },
+    ToProfileButton: {
+      position: 'absolute',
+      top: 0,
       right: 0,
-      backgroundColor: '#4CAF50',
-      paddingVertical: 10,
-      paddingHorizontal: 15,
-      borderRadius: 8,
+      backgroundColor: '#0056b4',
+      paddingVertical: 5,
+      paddingHorizontal: 5,
+      borderRadius: 10,
+    },
+    logoutimage :{
+      width: 40,
+      height: 30,
+    },
+    toprofileimage :{
+      width: 32,
+      height: 30,
     },
     loginButtonText: {
       color: '#fff',
@@ -112,6 +135,7 @@ const styles = StyleSheet.create({
       fontSize: 30, 
       textAlign: 'center',
       fontWeight: 'bold',
+      marginBottom: 10,
     }
   });
 

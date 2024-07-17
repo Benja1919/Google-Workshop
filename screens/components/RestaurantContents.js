@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, Alert, FlatList, TextInput, I
 import { firestoreDB } from '../FirebaseDB';
 import { throttle } from 'lodash';
 import BasicMap, {useCoordToAddress, useAddressToCoord} from './Maps';
+const col2 = '#fbfbfb';
 const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor,imageicon, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
     const DeleteButton = () =>{
         if(!hasdelete){
@@ -56,11 +57,12 @@ const setDescription = (text) =>{
     firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
 }
 
-const col2 = '#fbfbfb';
+
 images = {
     editimage :require("../../assets/icons/edit5.png"),
     mapimage : require("../../assets/icons/mapicon2.png"),
     locationimage : require("../../assets/icons/LocationIcon.png"),
+    tri : require("../../assets/icons/Tri1.png"),
 };
 
 const RestaurantContentComponent = ({ RestaurantUser }) => {
@@ -177,12 +179,17 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                             style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
                         />
                         <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',marginBottom:4,marginLeft:3}} onPress={() =>setLocationMap(!isLocationMapEnbaled)}>
-                            <Image
-                                source={images.mapimage}
-                                style={{...styles.icon,marginRight:6}}
-                                resizeMode="center"
-                            />
-                            <Text style={{fontWeight:16}}>N {CurrentRestaurantLocal.Coordinates.latitude}, W {CurrentRestaurantLocal.Coordinates.longitude}</Text>
+                            <View style={{flexDirection: 'row',flex: 1,alignItems: 'center'}}>
+                                <Image
+                                    source={images.mapimage}
+                                    style={{...styles.icon,marginRight:6}}
+                                    resizeMode="center"
+                                />
+                                <Text style={{fontWeight:16}}>N {CurrentRestaurantLocal.Coordinates.latitude}, W {CurrentRestaurantLocal.Coordinates.longitude}</Text>
+                            </View>
+                            <Image source={images.tri}
+                                style={{...styles.icon,alignSelf: 'flex-end',transform: [{rotate: isLocationMapEnbaled ? '0deg' : '180deg' }]}}
+                                resizeMode="center"/>
                         </TouchableOpacity>
                         <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={CurrentRestaurantLocal.Coordinates} mapclickfunction={GetMapCoordinate}/>
                     </View>
@@ -198,6 +205,8 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                     data={arr}
                     renderItem={renderItem}
                     keyExtractor={(item, index) => index.toString()}
+                    scrollEnabled={false} // Disable FlatList's own scrolling
+                    contentContainerStyle={styles.flatList}
                     />
                     
                 </View>
