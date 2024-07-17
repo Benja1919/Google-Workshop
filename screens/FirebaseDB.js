@@ -71,8 +71,9 @@ export const firestoreDB = () => {
 		const updatedData = {
 			ContentTitles: Restaurant.ContentTitles,
 			ContentData: Restaurant.ContentData,
-			description: Restaurant.description
-			
+			description: Restaurant.description,
+			Address: Restaurant.Address,
+			Coordinates: Restaurant.Coordinates,
 		};
 		try {
 		    await setDoc(userRef, updatedData, { merge: true });

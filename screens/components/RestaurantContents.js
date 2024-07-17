@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, Alert, FlatList, TextInput, I
 import { firestoreDB } from '../FirebaseDB';
 import { AuthContext } from '../AuthContext';
 import { throttle } from 'lodash';
+import BasicMap, {useCoordToAddress, useAddressToCoord} from './Maps';
 const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
     const DeleteButton = () =>{
         if(!hasdelete){
@@ -63,6 +64,9 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
     if(RestaurantUser != null){
         const [CurrentRestaurantLocal, setRestaurant] = React.useState('');
         const [, forceUpdate] = useState();
+        const [Coordinate, SetCoordinate] = useState({"latitude":null, "longitude":null})
+        const [AddressText, setAddressText] = useState('');
+        const [isLocationMapEnbaled, setLocationMap] = useState(false);
         CurrentRestaurantUser = RestaurantUser;
         const loadRestaurant = useCallback(
             throttle(async () => {
@@ -87,6 +91,24 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
             forceUpdate(Math.random());
         };
+        const handleEndEditing = (event) => {
+            setAddressText(event.nativeEvent.text);
+        };
+        Coords = useAddressToCoord(AddressText);
+        newAddress = useCoordToAddress(Coords.latitude,Coords.longitude)
+        CoordinateAddress = useCoordToAddress(Coordinate);
+        if(newAddress != '' && newAddress != null && Coords.latitude != null && newAddress != CurrentRestaurantLocal.Address){
+            console.log(Coords);
+            CurrentRestaurantLocal.Coordinates = Coords;
+            CurrentRestaurantLocal.Address = newAddress;
+            firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
+        }
+        else if(CoordinateAddress != null && Coordinate.longitude != null){
+            SetCoordinate({"latitude":null, "longitude":null});
+            CurrentRestaurantLocal.Coordinates = Coordinate;
+            CurrentRestaurantLocal.Address = CoordinateAddress;
+            firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
+        }
         const renderItem = ({ item }) => (
             <View style={styles.item1}>
                 <CustomTextInput
@@ -110,6 +132,11 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
         
             </View>
         );
+        const GetMapCoordinate = (event) =>{
+            const { coordinate } = event.nativeEvent;
+            SetCoordinate(coordinate);
+            forceUpdate(Math.random());
+        };
         //<TextInput style={styles.input} placeholder={CurrentRestaurantLocal.description} onChangeText={setDescription}/>
         if(CurrentRestaurantLocal != '' ){
             CurrentRestaurant = CurrentRestaurantLocal;
@@ -120,6 +147,7 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             }
             return (
                 <View>
+                    
                     <Text style={styles.SectionTitle}>Description </Text>
                     <View style={{...styles.item,padding: 5}}> 
                         <CustomTextInput
@@ -130,6 +158,26 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                             onChangeText={text => setDescription(text)}
                             style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
                         />
+                    </View>
+                    <Text style={styles.SectionTitle}>Location </Text>
+                    <View style={{...styles.item,padding: 5}}> 
+                        <CustomTextInput
+                            placeholder={CurrentRestaurantLocal.Address}
+                            placeholderTextColor="black"
+                            valueTextColor="black"
+                            hasdelete={false}
+                            onEndEditing={handleEndEditing}
+                            style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
+                        />
+                        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',marginBottom:4,marginLeft:3}} onPress={() =>setLocationMap(!isLocationMapEnbaled)}>
+                            <Image
+                                source={require('../../assets/icons/LocationIcon.png')}
+                                style={{...styles.icon,marginRight:3}}
+                                resizeMode="center"
+                            />
+                            <Text>N {CurrentRestaurantLocal.Coordinates.latitude}, W {CurrentRestaurantLocal.Coordinates.longitude}</Text>
+                        </TouchableOpacity>
+                        <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={CurrentRestaurantLocal.Coordinates} mapclickfunction={GetMapCoordinate}/>
                     </View>
                     <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',padding:10}}>
                         <Text style={styles.SectionTitle}>Addional Information</Text>
@@ -144,6 +192,7 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                     renderItem={renderItem}
                     keyExtractor={(item, index) => index.toString()}
                     />
+                    
                 </View>
             );
         }
@@ -151,17 +200,17 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
 };
 const styles = StyleSheet.create({
     container: {
-      padding: 10,
+        padding: 10,
     },
     item: {
-      backgroundColor: col2,
-      borderRadius: 15,
+        backgroundColor: col2,
+        borderRadius: 15,
     },
     item1: {
         padding: 5,
     },
     title: {
-      fontSize: 28,
+        fontSize: 28,
     },
     input: {
         borderWidth: 1,
@@ -213,6 +262,6 @@ const styles = StyleSheet.create({
         width: 13,
         height: 15,
         
-      },
+    },
   });
 export default RestaurantContentComponent;

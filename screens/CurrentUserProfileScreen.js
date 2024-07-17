@@ -4,6 +4,7 @@ import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import RestaurantContentComponent from './components/RestaurantContents';
+
 const CurrentUserProfile = ({ navigation }) => {
     const { isLoggedIn, logout, currentUser } = useContext(AuthContext);
     const onGestureEvent = (event) => {
@@ -66,6 +67,7 @@ const CurrentUserProfile = ({ navigation }) => {
                 </TouchableOpacity>
                 <View Push style={styles.Pusher}/>
                 <BottomBarComponent navigation={navigation}/>
+                
             </View>
         </PanGestureHandler>
     );
