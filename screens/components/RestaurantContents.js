@@ -1,10 +1,9 @@
 import React, { useContext, useState, useCallback } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert, FlatList, TextInput, Image } from 'react-native';
 import { firestoreDB } from '../FirebaseDB';
-import { AuthContext } from '../AuthContext';
 import { throttle } from 'lodash';
 import BasicMap, {useCoordToAddress, useAddressToCoord} from './Maps';
-const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
+const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor,imageicon, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
     const DeleteButton = () =>{
         if(!hasdelete){
             return <View/>
@@ -20,7 +19,7 @@ const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextCo
     return (
         <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',}}>
             <Image
-            source={require('../../assets/icons/edit5.png')}
+            source={imageicon}
             style={{...styles.icon,marginRight:3,marginLeft:style.marginLeft}}
             resizeMode="center"
             />
@@ -58,7 +57,11 @@ const setDescription = (text) =>{
 }
 
 const col2 = '#fbfbfb';
-
+images = {
+    editimage :require("../../assets/icons/edit5.png"),
+    mapimage : require("../../assets/icons/mapicon2.png"),
+    locationimage : require("../../assets/icons/LocationIcon.png"),
+};
 
 const RestaurantContentComponent = ({ RestaurantUser }) => {
     if(RestaurantUser != null){
@@ -68,6 +71,7 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
         const [AddressText, setAddressText] = useState('');
         const [isLocationMapEnbaled, setLocationMap] = useState(false);
         CurrentRestaurantUser = RestaurantUser;
+        
         const loadRestaurant = useCallback(
             throttle(async () => {
                 const res = await firestoreDB().GetRestaurantbyOwner(RestaurantUser);
@@ -98,7 +102,6 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
         newAddress = useCoordToAddress(Coords.latitude,Coords.longitude)
         CoordinateAddress = useCoordToAddress(Coordinate);
         if(newAddress != '' && newAddress != null && Coords.latitude != null && newAddress != CurrentRestaurantLocal.Address){
-            console.log(Coords);
             CurrentRestaurantLocal.Coordinates = Coords;
             CurrentRestaurantLocal.Address = newAddress;
             firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
@@ -117,6 +120,7 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                     valueTextColor="black"
                     hasdelete={true}
                     idx={item}
+                    imageicon={images.editimage}
                     deleteButtonFunction = {() => HandleMinusPress(item)}
                     onChangeText={text => setKey(item,text)}
                     style={{ fontSize: 20, fontWeight: 'bold'}}
@@ -125,6 +129,7 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                     placeholder={CurrentRestaurant.ContentData[item]}
                     placeholderTextColor="black"
                     valueTextColor="black"
+                    imageicon={images.editimage}
                     hasdelete={false}
                     onChangeText={text => setValue(item,text)}
                     style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
@@ -154,6 +159,7 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                             placeholder={CurrentRestaurantLocal.description}
                             placeholderTextColor="black"
                             valueTextColor="black"
+                            imageicon={images.editimage}
                             hasdelete={false}
                             onChangeText={text => setDescription(text)}
                             style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
@@ -165,17 +171,18 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                             placeholder={CurrentRestaurantLocal.Address}
                             placeholderTextColor="black"
                             valueTextColor="black"
+                            imageicon={images.locationimage}
                             hasdelete={false}
                             onEndEditing={handleEndEditing}
                             style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
                         />
                         <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',marginBottom:4,marginLeft:3}} onPress={() =>setLocationMap(!isLocationMapEnbaled)}>
                             <Image
-                                source={require('../../assets/icons/LocationIcon.png')}
-                                style={{...styles.icon,marginRight:3}}
+                                source={images.mapimage}
+                                style={{...styles.icon,marginRight:6}}
                                 resizeMode="center"
                             />
-                            <Text>N {CurrentRestaurantLocal.Coordinates.latitude}, W {CurrentRestaurantLocal.Coordinates.longitude}</Text>
+                            <Text style={{fontWeight:16}}>N {CurrentRestaurantLocal.Coordinates.latitude}, W {CurrentRestaurantLocal.Coordinates.longitude}</Text>
                         </TouchableOpacity>
                         <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={CurrentRestaurantLocal.Coordinates} mapclickfunction={GetMapCoordinate}/>
                     </View>

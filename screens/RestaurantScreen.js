@@ -54,10 +54,17 @@ const RestaurantScreen = ({ route, navigation }) => {
       <Text style={styles.description}>{restaurant.description}</Text>
       <View> 
         <Text style={styles.sectionTitle}>Location</Text>
-        <Text style={{...styles.detailsText,marginLeft:10}}>{restaurant.Address} </Text>
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left'}}>
+            <Image
+              source={require('../assets/icons/LocationIcon.png')}
+              style={{...styles.icon,marginRight:3,marginLeft:5}}
+              resizeMode="center"
+            />
+          <Text style={{...styles.details}}>{restaurant.Address} </Text>
+        </View>
         <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left'}} onPress={() =>setLocationMap(!isLocationMapEnbaled)}>
             <Image
-                source={require('../assets/icons/LocationIcon.png')}
+                source={require('../assets/icons/mapicon2.png')}
                 style={{...styles.icon,marginRight:3,marginLeft:5}}
                 resizeMode="center"
             />
@@ -97,8 +104,8 @@ const styles = StyleSheet.create({
     height: 15,
   },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-  description: { fontSize: 16, marginBottom: 10 },
-  detailsContainer: { marginTop: 20 },
+  description: { fontSize: 16, marginBottom: 5 },
+  detailsContainer: { marginTop: 10 },
   detailsHeader: { fontSize: 18, fontWeight: 'bold', marginBottom: 5 },
   sectionTitle: { fontSize: 25, fontWeight: 'bold', marginBottom: 3 },
   detailsText: { fontSize: 16, marginBottom: 10 },

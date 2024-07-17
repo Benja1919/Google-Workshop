@@ -17,7 +17,12 @@ import CurrentUserProfile from './screens/CurrentUserProfileScreen'
 
 
 const Stack = createStackNavigator();
-
+const AppHeaderTitle = () =>{
+  return (<Image
+  style={{ width: 200, height: 60 }}
+  source={require('./assets/icons/HomeName.png')} 
+/>);
+};
 const App = () => {
   return (
     <AuthProvider>
@@ -27,17 +32,16 @@ const App = () => {
             name="HomeScreen" 
             component={HomeScreen} 
             options={{ 
-              headerTitle: () => (
-                <Image
-                  style={{ width: 200, height: 60 }}
-                  source={require('./assets/icons/HomeName.png')} 
-                />
-              ),
+              headerTitle: AppHeaderTitle,
               headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }}
           />
           <Stack.Screen name="UserProfile" component={UserProfileScreen} />
-          <Stack.Screen name="ProfileScreen" component={CurrentUserProfile} />
+          <Stack.Screen name="ProfileScreen" component={CurrentUserProfile} options={{ 
+              headerTitle: AppHeaderTitle,
+              headerLeft: () => null,
+              headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }}/>
           <Stack.Screen name="Restaurant" component={RestaurantScreen} />
           <Stack.Screen name="MyLists" component={MyListsScreen} />
           <Stack.Screen name="Network" component={NetworkScreen} />
