@@ -104,7 +104,7 @@ const MyListsScreen = ({ route }) => {
     const fetchLists = async () => {
       if (!currentUser) return;
       try {
-        const fetchedLists = await firestoreDB().GetUserLists(user.userName);
+        const fetchedLists = await firestoreDB().GetUserLists(user.userName.toLowerCase());
         setLists(fetchedLists);
       } catch (error) {
         console.error("Error fetching lists: ", error);
@@ -195,6 +195,7 @@ const MyListsScreen = ({ route }) => {
           <Image source={list.Image} style={{ width: 30, height: 30 }} />
         </TouchableOpacity>
       ))}
+      { user.userName.toLowerCase() == currentUser.userName.toLowerCase() &&(
       <TouchableOpacity
         style={[styles.categoryButtonIcon, {
           right: 20,
@@ -204,8 +205,10 @@ const MyListsScreen = ({ route }) => {
       >
         <Image source={require('../assets/icons/pluslists.png')} style={styles.categoryButtonIcon} />
       </TouchableOpacity>
+      )}
     </View>
   );
+  
 
   const renderItemList = () => (
     <FlatList
