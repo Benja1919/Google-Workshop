@@ -8,7 +8,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
 
     const mediaItems = Array.isArray(post.mediaUrls)
         ? post.mediaUrls.map((url, index) => ({
-            url: url.startsWith('file://') ? url : `file://${url}`,
+            url,
             type: post.mediaTypes ? post.mediaTypes[index] : url.endsWith('.mp4') ? 'video' : url.endsWith('.gif') ? 'gif' : 'image'
         }))
         : [{ url: post.imageUrl, type: 'image' }];

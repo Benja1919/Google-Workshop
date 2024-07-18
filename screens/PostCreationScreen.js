@@ -6,8 +6,9 @@ import * as Location from 'expo-location';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { AuthContext } from './AuthContext';
+import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'firebase/storage';
 import { firestoreDB } from './FirebaseDB';
-
+import { initializeApp } from 'firebase/app';
 const GOOGLE_PLACES_API_KEY = 'YOUR_GOOGLE_PLACES_API_KEY'; // Replace with your Google Places API key
 
 const PostCreationScreen = ({ navigation }) => {
@@ -40,26 +41,52 @@ const PostCreationScreen = ({ navigation }) => {
   }, []);
 
   const pickMedia = async (mediaTypes, type) => {
-    let result = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!result.granted) {
-      Alert.alert('Error', 'Permission to access gallery is required');
-      return;
-    }
-
-    let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!pickerResult.canceled) {
-      setMediaUris([...mediaUris, pickerResult.assets[0].uri]);
-      setMediaType(type);
-    } else {
-      Alert.alert('Error', 'Media selection was canceled');
+    try {
+      // בקשת רשות גישה לספריית התמונות
+      const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!result.granted) {
+        Alert.alert('Error', 'Permission to access gallery is required');
+        return;
+      }
+  
+      // בחירת תמונה או מדיה אחרת
+      const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      // אם המשתמש לא ביטל את הבחירה
+      if (!pickerResult.canceled) {
+        const uri = pickerResult.assets[0].uri;
+        const filename = uri.substring(uri.lastIndexOf('/') + 1);
+  
+        // יצירת התייחסות ל-Firebase Storage
+        const storageRef = ref(storage, `images/${filename}`);
+  
+        // הורדת התמונה כ-blob
+        const response = await fetch(uri);
+        const blob = await response.blob();
+  
+        // העלאת התמונה ל-Firebase Storage
+        await uploadBytes(storageRef, blob);
+  
+        // קבלת כתובת ה-URL להורדת התמונה
+        const downloadURL = await getDownloadURL(storageRef);
+  
+        // הוספת ה-URI והסוג של המדיה
+        setMediaUris([...mediaUris, downloadURL]);
+        setMediaType(type);
+      } else {
+        Alert.alert('Error', 'Media selection was canceled');
+      }
+    } catch (error) {
+      Alert.alert('Error', `An error occurred: ${error.message}`);
     }
   };
+
+  const storage = getStorage();
 
   const pickImage = () => pickMedia(ImagePicker.MediaTypeOptions.Images, 'image');
   const pickVideo = () => pickMedia(ImagePicker.MediaTypeOptions.Videos, 'video');
