@@ -195,7 +195,7 @@ const MyListsScreen = ({ route }) => {
           <Image source={list.Image} style={{ width: 30, height: 30 }} />
         </TouchableOpacity>
       ))}
-      { user.userName.toLowerCase() == currentUser.userName.toLowerCase() &&(
+      { currentUser && user.userName.toLowerCase() == currentUser.userName.toLowerCase() &&( //only curr user can add lists to his own page
       <TouchableOpacity
         style={[styles.categoryButtonIcon, {
           right: 20,
