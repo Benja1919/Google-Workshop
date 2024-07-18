@@ -51,6 +51,17 @@ export const firestoreDB = () => {
         await addDoc(usersListsCollectionRef, list);
     };
 
+	const TryLoginUser = async (userName, password) => {
+		const userDoc = doc(firestore, 'users', userName);
+        const userSnapshot = await getDoc(userDoc);
+        const user = { id: userSnapshot.id, ...userSnapshot.data() }
+		if (user && user.password === password) {
+			return user;
+		} else {
+			return null;
+		}
+	};
+
     const GetUserLists = async (userName) => {
         const listsCollection = collection(firestore, 'users', userName, 'lists');
         const querySnapshot = await getDocs(listsCollection);
@@ -74,6 +85,7 @@ export const firestoreDB = () => {
         GetPosts,
         AddPost,
         CreateList,
+		TryLoginUser,
         GetUserLists,
         GetUserName,
         GetRestaurant,
