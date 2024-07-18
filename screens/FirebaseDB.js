@@ -81,6 +81,38 @@ export const firestoreDB = () => {
         return restaurantDoc.exists() ? restaurantDoc.data() : null;
     };
 
+	const GetRestaurantbyOwner = async (user) => {
+        const restaurantDoc = doc(firestore, 'restaurants', user.RestaurantID);
+        const restaurantSnapshot = await getDoc(restaurantDoc);
+        return { id: restaurantSnapshot.id, ...restaurantSnapshot.data() };
+	};
+
+	const UpdateRestaurantContent = async (Restaurant) => {
+		//Alert.alert(RestaurantUser);
+		const userRef = doc(firestore, "restaurants", Restaurant.id);
+
+		// Create the new contents object
+		const updatedData = {
+			ContentTitles: Restaurant.ContentTitles,
+			ContentData: Restaurant.ContentData,
+			description: Restaurant.description,
+			Address: Restaurant.Address,
+			Coordinates: Restaurant.Coordinates,
+		};
+		try {
+		    await setDoc(userRef, updatedData, { merge: true });
+		} catch (error) {
+			
+		}
+	};
+
+	const GetUsers = async () => {
+        const usersCollection = collection(firestore, 'users');
+        const usersSnapshot = await getDocs(usersCollection);
+        const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+		return users;
+	};
+
     return {
         GetPosts,
         AddPost,
@@ -89,6 +121,9 @@ export const firestoreDB = () => {
         GetUserLists,
         GetUserName,
         GetRestaurant,
+		UpdateRestaurantContent,
+		GetRestaurantbyOwner,
+		GetUsers 
     };
 };
 
