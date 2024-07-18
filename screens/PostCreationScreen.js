@@ -9,7 +9,7 @@ import { AuthContext } from './AuthContext';
 import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'firebase/storage';
 import { firestoreDB } from './FirebaseDB';
 import { initializeApp } from 'firebase/app';
-const GOOGLE_PLACES_API_KEY = 'YOUR_GOOGLE_PLACES_API_KEY'; // Replace with your Google Places API key
+const GOOGLE_PLACES_API_KEY = 'AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E'; // Replace with your Google Places API key
 
 const PostCreationScreen = ({ navigation }) => {
   const [restaurantName, setRestaurantName] = useState('');

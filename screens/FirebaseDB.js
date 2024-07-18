@@ -1,9 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { collection, getDocs, doc, getDoc, addDoc, setDoc, query,where, orderBy } from 'firebase/firestore';
-import { AuthContext } from './AuthContext';
-import { Alert } from 'react-native';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, getDocs, doc, getDoc, addDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -17,119 +16,75 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const firestore = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
 
 export const firestoreDB = () => {
-	const GetPosts = async () => {
+    const GetPosts = async () => {
         const postsCollection = collection(firestore, 'posts');
-		const q = query(postsCollection, orderBy("__name__", "desc"));
+        const q = query(postsCollection, orderBy("__name__", "desc"));
         const postsSnapshot = await getDocs(q);
         const postsList = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        return postsList
-    }
+        return postsList;
+    };
 
-	const AddPost = async (post) => {
-        const currentUser = await GetUserName(post.userName.toLowerCase())
-		const newPost = {
-			userName: post.userName,
-			restaurantName: post.restaurantName,
-			stars: post.stars,
-			content: post.content,
-			mediaUrls: post.mediaUrls || [], // Assuming post.mediaUrls is an array of URLs
-			mediaTypes: post.mediaTypes || [], // Assuming post.mediaTypes is an array of types (optional)
-			profileImageUrl: currentUser.profileImageUrl,
-		};
+    const AddPost = async (post) => {
+        const currentUser = await GetUserName(post.userName.toLowerCase());
+        const newPost = {
+            userName: post.userName,
+            restaurantName: post.restaurantName,
+            stars: post.stars,
+            content: post.content,
+            mediaUrls: post.mediaUrls || [],
+            mediaTypes: post.mediaTypes || [],
+            profileImageUrl: currentUser.profileImageUrl,
+        };
         const postsCollectionRef = collection(firestore, 'posts');
         const docRef = await addDoc(postsCollectionRef, newPost);
-		GetRestaurant(post.restaurantName).starcount += post.stars;
-		GetRestaurant(post.restaurantName).reviewcount += 1;
-	};
+        const restaurant = await GetRestaurant(post.restaurantName);
+        restaurant.starcount += post.stars;
+        restaurant.reviewcount += 1;
+    };
 
-	const CreateList = async (list) => {
-        const currentUser = await GetUserName(list.userName.toLowerCase())
+    const CreateList = async (list) => {
+        const currentUser = await GetUserName(list.userName.toLowerCase());
+        const usersListsCollectionRef = collection(firestore, 'users', list.userName, 'lists');
+        await addDoc(usersListsCollectionRef, list);
+    };
 
-        const usersListsCollectionRef = collection(firestore, 'usersLists');
-        const docRef = await addDoc(usersListsCollectionRef, list);
-	};
-
-	const GetUserLists = async (userName) => {
-		const q = query(collection(firestore, 'usersLists'),  where('userName', '==', userName));
-		const querySnapshot = await getDocs(q);
-		const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-		return lists;
-	  };
-
-	const addItemToList = async (list, restaurant) => {
-			////// you need to find a way to recognise the spesific List you are working at, and add a restaurand deteils to it
-			////// pay attention! you must consider the way you Get the list, and how you show ut to the user.
-			////// having a page dedicate to list sounds like the best solution
-	};
-	const UpdateRestaurantContent = async (Restaurant) => {
-		//Alert.alert(RestaurantUser);
-		const userRef = doc(firestore, "restaurants", Restaurant.id);
-
-		// Create the new contents object
-		const updatedData = {
-			ContentTitles: Restaurant.ContentTitles,
-			ContentData: Restaurant.ContentData,
-			description: Restaurant.description,
-			Address: Restaurant.Address,
-			Coordinates: Restaurant.Coordinates,
-		};
-		try {
-		    await setDoc(userRef, updatedData, { merge: true });
-		} catch (error) {
-			
-		}
-	};
-	const GetRestaurantbyOwner = async (user) => {
-        const restaurantDoc = doc(firestore, 'restaurants', user.RestaurantID);
-        const restaurantSnapshot = await getDoc(restaurantDoc);
-        return { id: restaurantSnapshot.id, ...restaurantSnapshot.data() };
-	};
-
-	const GetRestaurant = async (restaurantName) => {
-        const restaurantDoc = doc(firestore, 'restaurants', restaurantName);
-        const restaurantSnapshot = await getDoc(restaurantDoc);
-        return { id: restaurantSnapshot.id, ...restaurantSnapshot.data() };
-	};
-
-	const TryLoginUser = async (userName, password) => {
-		const userDoc = doc(firestore, 'users', userName);
-        const userSnapshot = await getDoc(userDoc);
-        const user = { id: userSnapshot.id, ...userSnapshot.data() }
-		if (user && user.password === password) {
-			return user;
-		} else {
-			return null;
-		}
-	};
+    const GetUserLists = async (userName) => {
+        const listsCollection = collection(firestore, 'users', userName, 'lists');
+        const querySnapshot = await getDocs(listsCollection);
+        const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return lists;
+    };
 
     const GetUserName = async (userName) => {
-		const userDoc = doc(firestore, 'users', userName);
-        const userSnapshot = await getDoc(userDoc);
-        const user = { id: userSnapshot.id, ...userSnapshot.data() }
-		return user;
-	};
+        const userDocRef = doc(firestore, 'users', userName);
+        const userDoc = await getDoc(userDocRef);
+        return userDoc.exists() ? userDoc.data() : null;
+    };
 
-	// Add this function to get all users
-	const GetUsers = async () => {
-        const usersCollection = collection(firestore, 'users');
-        const usersSnapshot = await getDocs(usersCollection);
-        const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-		return users;
-	};
+    const GetRestaurant = async (restaurantName) => {
+        const restaurantDocRef = doc(firestore, 'restaurants', restaurantName);
+        const restaurantDoc = await getDoc(restaurantDocRef);
+        return restaurantDoc.exists() ? restaurantDoc.data() : null;
+    };
 
-	return {
-		GetPosts,
-		AddPost,
-		GetRestaurant,
-		TryLoginUser,
-		UpdateRestaurantContent,
-		GetUserName,
-		GetUsers,  // Export the new function
-		GetRestaurantbyOwner,
-		CreateList,
-		GetUserLists,
-		GetUsers 
-	};
+    return {
+        GetPosts,
+        AddPost,
+        CreateList,
+        GetUserLists,
+        GetUserName,
+        GetRestaurant,
+    };
+};
+
+export const uploadImageToStorage = async (uri, fileName) => {
+    const storageRef = ref(storage, 'images/' + fileName);
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    await uploadBytes(storageRef, blob);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
 };

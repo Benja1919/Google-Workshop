@@ -1,10 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import Video from 'react-native-video';
+import { firestoreDB } from './FirebaseDB';
 
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [paused, setPaused] = useState(false);
     const [videoError, setVideoError] = useState(null);
+    const [profileImageUrl, setProfileImageUrl] = useState('');
+
+    useEffect(() => {
+        const fetchProfileImage = async () => {
+            try {
+                const user = await firestoreDB().GetUserName(post.userName.toLowerCase());
+                if (user && user.profileImageUrl && user.profileImageUrl !== '') {
+                    setProfileImageUrl(user.profileImageUrl);
+                } else {
+                    setProfileImageUrl(''); // הגדרת URL ריק במקרה של חוסר בתמונה
+                }
+            } catch (error) {
+                console.error('Error fetching profile image:', error);
+                setProfileImageUrl(''); // הגדרת URL ריק במקרה של שגיאה
+            }
+        };
+
+        fetchProfileImage();
+    }, [post.userName]);
 
     const mediaItems = Array.isArray(post.mediaUrls)
         ? post.mediaUrls.map((url, index) => ({
@@ -39,7 +59,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
         <View style={styles.postCard}>
             <View style={styles.header}>
                 <TouchableOpacity style={styles.userContainer} onPress={() => navigateToProfile(post.userName)}>
-                    <Image source={{ uri: post.profileImageUrl }} style={styles.userImage} />
+                    <Image source={{ uri: profileImageUrl || 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQA5QMBIgACEQEDEQH/xAAYAAEBAQEBAAAAAAAAAAAAAAAAAQIDB//EABYQAQEBAAAAAAAAAAAAAAAAAAABEf/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwD2GNJFAMWKCRRcAhi4sgM4uNYYDOLi4AmGNAM4Y0AzhjWJgJiNYYDKY1hQZRpAQVAGa1UBijVigi4YoBBrAFFABQAUEFARQBBQBFAQUBkUoIilBlGkBkVAEUAWJFgDRFgCgAoAAAAAAAAQAWoAAAACCoCI0gMUaqUGcFQCXVSNQFXEaAVFAAAAAAAAAAAC0AAAAABAAAZqY1UoMgAkajMaBYsCAqooAAAAAAAAAAAAAAAACKAgAIy0lBkACLGY1AWLEigqoAoAAAAAAAAAAAAAAAAAIACVBKCYACRqMNaDSs6oNCKCiAKAAAAAAAAAAAACAAAgJoCUTQBAGY0wsBvV1klB0GVBoQBRFAVAFEAUQBRAFEAATQAQBKagCFSgtRAGVjMqg1KuxhYDcrWuetQGxmVdBoZ00GlZAaGVBRAFETQaRNAVE1NBqolrNoNWs7U0AqABogDEaAFABTVANWUAXQAXTQBZQAAAEAAAESgCaACJqgIUAQAH/9k='}} style={styles.userImage} />
                     <Text style={styles.userName}>{post.userName}</Text>
                 </TouchableOpacity>
                 <Text style={styles.stars}>{'⭐'.repeat(post.stars)}</Text>
