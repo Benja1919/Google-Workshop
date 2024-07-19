@@ -113,25 +113,18 @@ export const firestoreDB = () => {
 	};
 
 	const GetUserFriends = async (userName) => {
-		try {
-		  console.log(`Fetching friends for user: ${userName}`);
-		  
+		try {		  
 		  // קבל את מסמך המשתמש
 		  const userDocRef = doc(firestore, 'users', userName);
 		  const userDoc = await getDoc(userDocRef);
 	  
 		  // בדוק אם המסמך קיים
 		  if (userDoc.exists()) {
-			const userData = userDoc.data();
-			console.log('User data:', userData);
-	  
+			const userData = userDoc.data();	  
 			// קבל את רשימת החברים
-			const friendsIds = userData.friends || [];
-			console.log('Friends IDs:', friendsIds);
-	  
+			const friendsIds = userData.friends || [];	  
 			// בדוק אם יש רשימה ריקה
 			if (friendsIds.length === 0) {
-			  console.log('No friends to fetch.');
 			  return [];
 			}
 	  
@@ -145,15 +138,10 @@ export const firestoreDB = () => {
 			  const friendDoc = await getDoc(friendDocRef);
 			  if (friendDoc.exists()) {
 				friends.push({ id: friendDoc.id, ...friendDoc.data() });
-			  } else {
-				console.log(`Friend with ID ${id} does not exist.`);
-			  }
+			  } 
 			}
-	  
-			console.log('Friends list:', friends);
 			return friends;
 		  } else {
-			console.log('User document not found.');
 			return [];
 		  }
 		} catch (error) {

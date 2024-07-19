@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,12 +9,12 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
-import { GetUserFriends } from './FirebaseDB'; // ייבוא פונקציה ישירה
+import { AuthContext } from './AuthContext'; // Import AuthContext
 import { firestoreDB } from './FirebaseDB';
-
 
 const NetworkScreen = ({ route }) => {
   const { userName } = route.params; // קבלת userName מהפרמטרים
+  const { currentUser } = useContext(AuthContext); // Use AuthContext to get current user
   const [users, setUsers] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [userSelected, setUserSelected] = useState({});
@@ -41,6 +41,11 @@ const NetworkScreen = ({ route }) => {
     setModalVisible(true);
   };
 
+  // פונקציה לבדוק אם המשתמש הנוכחי עוקב אחרי המשתמש המוצג
+  const isFollowing = (user) => {
+    return currentUser?.friends?.includes(user.userName) || false;
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -52,11 +57,15 @@ const NetworkScreen = ({ route }) => {
             <Image style={styles.image} source={{ uri: item.profileImageUrl }} />
             <View style={styles.cardContent}>
               <Text style={styles.name}>{item.userName}</Text>
-              <TouchableOpacity
-                style={styles.followButton}
-                onPress={() => selectUser(item)}>
-                <Text style={styles.followButtonText}>Follow</Text>
-              </TouchableOpacity>
+              {currentUser?.userName !== item.userName && ( // Check if the current user is not the one being displayed
+                <TouchableOpacity
+                  style={styles.followButton}
+                  onPress={() => selectUser(item)}>
+                  <Text style={styles.followButtonText}>
+                    {isFollowing(item) ? 'Following' : 'Follow'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </TouchableOpacity>
         )}
@@ -71,8 +80,8 @@ const NetworkScreen = ({ route }) => {
           <View style={styles.popup}>
             <View style={styles.popupContent}>
               <ScrollView contentContainerStyle={styles.modalInfo}>
-                <Image style={styles.image} source={{ uri: userSelected.image }} />
-                <Text style={styles.name}>{userSelected.name}</Text>
+                <Image style={styles.image} source={{ uri: userSelected.profileImageUrl }} />
+                <Text style={styles.name}>{userSelected.userName}</Text>
                 <Text style={styles.position}>{userSelected.position}</Text>
                 <Text style={styles.about}>{userSelected.about}</Text>
               </ScrollView>
