@@ -14,18 +14,18 @@ import { firestoreDB } from './FirebaseDB';
 import { doc, updateDoc } from 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
 
-// אתחול Firestore
+// Initialize Firestore
 const firestore = getFirestore();
 
 const NetworkScreen = ({ route }) => {
-  const { userName } = route.params; // קבלת userName מהפרמטרים
+  const { userName } = route.params; // Get userName from parameters
   const { currentUser } = useContext(AuthContext); // Use AuthContext to get current user
   const [users, setUsers] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [userSelected, setUserSelected] = useState({});
   const [followedUsers, setFollowedUsers] = useState(new Set()); // State to track followed users
 
-  // פונקציה להבאת חברים מה-DB
+  // Function to fetch friends from DB
   const fetchFriends = async () => {
     try {
       const friendsList = await firestoreDB().GetUserFriends(userName.toLowerCase()); // Fetch friends data
@@ -39,30 +39,49 @@ const NetworkScreen = ({ route }) => {
 
   useEffect(() => {
     fetchFriends();
-  }, [userName]); // הוספת userName כתלות
+  }, [userName]); // Add userName as a dependency
 
-  // פונקציה לבחירת משתמש
+  // Function to select a user
   const selectUser = (user) => {
     setUserSelected(user);
     setModalVisible(true);
   };
 
-  // פונקציה לבדוק אם המשתמש הנוכחי עוקב אחרי המשתמש המוצג
+  // Function to check if the current user is following the displayed user
   const isFollowing = (user) => {
     return followedUsers.has(user.userName);
   };
 
-  // פונקציה לעקוב אחרי משתמש
+  // Function to follow a user
   const handleFollow = async (user) => {
     try {
       const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
-      await updateDoc(userRef, {
-        friends: [...(currentUser?.friends || []), user.userName],
-      });
-
-      setFollowedUsers(new Set([...followedUsers, user.userName]));
+      const currentFriends = currentUser?.friends || [];
+      // Avoid adding duplicate entries
+      if (!currentFriends.includes(user.userName)) {
+        await updateDoc(userRef, {
+          friends: [...currentFriends, user.userName],
+        });
+        setFollowedUsers(new Set([...followedUsers, user.userName]));
+      }
     } catch (error) {
       console.error('Error following user:', error);
+    }
+  };
+
+  // Function to unfollow a user
+  const handleUnfollow = async (user) => {
+    try {
+      const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
+      const updatedFriends = (currentUser?.friends || []).filter(
+        (friend) => friend !== user.userName
+      );
+      await updateDoc(userRef, {
+        friends: updatedFriends,
+      });
+      setFollowedUsers(new Set(updatedFriends));
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
     }
   };
 
@@ -77,18 +96,28 @@ const NetworkScreen = ({ route }) => {
             <Image style={styles.image} source={{ uri: item.profileImageUrl }} />
             <View style={styles.cardContent}>
               <Text style={styles.name}>{item.userName}</Text>
-              {currentUser?.userName !== item.userName && ( // Check if the current user is not the one being displayed
-                <TouchableOpacity
-                  style={styles.followButton}
-                  onPress={() => {
-                    if (!isFollowing(item)) {
-                      handleFollow(item);
-                    }
-                  }}>
-                  <Text style={styles.followButtonText}>
-                    {isFollowing(item) ? 'Following' : 'Follow'}
-                  </Text>
-                </TouchableOpacity>
+              {currentUser?.userName !== item.userName && (
+                <View style={styles.buttonsContainer}>
+                  {isFollowing(item) ? (
+                    <>
+                      <TouchableOpacity
+                        style={styles.followingButton}>
+                        <Text style={styles.followingButtonText}>Following</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.unfollowButton}
+                        onPress={() => handleUnfollow(item)}>
+                        <Text style={styles.unfollowButtonText}>Unfollow</Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.followButton}
+                      onPress={() => handleFollow(item)}>
+                      <Text style={styles.followButtonText}>Follow</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               )}
             </View>
           </TouchableOpacity>
@@ -161,7 +190,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     flex: 1,
-    alignSelf: 'center',
+    alignSelf: 'left',
     color: '#008080',
     fontWeight: 'bold',
   },
@@ -174,8 +203,11 @@ const styles = StyleSheet.create({
   about: {
     marginHorizontal: 10,
   },
-  followButton: {
+  buttonsContainer: {
+    flexDirection: 'row',
     marginTop: 10,
+  },
+  followButton: {
     height: 35,
     width: 100,
     flexDirection: 'row',
@@ -183,8 +215,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 30,
     backgroundColor: '#00BFFF',
+    marginRight: 10,
+  },
+  followingButton: {
+    height: 35,
+    width: 100,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 30,
+    backgroundColor: '#00BFFF',
+    marginRight: 10,
+  },
+  unfollowButton: {
+      height: 35,
+      width: 100,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 30,
+      backgroundColor: '#FF6347', // Red background for unfollow
+      marginLeft: 10,
+  },
+  unfollowButtonText: {
+    color: '#FFFFFF',
+    fontSize: 20,
   },
   followButtonText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+  },
+  followingButtonText: {
     color: '#FFFFFF',
     fontSize: 20,
   },
