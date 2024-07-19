@@ -11,6 +11,11 @@ import {
 } from 'react-native';
 import { AuthContext } from './AuthContext'; // Import AuthContext
 import { firestoreDB } from './FirebaseDB';
+import { doc, updateDoc } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+
+// אתחול Firestore
+const firestore = getFirestore();
 
 const NetworkScreen = ({ route }) => {
   const { userName } = route.params; // קבלת userName מהפרמטרים
@@ -18,14 +23,15 @@ const NetworkScreen = ({ route }) => {
   const [users, setUsers] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [userSelected, setUserSelected] = useState({});
+  const [followedUsers, setFollowedUsers] = useState(new Set()); // State to track followed users
 
   // פונקציה להבאת חברים מה-DB
   const fetchFriends = async () => {
     try {
-      console.log(`Fetching friends for user: ${userName}`);
       const friendsList = await firestoreDB().GetUserFriends(userName.toLowerCase()); // Fetch friends data
-      console.log('Fetched friends list:', friendsList);
       setUsers(friendsList);
+      const followedSet = new Set(currentUser?.friends || []);
+      setFollowedUsers(followedSet);
     } catch (error) {
       console.error('Error fetching friends:', error);
     }
@@ -43,7 +49,21 @@ const NetworkScreen = ({ route }) => {
 
   // פונקציה לבדוק אם המשתמש הנוכחי עוקב אחרי המשתמש המוצג
   const isFollowing = (user) => {
-    return currentUser?.friends?.includes(user.userName) || false;
+    return followedUsers.has(user.userName);
+  };
+
+  // פונקציה לעקוב אחרי משתמש
+  const handleFollow = async (user) => {
+    try {
+      const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
+      await updateDoc(userRef, {
+        friends: [...(currentUser?.friends || []), user.userName],
+      });
+
+      setFollowedUsers(new Set([...followedUsers, user.userName]));
+    } catch (error) {
+      console.error('Error following user:', error);
+    }
   };
 
   return (
@@ -60,7 +80,11 @@ const NetworkScreen = ({ route }) => {
               {currentUser?.userName !== item.userName && ( // Check if the current user is not the one being displayed
                 <TouchableOpacity
                   style={styles.followButton}
-                  onPress={() => selectUser(item)}>
+                  onPress={() => {
+                    if (!isFollowing(item)) {
+                      handleFollow(item);
+                    }
+                  }}>
                   <Text style={styles.followButtonText}>
                     {isFollowing(item) ? 'Following' : 'Follow'}
                   </Text>

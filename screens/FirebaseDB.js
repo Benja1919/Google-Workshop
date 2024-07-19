@@ -150,9 +150,14 @@ export const firestoreDB = () => {
 		}
 	  };
 
+	  const getUserRef = (userName) => {
+		return firestore.collection('users').doc(userName);
+	  };
+
     return {
         GetPosts,
         AddPost,
+		getUserRef,
         CreateList,
 		TryLoginUser,
 		GetUserFriends,
