@@ -7,6 +7,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [paused, setPaused] = useState(false);
     const [videoError, setVideoError] = useState(null);
     const [profileImageUrl, setProfileImageUrl] = useState('');
+    const [activeIndex, setActiveIndex] = useState(0); // Track active dot index
 
     useEffect(() => {
         const fetchProfileImage = async () => {
@@ -15,11 +16,11 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                 if (user && user.profileImageUrl && user.profileImageUrl !== '') {
                     setProfileImageUrl(user.profileImageUrl);
                 } else {
-                    setProfileImageUrl(''); // הגדרת URL ריק במקרה של חוסר בתמונה
+                    setProfileImageUrl(''); // Empty URL if no image
                 }
             } catch (error) {
                 console.error('Error fetching profile image:', error);
-                setProfileImageUrl(''); // הגדרת URL ריק במקרה של שגיאה
+                setProfileImageUrl(''); // Empty URL if error
             }
         };
 
@@ -55,6 +56,32 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
         }
     };
 
+    const viewabilityConfig = {
+        itemVisiblePercentThreshold: 50,
+    };
+
+    const onViewableItemsChanged = ({ viewableItems }) => {
+        if (viewableItems.length > 0) {
+            setActiveIndex(viewableItems[0].index || 0);
+        }
+    };
+
+    const PaginationDots = ({ index, length }) => {
+        return (
+            <View style={styles.paginationContainer}>
+                {Array.from({ length }).map((_, i) => (
+                    <View
+                        key={i}
+                        style={[
+                            styles.paginationDot,
+                            { opacity: index === i ? 1 : 0.5 },
+                        ]}
+                    />
+                ))}
+            </View>
+        );
+    };
+
     return (
         <View style={styles.postCard}>
             <View style={styles.header}>
@@ -76,7 +103,10 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                 showsHorizontalScrollIndicator={false}
                 snapToAlignment="center"
                 decelerationRate="fast"
+                viewabilityConfig={viewabilityConfig}
+                onViewableItemsChanged={onViewableItemsChanged}
             />
+            <PaginationDots index={activeIndex} length={mediaItems.length} />
             {videoError && <Text style={styles.errorText}>{videoError}</Text>}
             <Text style={styles.content}>{post.content}</Text>
         </View>
@@ -140,6 +170,18 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 14,
         marginTop: 10,
+    },
+    paginationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 10,
+    },
+    paginationDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#000',
+        margin: 3,
     },
 });
 
