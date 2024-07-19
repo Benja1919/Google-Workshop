@@ -17,7 +17,8 @@ import { getFirestore } from 'firebase/firestore';
 // Initialize Firestore
 const firestore = getFirestore();
 
-const NetworkScreen = ({ route }) => {
+
+const NetworkScreen = ({navigation, route }) => {
   const { userName } = route.params; // Get userName from parameters
   const { currentUser } = useContext(AuthContext); // Use AuthContext to get current user
   const [users, setUsers] = useState([]);
@@ -25,6 +26,9 @@ const NetworkScreen = ({ route }) => {
   const [userSelected, setUserSelected] = useState({});
   const [followedUsers, setFollowedUsers] = useState(new Set()); // State to track followed users
 
+  const navigateToProfile = (userName) => {
+    navigation.navigate('UserProfile', { userName });
+  };
   // Function to fetch friends from DB
   const fetchFriends = async () => {
     try {
@@ -92,7 +96,7 @@ const NetworkScreen = ({ route }) => {
         data={users}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => selectUser(item)}>
+          <TouchableOpacity style={styles.card} onPress={() => navigateToProfile(item.userName)}>
             <Image style={styles.image} source={{ uri: item.profileImageUrl }} />
             <View style={styles.cardContent}>
               <Text style={styles.name}>{item.userName}</Text>
