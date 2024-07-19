@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,129 +6,60 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
-  Dimensions,
   Modal,
   ScrollView,
-} from 'react-native'
+} from 'react-native';
+import { GetUserFriends } from './FirebaseDB'; // ייבוא פונקציה ישירה
+import { firestoreDB } from './FirebaseDB';
 
-export default Users = () => {
-  const data = [
-    {
-      id: 1,
-      name: 'Mark Doe',
-      position: 'CEO',
-      image: 'https://bootdey.com/img/Content/avatar/avatar7.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 2,
-      name: 'John Doe',
-      position: 'CTO',
-      image: 'https://bootdey.com/img/Content/avatar/avatar1.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 3,
-      name: 'Clark Man',
-      position: 'Creative designer',
-      image: 'https://bootdey.com/img/Content/avatar/avatar6.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 4,
-      name: 'Jaden Boor',
-      position: 'Front-end dev',
-      image: 'https://bootdey.com/img/Content/avatar/avatar5.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 5,
-      name: 'Srick Tree',
-      position: 'Backend-end dev',
-      image: 'https://bootdey.com/img/Content/avatar/avatar4.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 6,
-      name: 'John Doe',
-      position: 'Creative designer',
-      image: 'https://bootdey.com/img/Content/avatar/avatar3.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 7,
-      name: 'John Doe',
-      position: 'Manager',
-      image: 'https://bootdey.com/img/Content/avatar/avatar2.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 8,
-      name: 'John Doe',
-      position: 'IOS dev',
-      image: 'https://bootdey.com/img/Content/avatar/avatar1.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 9,
-      name: 'John Doe',
-      position: 'Web dev',
-      image: 'https://bootdey.com/img/Content/avatar/avatar4.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-    {
-      id: 10,
-      name: 'John Doe',
-      position: 'Analyst',
-      image: 'https://bootdey.com/img/Content/avatar/avatar7.png',
-      about:
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.',
-    },
-  ]
 
-  const [users, setUsers] = useState(data)
-  const [modalVisible, setModalVisible] = useState(false)
-  const [userSelected, setUserSelected] = useState([])
+const NetworkScreen = ({ route }) => {
+  const { userName } = route.params; // קבלת userName מהפרמטרים
+  const [users, setUsers] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [userSelected, setUserSelected] = useState({});
 
-  const selectUser = user => {
-    setUserSelected(user)
-    setModalVisible(true)
-  }
+  // פונקציה להבאת חברים מה-DB
+  const fetchFriends = async () => {
+    try {
+      console.log(`Fetching friends for user: ${userName}`);
+      const friendsList = await firestoreDB().GetUserFriends(userName.toLowerCase()); // Fetch friends data
+      console.log('Fetched friends list:', friendsList);
+      setUsers(friendsList);
+    } catch (error) {
+      console.error('Error fetching friends:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFriends();
+  }, [userName]); // הוספת userName כתלות
+
+  // פונקציה לבחירת משתמש
+  const selectUser = (user) => {
+    setUserSelected(user);
+    setModalVisible(true);
+  };
 
   return (
     <View style={styles.container}>
       <FlatList
         style={styles.userList}
-        columnWrapperStyle={styles.listContainer}
         data={users}
-        keyExtractor={item => {
-          return item.id
-        }}
-        renderItem={({ item }) => {
-          return (
-            <TouchableOpacity style={styles.card} onPress={() => selectUser(item)}>
-              <Image style={styles.image} source={{ uri: item.image }} />
-              <View style={styles.cardContent}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.position}>{item.position}</Text>
-                <TouchableOpacity
-                  style={styles.followButton}
-                  onPress={() => selectUser(item)}>
-                  <Text style={styles.followButtonText}>Follow</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          )
-        }}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.card} onPress={() => selectUser(item)}>
+            <Image style={styles.image} source={{ uri: item.profileImageUrl }} />
+            <View style={styles.cardContent}>
+              <Text style={styles.name}>{item.userName}</Text>
+              <TouchableOpacity
+                style={styles.followButton}
+                onPress={() => selectUser(item)}>
+                <Text style={styles.followButtonText}>Follow</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        )}
       />
 
       <Modal
@@ -148,9 +79,7 @@ export default Users = () => {
             </View>
             <View style={styles.popupButtons}>
               <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(false)
-                }}
+                onPress={() => setModalVisible(false)}
                 style={styles.btnClose}>
                 <Text style={styles.txtClose}>Close</Text>
               </TouchableOpacity>
@@ -159,32 +88,14 @@ export default Users = () => {
         </View>
       </Modal>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 20,
     backgroundColor: '#eeeeee',
-  },
-  header: {
-    backgroundColor: '#00CED1',
-    height: 200,
-  },
-  headerContent: {
-    padding: 30,
-    alignItems: 'center',
-    flex: 1,
-  },
-  detailContent: {
-    top: 80,
-    height: 500,
-    width: Dimensions.get('screen').width - 90,
-    marginHorizontal: 30,
-    flexDirection: 'row',
-    position: 'absolute',
-    backgroundColor: '#ffffff',
   },
   userList: {
     flex: 1,
@@ -198,7 +109,6 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 45,
   },
-
   card: {
     shadowColor: '#00000021',
     shadowOffset: {
@@ -208,7 +118,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
     elevation: 12,
-
     marginVertical: 10,
     marginHorizontal: 20,
     backgroundColor: 'white',
@@ -216,7 +125,6 @@ const styles = StyleSheet.create({
     padding: 10,
     flexDirection: 'row',
   },
-
   name: {
     fontSize: 18,
     flex: 1,
@@ -233,7 +141,6 @@ const styles = StyleSheet.create({
   about: {
     marginHorizontal: 10,
   },
-
   followButton: {
     marginTop: 10,
     height: 35,
@@ -248,7 +155,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 20,
   },
-  /************ modals ************/
   popup: {
     backgroundColor: 'white',
     marginTop: 80,
@@ -258,15 +164,11 @@ const styles = StyleSheet.create({
   popupOverlay: {
     backgroundColor: '#00000057',
     flex: 1,
-    marginTop: 30,
+    justifyContent: 'center',
   },
   popupContent: {
-    //alignItems: 'center',
     margin: 5,
     height: 250,
-  },
-  popupHeader: {
-    marginBottom: 45,
   },
   popupButtons: {
     marginTop: 15,
@@ -275,23 +177,21 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     justifyContent: 'center',
   },
-  popupButton: {
-    flex: 1,
-    marginVertical: 16,
-  },
   btnClose: {
-    flex:1,
+    flex: 1,
     height: 40,
     backgroundColor: '#20b2aa',
-    padding:5,
-    alignItems:'center',
-    justifyContent:'center',
+    padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalInfo: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  txtClose:{
-    color:'white'
-  }
-})
+  txtClose: {
+    color: 'white',
+  },
+});
+
+export default NetworkScreen;

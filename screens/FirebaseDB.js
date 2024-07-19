@@ -27,23 +27,22 @@ export const firestoreDB = () => {
         return postsList;
     };
 
-    const AddPost = async (post) => {
-        const currentUser = await GetUserName(post.userName.toLowerCase());
-        const newPost = {
-            userName: post.userName,
-            restaurantName: post.restaurantName,
-            stars: post.stars,
-            content: post.content,
-            mediaUrls: post.mediaUrls || [],
-            mediaTypes: post.mediaTypes || [],
-            profileImageUrl: currentUser.profileImageUrl,
-        };
+	const AddPost = async (post) => {
+        const currentUser = await GetUserName(post.userName.toLowerCase())
+		const newPost = {
+			userName: post.userName,
+			restaurantName: post.restaurantName,
+			stars: post.stars,
+			content: post.content,
+			mediaUrls: post.mediaUrls || [], // Assuming post.mediaUrls is an array of URLs
+			mediaTypes: post.mediaTypes || [], // Assuming post.mediaTypes is an array of types (optional)
+			profileImageUrl: currentUser.profileImageUrl,
+		};
         const postsCollectionRef = collection(firestore, 'posts');
         const docRef = await addDoc(postsCollectionRef, newPost);
-        const restaurant = await GetRestaurant(post.restaurantName);
-        restaurant.starcount += post.stars;
-        restaurant.reviewcount += 1;
-    };
+		GetRestaurant(post.restaurantName).starcount += post.stars;
+		GetRestaurant(post.restaurantName).reviewcount += 1;
+	};
 
     const CreateList = async (list) => {
         const currentUser = await GetUserName(list.userName.toLowerCase());
@@ -113,11 +112,62 @@ export const firestoreDB = () => {
 		return users;
 	};
 
+	const GetUserFriends = async (userName) => {
+		try {
+		  console.log(`Fetching friends for user: ${userName}`);
+		  
+		  // קבל את מסמך המשתמש
+		  const userDocRef = doc(firestore, 'users', userName);
+		  const userDoc = await getDoc(userDocRef);
+	  
+		  // בדוק אם המסמך קיים
+		  if (userDoc.exists()) {
+			const userData = userDoc.data();
+			console.log('User data:', userData);
+	  
+			// קבל את רשימת החברים
+			const friendsIds = userData.friends || [];
+			console.log('Friends IDs:', friendsIds);
+	  
+			// בדוק אם יש רשימה ריקה
+			if (friendsIds.length === 0) {
+			  console.log('No friends to fetch.');
+			  return [];
+			}
+	  
+			// קבל את פרטי החברים
+			const friendsCollection = collection(firestore, 'users');
+			// יצר שגיאה בשימוש ב-where עם רשימה גדולה
+			// נשתמש בלולאת for כדי לטעון חברים כל אחד בנפרד
+			const friends = [];
+			for (const id of friendsIds) {
+			  const friendDocRef = doc(friendsCollection, id.toLowerCase());
+			  const friendDoc = await getDoc(friendDocRef);
+			  if (friendDoc.exists()) {
+				friends.push({ id: friendDoc.id, ...friendDoc.data() });
+			  } else {
+				console.log(`Friend with ID ${id} does not exist.`);
+			  }
+			}
+	  
+			console.log('Friends list:', friends);
+			return friends;
+		  } else {
+			console.log('User document not found.');
+			return [];
+		  }
+		} catch (error) {
+		  console.error('Error getting user friends:', error);
+		  return [];
+		}
+	  };
+
     return {
         GetPosts,
         AddPost,
         CreateList,
 		TryLoginUser,
+		GetUserFriends,
         GetUserLists,
         GetUserName,
         GetRestaurant,
