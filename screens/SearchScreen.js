@@ -128,7 +128,7 @@ const SearchScreen = () => {
   );
 
   return (
-    <PanGestureHandler onGestureEvent={onGestureEvent}>
+    <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={{ flex: 1, padding: 20 }}>
         <View style={styles.buttonContainer}>
           {/* <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>

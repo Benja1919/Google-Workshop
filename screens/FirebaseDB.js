@@ -1,7 +1,7 @@
 import React from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { collection, getDocs, doc, getDoc, addDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -98,6 +98,7 @@ export const firestoreDB = () => {
 			Address: Restaurant.Address,
 			Coordinates: Restaurant.Coordinates,
 			OpeningHours: Restaurant.OpeningHours,
+			ProfileImageURI: Restaurant.ProfileImageURI,
 		};
 		try {
 		    await setDoc(userRef, updatedData, { merge: true });
@@ -105,7 +106,6 @@ export const firestoreDB = () => {
 			
 		}
 	};
-
 	const GetUsers = async () => {
         const usersCollection = collection(firestore, 'users');
         const usersSnapshot = await getDocs(usersCollection);
@@ -167,7 +167,7 @@ export const firestoreDB = () => {
         GetRestaurant,
 		UpdateRestaurantContent,
 		GetRestaurantbyOwner,
-		GetUsers 
+		GetUsers,
     };
 };
 
@@ -178,4 +178,20 @@ export const uploadImageToStorage = async (uri, fileName) => {
     await uploadBytes(storageRef, blob);
     const downloadURL = await getDownloadURL(storageRef);
     return downloadURL;
+};
+export const DeleteImageByURI = async (uri) =>{
+	const match = uri.match(/\/o\/(.*?)\?/);
+	if (match && match[1]) {
+		imagePath = decodeURIComponent(match[1]);
+		try {
+			// Create a reference to the file to delete
+			const imageRef = ref(storage,imagePath);
+		
+			// Delete the file
+			await deleteObject(imageRef);
+			} 
+		catch (error) {
+			console.error('Error deleting image:', error);
+		}
+	}
 };

@@ -1,10 +1,12 @@
 import React, { useContext, useState, useCallback } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Alert, FlatList, TextInput, Image } from 'react-native';
-import { firestoreDB } from '../FirebaseDB';
+import { View, StyleSheet, TouchableOpacity, Text, Alert, FlatList, TextInput, ImageBackground, Image } from 'react-native';
+import { firestoreDB, DeleteImageByURI } from '../FirebaseDB';
 import { throttle } from 'lodash';
 import BasicMap, {useCoordToAddress, useAddressToCoord} from './Maps';
-
+import ImprovedImageComponent from './ImprovedImage';
+import * as ImagePicker from 'expo-image-picker';
 import OpeningTimes from './OpeningTimeViewer';
+import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'firebase/storage';
 const col2 = '#fbfbfb';
 const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor,imageicon, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
     const DeleteButton = () =>{
@@ -61,7 +63,7 @@ const setDescription = (text) =>{
 
 
 images = {
-    editimage :require("../../assets/icons/edit5.png"),
+    editimage :require("../../assets/icons/edittransparent.png"),
     mapimage : require("../../assets/icons/mapicon2.png"),
     locationimage : require("../../assets/icons/LocationIcon.png"),
     tri : require("../../assets/icons/Tri1.png"),
@@ -74,8 +76,12 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
         const [Coordinate, SetCoordinate] = useState({"latitude":null, "longitude":null})
         const [AddressText, setAddressText] = useState('');
         const [isLocationMapEnbaled, setLocationMap] = useState(false);
-        CurrentRestaurantUser = RestaurantUser;
+
         
+        CurrentRestaurantUser = RestaurantUser;
+
+        const pickImage = () => pickMedia(ImagePicker.MediaTypeOptions.Images, 'image');
+
         const loadRestaurant = useCallback(
             throttle(async () => {
                 const res = await firestoreDB().GetRestaurantbyOwner(RestaurantUser);
@@ -83,7 +89,58 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             }, 2000),
             [RestaurantUser] // Add dependencies to useCallback
         );
-        
+        const storage = getStorage();
+        const [profileURI, setProfileUri] = useState('');
+        const pickMedia = async (mediaTypes, type) => {
+            try {
+              // בקשת רשות גישה לספריית התמונות
+              const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
+              if (!result.granted) {
+                Alert.alert('Error', 'Permission to access gallery is required');
+                return;
+              }
+          
+              // בחירת תמונה או מדיה אחרת
+              const pickerResult = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+              });
+          
+              // אם המשתמש לא ביטל את הבחירה
+              if (!pickerResult.canceled) {
+                const uri = pickerResult.assets[0].uri;
+                const filename = uri.substring(uri.lastIndexOf('/') + 1);
+          
+                // יצירת התייחסות ל-Firebase Storage
+                const storageRef = ref(storage, `images/${filename}`);
+          
+                // הורדת התמונה כ-blob
+                const response = await fetch(uri);
+                const blob = await response.blob();
+          
+                // העלאת התמונה ל-Firebase Storage
+                await uploadBytes(storageRef, blob);
+          
+                // קבלת כתובת ה-URL להורדת התמונה
+                const downloadURL = await getDownloadURL(storageRef);
+                
+                // הוספת ה-URI והסוג של המדיה
+                setProfileUri(downloadURL);
+              } else {
+                
+              }
+            } catch (error) {
+              Alert.alert('Error', `An error occurred: ${error.message}`);
+            }
+        };
+        if(profileURI != ''){
+            DeleteImageByURI(CurrentRestaurant.ProfileImageURI);
+            CurrentRestaurant.ProfileImageURI = profileURI;
+            firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
+            setProfileUri('');
+        }
         React.useEffect(() => {
             loadRestaurant();
         }, [loadRestaurant]);
@@ -114,6 +171,7 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             SetCoordinate({"latitude":null, "longitude":null});
             CurrentRestaurantLocal.Coordinates = Coordinate;
             CurrentRestaurantLocal.Address = CoordinateAddress;
+            setAddressText(CoordinateAddress);
             firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
         }
 
@@ -150,15 +208,26 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
         //<TextInput style={styles.input} placeholder={CurrentRestaurantLocal.description} onChangeText={setDescription}/>
         if(CurrentRestaurantLocal != '' ){
             CurrentRestaurant = CurrentRestaurantLocal;
-            
             let arr = [];
             for (let i = 0; i < CurrentRestaurantLocal.ContentData.length; i++) {
                 arr.push(i);
             }
             return (
-                <View>
-                    
-                    <Text style={styles.SectionTitle}>Description </Text>
+                <View >
+                    <Text style={styles.SectionTitle}>Profile Image</Text>
+                    <TouchableOpacity style={{justifyContent: 'center', position: 'relative'}} onPress={pickImage}>
+                        <ImprovedImageComponent ImageURI={CurrentRestaurantLocal.ProfileImageURI } ImageStyle={{...styles.profileImage}} />
+                        <Image 
+                            source={images.editimage}  
+                            style={{
+                                ...styles.iconBeeg,
+                                position: 'absolute',
+                                left: styles.profileImage.width-10, // Adjust as needed
+                                bottom: 10, // Adjust as needed
+                            }}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.SectionTitle}>Description</Text>
                     <View style={{...styles.item,padding: 5}}> 
                         <CustomTextInput
                             placeholder={CurrentRestaurantLocal.description}
@@ -230,6 +299,12 @@ const styles = StyleSheet.create({
     item1: {
         padding: 5,
     },
+    profileImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        marginBottom: 10,
+    },
     title: {
         fontSize: 28,
     },
@@ -282,6 +357,11 @@ const styles = StyleSheet.create({
     icon: {
         width: 13,
         height: 15,
+        
+    },
+    iconBeeg: {
+        width: 20,
+        height: 23,
         
     },
   });

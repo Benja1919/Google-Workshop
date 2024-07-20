@@ -76,7 +76,7 @@ const RestaurantScreen = ({ route, navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>{restaurant.name}</Text>
-      <Image source={{ uri: restaurant.profileImageUrl }} style={styles.profileImage} />
+      <Image source={{ uri: restaurant.ProfileImageURI}} style={styles.profileImage} />
       <Text style={styles.description}>{restaurant.description}</Text>
       <Text style={styles.sectionTitle}>Location</Text>
       <View style={{...styles.item,padding: 10}}> 
