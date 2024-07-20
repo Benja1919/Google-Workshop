@@ -74,7 +74,7 @@ const RestaurantScreen = ({ route, navigation }) => {
 
   
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.header}>{restaurant.name}</Text>
       <Image source={{ uri: restaurant.profileImageUrl }} style={styles.profileImage} />
       <Text style={styles.description}>{restaurant.description}</Text>
@@ -102,21 +102,21 @@ const RestaurantScreen = ({ route, navigation }) => {
               resizeMode="center"/>
         </TouchableOpacity>
         <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={restaurant.Coordinates}/>
-    </View>
-    <Text style={styles.sectionTitle}>Opening Times </Text>
-                    <OpeningTimes restaurant={restaurant} isEditable ={false}/>
-    <Text style={styles.sectionTitle}>Rating</Text>
-    <View style={styles.item}>
-      <Text style={{...styles.detailsHeader,marginLeft:10}}>Average Rating:</Text>
-      <Text style={{...styles.detailsText,marginLeft:20}}>{restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>
-    </View>
-    <AdditionalDetailsComponent restaurant={restaurant}/>
-    
-    <Text style={styles.sectionTitle}>Posts</Text>
+      </View>
+      <Text style={styles.sectionTitle}>Opening Times </Text>
+                      <OpeningTimes restaurant={restaurant} isEditable ={false}/>
+      <Text style={styles.sectionTitle}>Rating</Text>
+      <View style={styles.item}>
+        <Text style={{...styles.detailsHeader,marginLeft:10}}>Average Rating:</Text>
+        <Text style={{...styles.detailsText,marginLeft:20}}>{restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>
+      </View>
+      <AdditionalDetailsComponent restaurant={restaurant}/>
+      
+      <Text style={styles.sectionTitle}>Posts</Text>
 
       {/* Display posts for the specific restaurant */}
-      <PostsScreen navigation={navigation} route={{ params: { filterrestaurantName: restaurantName } }} />
-    </View>
+      <PostsScreen navigation={navigation} route={{ params: { filterrestaurantName: restaurantName } }} isScrollEnabled={false}/>
+    </ScrollView>
   );
 };
 

@@ -13,7 +13,7 @@ import { firestoreDB } from './FirebaseDB';
  *
  * @returns {JSX.Element} The rendered posts screen component.
  */
-const PostsScreen = ({ navigation, route }) => {
+const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
   const [posts, setPosts] = React.useState([]);
 
   React.useEffect(() => {
@@ -85,6 +85,7 @@ const PostsScreen = ({ navigation, route }) => {
         data={posts}
         renderItem={renderPost}
         keyExtractor={(item) => item.id}
+        scrollEnabled={isScrollEnabled}
       />
   );
 };
