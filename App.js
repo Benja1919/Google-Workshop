@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
-import { Image } from 'react-native';
+import { Image, LogBox } from 'react-native';
 import UserProfileScreen from './screens/UserProfileScreen';
 import RestaurantScreen from './screens/RestaurantScreen';
 import PostsScreen from './screens/PostsScreen';
@@ -14,6 +14,18 @@ import LoginScreen from './screens/LoginScreen'
 import SearchScreen from './screens/SearchScreen'
 import { AuthProvider } from './screens/AuthContext';
 import CurrentUserProfile from './screens/CurrentUserProfileScreen'
+//caused by a library component DateTimePickerModal
+LogBox.ignoreLogs([ //suppresses in expo go
+  /defaultProps will be removed/
+]);
+//overrides console.error so it will also suppress the error in console
+const originalError = console.error;
+console.error = (...args) => {
+  if (typeof args[0] === 'string' && args[0].includes('Support for defaultProps will be removed from memo components in a future major release. Use JavaScript default parameters instead.')) {
+    return;
+  }
+  originalError(...args);
+};
 
 
 const Stack = createStackNavigator();

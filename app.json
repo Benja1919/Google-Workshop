@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "MyFoodApp",
-    "slug": "MyFoodApp",
+    "name": "CommunEaty",
+    "slug": "CommunEaty",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "icon": "./assets/pic.png",
     "splash": {
       "image": "./assets/logo.png",

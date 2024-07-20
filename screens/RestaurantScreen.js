@@ -6,6 +6,7 @@ import PostsScreen from './PostsScreen';
 import { firestoreDB } from './FirebaseDB';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import BasicMap from './components/Maps';
+import OpeningTimes from './components/OpeningTimeViewer';
 const col2 = '#fbfbfb';
 const AdditionalDetailsComponent = ({restaurant}) =>{
   if(restaurant.ContentTitles.length > 0){
@@ -94,7 +95,7 @@ const RestaurantScreen = ({ route, navigation }) => {
                 style={{...styles.icon,marginRight:3,marginLeft:1}}
                 resizeMode="center"
             />
-            <Text style={styles.details}>N {restaurant.Coordinates.latitude}, W {restaurant.Coordinates.longitude}</Text>
+            <Text style={{...styles.details}}>N {restaurant.Coordinates.latitude}, W {restaurant.Coordinates.longitude}</Text>
           </View>
             <Image source={images.tri}
               style={{...styles.icon,alignSelf: 'flex-end',transform: [{rotate: isLocationMapEnbaled ? '0deg' : '180deg' }]}}
@@ -102,6 +103,8 @@ const RestaurantScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={restaurant.Coordinates}/>
     </View>
+    <Text style={styles.sectionTitle}>Opening Times </Text>
+                    <OpeningTimes restaurant={restaurant} isEditable ={false}/>
     <Text style={styles.sectionTitle}>Rating</Text>
     <View style={styles.item}>
       <Text style={{...styles.detailsHeader,marginLeft:10}}>Average Rating:</Text>

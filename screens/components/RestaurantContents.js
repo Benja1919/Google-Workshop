@@ -3,6 +3,8 @@ import { View, StyleSheet, TouchableOpacity, Text, Alert, FlatList, TextInput, I
 import { firestoreDB } from '../FirebaseDB';
 import { throttle } from 'lodash';
 import BasicMap, {useCoordToAddress, useAddressToCoord} from './Maps';
+
+import OpeningTimes from './OpeningTimeViewer';
 const col2 = '#fbfbfb';
 const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor,imageicon, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
     const DeleteButton = () =>{
@@ -114,6 +116,7 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             CurrentRestaurantLocal.Address = CoordinateAddress;
             firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
         }
+
         const renderItem = ({ item }) => (
             <View style={styles.item1}>
                 <CustomTextInput
@@ -167,6 +170,8 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                             style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
                         />
                     </View>
+                    <Text style={styles.SectionTitle}>Opening Times </Text>
+                    <OpeningTimes restaurant={CurrentRestaurantLocal} isEditable ={true}/>
                     <Text style={styles.SectionTitle}>Location </Text>
                     <View style={{...styles.item,padding: 5}}> 
                         <CustomTextInput

@@ -57,11 +57,7 @@ const CurrentUserProfile = ({ navigation }) => {
           <View style={styles.Pusher}>
             
             <ScrollView Main style={styles.container}>
-              <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
-                <Image style={styles.logoutimage}
-                  source ={require("../assets/icons/logout3.png")}        
-                />
-              </TouchableOpacity> 
+              
               <Text style={styles.BigTitle}>Edit Restaurant Profile </Text>
               <TouchableOpacity style={styles.ToProfileButton} onPress={() => navigateToRestaurant(currentUser.RestaurantID)}>
                 <Image style={styles.toprofileimage}
@@ -71,7 +67,11 @@ const CurrentUserProfile = ({ navigation }) => {
                         
               <RestaurantContentComponent RestaurantUser={currentUser}/>
               <Text style={{fontSize:40}}></Text>
-
+              <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
+                <Image style={styles.logoutimage}
+                  source ={require("../assets/icons/logout3.png")}        
+                />
+              </TouchableOpacity> 
             </ScrollView>
             <View Push style={styles.Pusher}/>
             <BottomBarComponent navigation={navigation}/>

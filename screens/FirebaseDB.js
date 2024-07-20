@@ -97,6 +97,7 @@ export const firestoreDB = () => {
 			description: Restaurant.description,
 			Address: Restaurant.Address,
 			Coordinates: Restaurant.Coordinates,
+			OpeningHours: Restaurant.OpeningHours,
 		};
 		try {
 		    await setDoc(userRef, updatedData, { merge: true });
