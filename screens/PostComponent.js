@@ -9,9 +9,15 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [videoError, setVideoError] = useState(null);
     const [profileImageUrl, setProfileImageUrl] = useState('');
     const [activeIndex, setActiveIndex] = useState(0); // Track active dot index
-    const [liked, setLiked] = useState(false);
     const [setLikesCount] = useState(post.likes ? post.likes.length : 0);
     const {currentUser} = useContext(AuthContext);
+    curr_user = '';
+    if (!currentUser){
+      const curr_user = '';
+    }
+    else {
+      curr_user = currentUser.userName;
+    }
 
     useEffect(() => {
         const fetchProfileImage = async () => {
@@ -89,17 +95,15 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const postDate = new Date(post.creationTime.seconds * 1000);
     const toggleLike = async () => {
       if(currentUser){
-        if (!liked) {
+        if (post.like_users.includes(currentUser.userName)) {
             try {
                 const updatedPost = await firestoreDB().LikePost(post.id, currentUser.userName);
-                setLiked(true);
             } catch (error) {
                 console.error('Error liking post:', error);
             }
         } else {
             try {
                 const updatedPost = await firestoreDB().UnlikePost(post.id, currentUser.userName);
-                setLiked(false);
             } catch (error) {
                 console.error('Error unliking post:', error);
             }
@@ -140,7 +144,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
             <View style={styles.likeContainer}>
             <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
                     <Image
-                        source={liked ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
+                        source={post.like_users.includes(curr_user) ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
                         style={styles.icon}
                     />
                     </TouchableOpacity>
