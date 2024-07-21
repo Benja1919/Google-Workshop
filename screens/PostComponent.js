@@ -81,6 +81,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
             </View>
         );
     };
+    const postDate = new Date(post.creationTime["seconds"] * 1000);
 
     return (
         <View style={styles.postCard}>
@@ -90,6 +91,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                     <Text style={styles.userName}>{post.userName}</Text>
                 </TouchableOpacity>
                 <Text style={styles.stars}>{'⭐'.repeat(post.stars)}</Text>
+                <Text>{postDate.toLocaleDateString()+"\n"+postDate.toLocaleTimeString()}</Text>
             </View>
             <TouchableOpacity onPress={() => navigateToRestaurant(post.restaurantName)}>
                 <Text style={styles.restaurantName}>{post.restaurantName}</Text>
@@ -106,7 +108,9 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                 viewabilityConfig={viewabilityConfig}
                 onViewableItemsChanged={onViewableItemsChanged}
             />
+            {mediaItems.length > 1 && (
             <PaginationDots index={activeIndex} length={mediaItems.length} />
+            )}
             {videoError && <Text style={styles.errorText}>{videoError}</Text>}
             <Text style={styles.content}>{post.content}</Text>
         </View>

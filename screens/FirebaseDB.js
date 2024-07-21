@@ -1,8 +1,8 @@
 import React from 'react';
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { collection, getDocs, doc, getDoc, addDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, getDocs, doc, getDoc, addDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -21,11 +21,23 @@ const storage = getStorage(firebaseApp);
 export const firestoreDB = () => {
     const GetPosts = async () => {
         const postsCollection = collection(firestore, 'posts');
-        const q = query(postsCollection, orderBy("__name__", "desc"));
+        const q = query(postsCollection, orderBy("creationTime", "desc"));
         const postsSnapshot = await getDocs(q);
         const postsList = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         return postsList;
     };
+
+	const SubscribeToPosts = (callback) => {
+    const postsCollection = collection(firestore, 'posts');
+    const q = query(postsCollection, orderBy("creationTime", "desc"));
+    
+    return onSnapshot(q, (snapshot) => {
+        const postsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(postsList);
+    }, (error) => {
+        console.error('Error fetching real-time posts:', error);
+    });
+};
 
 	const AddPost = async (post) => {
         const currentUser = await GetUserName(post.userName.toLowerCase())
@@ -37,9 +49,16 @@ export const firestoreDB = () => {
 			mediaUrls: post.mediaUrls || [], // Assuming post.mediaUrls is an array of URLs
 			mediaTypes: post.mediaTypes || [], // Assuming post.mediaTypes is an array of types (optional)
 			profileImageUrl: currentUser.profileImageUrl,
+			creationTime: new Date()
 		};
         const postsCollectionRef = collection(firestore, 'posts');
         const docRef = await addDoc(postsCollectionRef, newPost);
+		let postDoc = await getDoc(docRef);
+		while (!postDoc.exists || !postDoc.data().creationTime) {
+			// Small delay before checking again
+			await new Promise(resolve => setTimeout(resolve, 100));
+			postDoc = await getDoc(postRef);
+		}
 		GetRestaurant(post.restaurantName).starcount += post.stars;
 		GetRestaurant(post.restaurantName).reviewcount += 1;
 	};
@@ -158,6 +177,7 @@ export const firestoreDB = () => {
 
     return {
         GetPosts,
+		SubscribeToPosts,
         AddPost,
 		getUserRef,
         CreateList,
@@ -180,6 +200,7 @@ export const uploadImageToStorage = async (uri, fileName) => {
     const downloadURL = await getDownloadURL(storageRef);
     return downloadURL;
 };
+
 export const DeleteImageByURI = async (uri) =>{
 	const match = uri.match(/\/o\/(.*?)\?/);
 	if (match && match[1]) {

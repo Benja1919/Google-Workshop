@@ -8,7 +8,7 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { AuthContext } from './AuthContext';
 import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'firebase/storage';
 import { firestoreDB } from './FirebaseDB';
-import { initializeApp } from 'firebase/app';
+
 const GOOGLE_PLACES_API_KEY = 'AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E'; // Replace with your Google Places API key
 
 const PostCreationScreen = ({ navigation }) => {
@@ -146,8 +146,8 @@ const PostCreationScreen = ({ navigation }) => {
       location: location ? `${location.coords.latitude}, ${location.coords.longitude}` : null,
     };
 
-    await firestoreDB().AddPost(newPost);
-    navigation.goBack();
+    firestoreDB().AddPost(newPost);
+    navigation.navigate('HomeScreen');
   };
 
   return (

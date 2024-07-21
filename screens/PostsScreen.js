@@ -40,6 +40,26 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
     };
 
     loadPosts();
+
+    // Set up real-time listener
+    const unsubscribe = firestoreDB().SubscribeToPosts((allPosts) => {
+      const filterRestaurantName = route?.params?.filterrestaurantName;
+      const filterUserName = route?.params?.filterUserName;
+
+      let filteredPosts = allPosts;
+
+      if (filterRestaurantName) {
+        filteredPosts = filteredPosts.filter(post => post.restaurantName === filterRestaurantName);
+      }
+
+      if (filterUserName) {
+        filteredPosts = filteredPosts.filter(post => post.userName === filterUserName);
+      }
+
+      setPosts(filteredPosts);
+    });
+
+    return () => unsubscribe();
   }, [route]);
 
   /**
