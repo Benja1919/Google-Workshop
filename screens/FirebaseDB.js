@@ -70,7 +70,7 @@ export const firestoreDB = () => {
     };
 
 	const TryLoginUser = async (userName, password) => {
-		const userDoc = doc(firestore, 'users', userName);
+		const userDoc = doc(firestore, 'users', userName.toLowerCase());
         const userSnapshot = await getDoc(userDoc);
         const user = { id: userSnapshot.id, ...userSnapshot.data() }
 		if (user && user.password === password) {
