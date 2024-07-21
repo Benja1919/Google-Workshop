@@ -2,7 +2,7 @@ import React from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { collection, onSnapshot, getDocs, doc, getDoc, addDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, getDocs, doc, getDoc, addDoc,updateDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -26,6 +26,63 @@ export const firestoreDB = () => {
         const postsList = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         return postsList;
     };
+
+
+	// Function to like a post
+	const LikePost = async (postId, currentUserId) => {
+		const postRef = doc(firestore, 'posts', postId);
+		try {
+			const postDoc = await getDoc(postRef);
+			if (!postDoc.exists()) {
+				throw new Error('Post not found');
+			}
+	
+			const postData = postDoc.data();
+			console.log(currentUserId);
+			const likesCount = postData.likes ?? 0; // Use nullish coalescing to ensure default value
+			const like_users = postData.like_users ?? []; // Ensure default to empty array
+			if (!like_users.includes(currentUserId)) {
+				await updateDoc(postRef, {
+					likes: likesCount + 1, // Increment the like count
+					like_users: [currentUserId, ...like_users], // Add user ID to array
+				});
+			}
+	
+			return await getDoc(postRef); // Return the updated post
+		} catch (error) {
+			console.error('Error liking post:', error);
+			throw error;
+		}
+	};
+	
+	// Function to unlike a post
+	const UnlikePost = async (postId, currentUserId) => {
+		const postRef = doc(firestore, 'posts', postId);
+		try {
+			const postDoc = await getDoc(postRef);
+			if (!postDoc.exists()) {
+				throw new Error('Post not found');
+			}
+	
+			const postData = postDoc.data();
+			const likesCount = postData.likes ?? 0; // Use nullish coalescing to ensure default value
+			const like_users = postData.like_users ?? []; // Ensure default to empty array
+			console.log(likesCount);
+			if (like_users.includes(currentUserId)) {
+				await updateDoc(postRef, {
+					likes: likesCount - 1, // Decrement the like count
+					like_users: like_users.filter(id => id !== currentUserId), // Remove user ID from array
+				});
+			}
+	
+			return await getDoc(postRef); // Return the updated post
+		} catch (error) {
+			console.error('Error unliking post:', error);
+			throw error;
+		}
+	};
+	
+	
 
 	const SubscribeToPosts = (callback) => {
     const postsCollection = collection(firestore, 'posts');
@@ -186,6 +243,8 @@ export const firestoreDB = () => {
 		TryLoginUser,
 		GetUserFriends,
         GetUserLists,
+        LikePost,
+        UnlikePost,
         GetUserName,
         GetRestaurant,
 		UpdateRestaurantContent,

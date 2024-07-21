@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from './AuthContext';
 import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import Video from 'react-native-video';
 import { firestoreDB } from './FirebaseDB';
@@ -8,6 +9,9 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [videoError, setVideoError] = useState(null);
     const [profileImageUrl, setProfileImageUrl] = useState('');
     const [activeIndex, setActiveIndex] = useState(0); // Track active dot index
+    const [liked, setLiked] = useState(false);
+    const [setLikesCount] = useState(post.likes ? post.likes.length : 0);
+    const {currentUser} = useContext(AuthContext);
 
     useEffect(() => {
         const fetchProfileImage = async () => {
@@ -81,7 +85,25 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
             </View>
         );
     };
-    const postDate = new Date(post.creationTime["seconds"] * 1000);
+
+    const postDate = new Date(post.creationTime.seconds * 1000);
+    const toggleLike = async () => {
+        if (!liked) {
+            try {
+                const updatedPost = await firestoreDB().LikePost(post.id, currentUser.userName);
+                setLiked(true);
+            } catch (error) {
+                console.error('Error liking post:', error);
+            }
+        } else {
+            try {
+                const updatedPost = await firestoreDB().UnlikePost(post.id, currentUser.userName);
+                setLiked(false);
+            } catch (error) {
+                console.error('Error unliking post:', error);
+            }
+        }
+    };
 
     return (
         <View style={styles.postCard}>
@@ -91,7 +113,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                     <Text style={styles.userName}>{post.userName}</Text>
                 </TouchableOpacity>
                 <Text style={styles.stars}>{'⭐'.repeat(post.stars)}</Text>
-                <Text>{postDate.toLocaleDateString()+"\n"+postDate.toLocaleTimeString()}</Text>
+                <Text>{postDate.toLocaleDateString() + "\n" + postDate.toLocaleTimeString()}</Text>
             </View>
             <TouchableOpacity onPress={() => navigateToRestaurant(post.restaurantName)}>
                 <Text style={styles.restaurantName}>{post.restaurantName}</Text>
@@ -109,10 +131,19 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                 onViewableItemsChanged={onViewableItemsChanged}
             />
             {mediaItems.length > 1 && (
-            <PaginationDots index={activeIndex} length={mediaItems.length} />
+                <PaginationDots index={activeIndex} length={mediaItems.length} />
             )}
             {videoError && <Text style={styles.errorText}>{videoError}</Text>}
             <Text style={styles.content}>{post.content}</Text>
+            <View style={styles.likeContainer}>
+            <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
+                    <Image
+                        source={liked ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
+                        style={styles.icon}
+                    />
+                    </TouchableOpacity>
+                <Text style ={styles.likesCountText}>{post.likes} {'likes'}</Text>
+            </View>
         </View>
     );
 };
@@ -157,35 +188,54 @@ const styles = StyleSheet.create({
     },
     stars: {
         fontSize: 16,
-        color: '#ffd700',
+    },
+    icon: {
+      width: 25,
+      height: 20,
     },
     media: {
-        width: Dimensions.get('window').width - 30, // Reduce width to accommodate padding
-        height: 200,
+        width: Dimensions.get('window').width - 30,
+        height: Dimensions.get('window').width - 30,
         borderRadius: 8,
-        marginRight: 10,
+        marginBottom: 10,
+    },
+    errorText: {
+        color: 'red',
         marginBottom: 10,
     },
     content: {
         fontSize: 16,
-        color: '#333',
+        marginBottom: 10,
     },
-    errorText: {
-        color: 'red',
-        fontSize: 14,
+    likeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginTop: 10,
+    },
+    likesCountText: {
+      fontSize: 16,
+      
+    },
+    likeButton: {
+        backgroundColor: 'transparent',
+        padding: 5,
+        marginRight: 10,
+    },
+    likeText: {
+        fontWeight: 'bold',
     },
     paginationContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 10,
     },
     paginationDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: '#000',
-        margin: 3,
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#1e90ff',
+        marginHorizontal: 5,
     },
 });
 
