@@ -88,6 +88,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
 
     const postDate = new Date(post.creationTime.seconds * 1000);
     const toggleLike = async () => {
+      if(currentUser){
         if (!liked) {
             try {
                 const updatedPost = await firestoreDB().LikePost(post.id, currentUser.userName);
@@ -103,6 +104,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                 console.error('Error unliking post:', error);
             }
         }
+      }
     };
 
     return (
