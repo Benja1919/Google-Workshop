@@ -95,7 +95,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const postDate = new Date(post.creationTime.seconds * 1000);
     const toggleLike = async () => {
       if(currentUser){
-        if (post.like_users.includes(currentUser.userName)) {
+        if (!post.like_users.includes(currentUser.userName)) {
             try {
                 const updatedPost = await firestoreDB().LikePost(post.id, currentUser.userName);
             } catch (error) {
