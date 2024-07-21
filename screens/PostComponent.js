@@ -11,7 +11,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [activeIndex, setActiveIndex] = useState(0); // Track active dot index
     const [setLikesCount] = useState(post.likes ? post.likes.length : 0);
     const {currentUser} = useContext(AuthContext);
-    curr_user = '';
+    curr_user = '0';
     if (!currentUser){
       const curr_user = '';
     }
