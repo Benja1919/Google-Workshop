@@ -99,6 +99,7 @@ export const firestoreDB = () => {
 			Coordinates: Restaurant.Coordinates,
 			OpeningHours: Restaurant.OpeningHours,
 			ProfileImageURI: Restaurant.ProfileImageURI,
+			name: Restaurant.name,
 		};
 		try {
 		    await setDoc(userRef, updatedData, { merge: true });

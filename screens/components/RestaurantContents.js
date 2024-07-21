@@ -60,7 +60,10 @@ const setDescription = (text) =>{
     CurrentRestaurant.description = text;
     firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
 }
-
+const setName = (text) =>{
+    CurrentRestaurant.name = text;
+    firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
+}
 
 images = {
     editimage :require("../../assets/icons/edittransparent.png"),
@@ -214,6 +217,18 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             }
             return (
                 <View >
+                    <Text style={styles.SectionTitle}>Name</Text>
+                    <View style={{...styles.item,padding: 5}}> 
+                        <CustomTextInput
+                            placeholder={CurrentRestaurantLocal.name}
+                            placeholderTextColor="black"
+                            valueTextColor="black"
+                            imageicon={images.editimage}
+                            hasdelete={false}
+                            onChangeText={text => setName(text)}
+                            style={{ fontSize: 16, fontWeight: 'regular',marginLeft:3}}
+                        />
+                    </View>
                     <Text style={styles.SectionTitle}>Profile Image</Text>
                     <TouchableOpacity style={{justifyContent: 'center', position: 'relative'}} onPress={pickImage}>
                         <ImprovedImageComponent ImageURI={CurrentRestaurantLocal.ProfileImageURI } ImageStyle={{...styles.profileImage}} />
