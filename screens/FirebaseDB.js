@@ -94,9 +94,11 @@ export const firestoreDB = () => {
     };
 
     const GetRestaurant = async (restaurantName) => {
-        const restaurantDocRef = doc(firestore, 'restaurants', restaurantName);
-        const restaurantDoc = await getDoc(restaurantDocRef);
-        return restaurantDoc.exists() ? restaurantDoc.data() : null;
+		const restaurantCollection = collection(firestore, 'restaurants');
+		const q = query(restaurantCollection, where("name", "==", restaurantName));
+		const querySnapshot = await getDocs(q);
+        const restaurantDoc = querySnapshot.docs[0];
+        return restaurantDoc != undefined ? restaurantDoc.data() : null;
     };
 
 	const GetRestaurantbyOwner = async (user) => {
