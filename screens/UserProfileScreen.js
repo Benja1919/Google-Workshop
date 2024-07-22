@@ -7,6 +7,7 @@ import myNetworkIcon from '../assets/icons/network.png';
 import { firestoreDB } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
 
+
 const UserProfileScreen = ({ route, navigation }) => {
   const { userName } = route.params;
   const [user, setUser] = useState(null);
@@ -159,25 +160,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
-  bio: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  ranksContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginVertical: 10,
-  },
-  rank: {
-    fontSize: 12,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    margin: 5,
-  },
+  // bio: {
+  //   fontSize: 16,
+  //   textAlign: 'center',
+  //   marginBottom: 10,
+  // },
+  // ranksContainer: {
+  //   flexDirection: 'row',
+  //   flexWrap: 'wrap',
+  //   justifyContent: 'center',
+  //   marginVertical: 10,
+  // },
+  // rank: {
+  //   fontSize: 12,
+  //   backgroundColor: '#e0e0e0',
+  //   borderRadius: 10,
+  //   paddingHorizontal: 10,
+  //   paddingVertical: 5,
+  //   margin: 5,
+  // },
   bottomBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',

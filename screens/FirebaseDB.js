@@ -102,6 +102,8 @@ export const firestoreDB = () => {
 			userName: post.userName,
 			restaurantName: post.restaurantName,
 			stars: post.stars,
+			likes: 0,
+			like_users: [],
 			content: post.content,
 			mediaUrls: post.mediaUrls || [], // Assuming post.mediaUrls is an array of URLs
 			mediaTypes: post.mediaTypes || [], // Assuming post.mediaTypes is an array of types (optional)
