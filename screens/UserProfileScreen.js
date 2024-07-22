@@ -1,35 +1,34 @@
 // UserProfileScreen.js
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
 import myNetworkIcon from '../assets/icons/network.png';
-
-
-const usersData = {
-  'User123': {
-    userName : 'User123',
-    profileImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUNgR19yyBvpU38PzemDmZ1-rcQf-zc2uZFA&s',
-    bio: 'Food lover. Always exploring new restaurants!',
-    ranks: ['Verified', 'Top 10 Reviewer', '300 connections'],
-  },
-  'FoodieJohn': {
-    userName : 'foodiejohn',
-    profileImageUrl: 'https://media.licdn.com/dms/image/D4D03AQGJqUJqrC6OlQ/profile-displayphoto-shrink_200_200/0/1714751209049?e=2147483647&v=beta&t=yHaqR0QYWP4kdNUcVZp0sGsrq-uW-qehrZESEG1nAao',
-    bio: 'Dessert fanatic and food critic.',
-    ranks: ['Top 25 Reviewer'],
-  },
-  // Add more users data here...
-};
+import { firestoreDB } from './FirebaseDB';
+import { AuthContext } from './AuthContext';
 
 const UserProfileScreen = ({ route, navigation }) => {
   const { userName } = route.params;
-  const user = usersData[userName];
+  const [user, setUser] = useState(null);
+  const { isLoggedIn, logout } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await firestoreDB().GetUserName(userName);
+        setUser(userData);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, [userName]);
 
   const navigateToPostCreation = () => {
     navigation.navigate('PostCreation');
   };
-  
+
   const navigateToLoginScreen = () => {
     navigation.navigate('LoginScreen');
   };
@@ -37,20 +36,30 @@ const UserProfileScreen = ({ route, navigation }) => {
   const navigateToSearch = () => {
     navigation.navigate('Search');
   };
-  
+
   const navigateToProfile = () => {
     navigation.navigate('ProfileScreen');
   };
-  
+
   const navigateToHome = () => {
     navigation.navigate('HomeScreen');
   };
-  
+
   const handlePress = () => {
     if (isLoggedIn) {
       logout();
     } else {
       navigateToLoginScreen();
+    }
+  };
+
+  const navigateToScreen = (screen) => {
+    if (screen === 'Posts') {
+      navigation.navigate(screen, { filterUserName: userName });
+    } else if (screen === 'MyLists') {
+      navigation.navigate('MyLists', { user, profileImageUrl: user.profileImageUrl });
+    } else {
+      navigation.navigate(screen, { userName });
     }
   };
 
@@ -61,22 +70,6 @@ const UserProfileScreen = ({ route, navigation }) => {
       </View>
     );
   }
-
-  const navigateToScreen = (screen) => {
-    if (screen === 'Posts') {
-      navigation.navigate(screen, { filterUserName: userName });
-    }
-    else {
-      if (screen === 'MyLists')
-        {
-        navigation.navigate('MyLists', { user, profileImageUrl: user.profileImageUrl });
-    }
-    else
-    {
-      navigation.navigate(screen, { userName });
-    }
-  }
-};
 
   const buttons = [
     { label: 'Posts', screen: 'Posts', icon: postsIcon },
@@ -89,13 +82,13 @@ const UserProfileScreen = ({ route, navigation }) => {
   const radius = Math.min(screenWidth, screenHeight) / 2.7;
 
   const buttonStyles = buttons.map((button, index) => {
-    const angle = (Math.PI) / (buttons.length-1) * index - Math.PI; // Adjusted angle to start from top
+    const angle = (Math.PI) / (buttons.length - 1) * index - Math.PI; // Adjusted angle to start from top
     const x = radius * Math.cos(angle);
     const y = radius * Math.sin(angle);
     return {
       ...styles.circleButton,
       left: screenWidth / 2 + x - 40,
-      top: screenHeight / 2 + y - 150,
+      top: screenHeight / 2 + y - 110,
     };
   });
 
@@ -104,12 +97,6 @@ const UserProfileScreen = ({ route, navigation }) => {
       <View style={styles.profileContainer}>
         <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
         <Text style={styles.header}>{userName}</Text>
-        <Text style={styles.bio}>{user.bio}</Text>
-        <View style={styles.ranksContainer}>
-          {user.ranks.map((rank, index) => (
-            <Text key={index} style={styles.rank}>{rank}</Text>
-          ))}
-        </View>
       </View>
       {buttons.map((button, index) => (
         <TouchableOpacity
@@ -121,42 +108,41 @@ const UserProfileScreen = ({ route, navigation }) => {
           <Text style={styles.buttonText}>{button.label}</Text>
         </TouchableOpacity>
       ))}
-          {/* Bottom bar */}
-          <View style={styles.bottomBar}>
-        
-          {/* Button for home */}
-          <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
-            <Image source={require('../assets/icons/home.png')} style={styles.icon} />
-          </TouchableOpacity>
-  
-          {/* Button for search */}
-          <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
-            <Image source={require('../assets/icons/search.png')} style={styles.icon} />
-          </TouchableOpacity>
-  
-          {/* Button to navigate to post creation */}
-          <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
+      {/* Bottom bar */}
+      <View style={styles.bottomBar}>
+        {/* Button for home */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
+          <Image source={require('../assets/icons/home.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button for search */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
+          <Image source={require('../assets/icons/search.png')} style={styles.icon} />
+        </TouchableOpacity>
+
+        {/* Button to navigate to post creation */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
           <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
-          </TouchableOpacity>
-  
-          {/* Button for profile */}
-          <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
-            <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+
+        {/* Button for profile */}
+        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
+          <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
+        </TouchableOpacity>
       </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center', // Center the container vertically
-    alignItems: 'center', // Center the container horizontally
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#f0f0f0',
   },
   profileContainer: {
-    alignItems: 'center', // Center the content inside the profile container
+    alignItems: 'center',
     marginBottom: 20,
   },
   profileImage: {

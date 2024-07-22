@@ -150,7 +150,7 @@ export const firestoreDB = () => {
     };
 
     const GetUserName = async (userName) => {
-        const userDocRef = doc(firestore, 'users', userName);
+        const userDocRef = doc(firestore, 'users', userName.toLowerCase());
         const userDoc = await getDoc(userDocRef);
         return userDoc.exists() ? userDoc.data() : null;
     };
