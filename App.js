@@ -14,6 +14,8 @@ import LoginScreen from './screens/LoginScreen'
 import SearchScreen from './screens/SearchScreen'
 import { AuthProvider } from './screens/AuthContext';
 import CurrentUserProfile from './screens/CurrentUserProfileScreen'
+import SignUpScreen from './screens/SignUpScreen'; // Import the SignInScreen component
+
 //caused by a library component DateTimePickerModal
 LogBox.ignoreLogs([ //suppresses in expo go
   /defaultProps will be removed/
@@ -62,6 +64,7 @@ const App = () => {
           <Stack.Screen name="Search" component={SearchScreen} />
           <Stack.Screen name="Posts" component={PostsScreen} />
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

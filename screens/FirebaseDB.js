@@ -126,6 +126,11 @@ export const firestoreDB = () => {
         await addDoc(usersListsCollectionRef, list);
     };
 
+	const CreateUser = async(user) => {
+		const usersCollectionRef = collection(firestore, 'users');
+        await addDoc(usersCollectionRef, user);
+	}
+
 	const TryLoginUser = async (userName, password) => {
 		const userDoc = doc(firestore, 'users', userName.toLowerCase());
         const userSnapshot = await getDoc(userDoc);
@@ -250,6 +255,7 @@ export const firestoreDB = () => {
 		UpdateRestaurantContent,
 		GetRestaurantbyOwner,
 		GetUsers,
+		CreateUser,
     };
 };
 

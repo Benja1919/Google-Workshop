@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, TextInput, View, Button, Alert } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Button, Alert, Pressable } from 'react-native';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
@@ -65,11 +65,22 @@ const LoginScreen = ({ navigation }) => {
           onChangeText={setPassword}
           secureTextEntry
         />
+
+      
         
         <Button title="Login" onPress={handleLogin} />
+        <Pressable onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.link}>
+            Don't have an account? Sign in Here!
+          </Text>
+        </Pressable>
         <View pusher style={styles.pusher}/>
         <BottomBarComponent navigation={navigation}/>
+        
+
+     
       </View>
+      
     </PanGestureHandler>
   );
 };
@@ -80,13 +91,15 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     paddingHorizontal: 16,
     backgroundColor: '#fff',
+    
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginTop : "45%",
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -98,6 +111,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 4,
   },
+
+  link: {
+    fontSize: 15,
+    textAlign: 'center',
+    color: 'grey',
+    justifyContent: 'center',
+    marginTop : 10,
+    textDecorationLine: 'underline',
+  }
 });
 
 export default LoginScreen;
