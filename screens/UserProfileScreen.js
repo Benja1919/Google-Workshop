@@ -6,7 +6,7 @@ import myListsIcon from '../assets/icons/lists.png';
 import myNetworkIcon from '../assets/icons/network.png';
 import { firestoreDB } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
-
+import BottomBarComponent from './components/BottomBar';
 
 const UserProfileScreen = ({ route, navigation }) => {
   const { userName } = route.params;
@@ -94,43 +94,26 @@ const UserProfileScreen = ({ route, navigation }) => {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.profileContainer}>
-        <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
-        <Text style={styles.header}>{userName}</Text>
+    <View style={{flex:1}}>
+      <View >
+        
+        {buttons.map((button, index) => (
+          <TouchableOpacity
+            key={index}
+            style={buttonStyles[index]}
+            onPress={() => navigateToScreen(button.screen)}
+          >
+            <Image source={buttons[index].icon} style={styles.icon} />
+            <Text style={styles.buttonText}>{button.label}</Text>
+          </TouchableOpacity>
+        ))}
+        <View style={styles.profileContainer}>
+          <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
+          <Text style={styles.header}>{userName}</Text>
+        </View>
       </View>
-      {buttons.map((button, index) => (
-        <TouchableOpacity
-          key={index}
-          style={buttonStyles[index]}
-          onPress={() => navigateToScreen(button.screen)}
-        >
-          <Image source={buttons[index].icon} style={styles.icon} />
-          <Text style={styles.buttonText}>{button.label}</Text>
-        </TouchableOpacity>
-      ))}
-      {/* Bottom bar */}
-      <View style={styles.bottomBar}>
-        {/* Button for home */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
-          <Image source={require('../assets/icons/home.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button for search */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToSearch}>
-          <Image source={require('../assets/icons/search.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button to navigate to post creation */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToPostCreation}>
-          <Image source={require('../assets/icons/plus.png')} style={styles.icon} />
-        </TouchableOpacity>
-
-        {/* Button for profile */}
-        <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
-          <Image source={require('../assets/icons/profile.png')} style={styles.icon} />
-        </TouchableOpacity>
-      </View>
+      <View style={{flex:1}}/>
+      <BottomBarComponent navigation={navigation} style={{justifyContent: 'flex-end'}}/>
     </View>
   );
 };
@@ -145,6 +128,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     alignItems: 'center',
     marginBottom: 20,
+    top : 230
   },
   profileImage: {
     width: 200,
@@ -160,25 +144,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
-  // bio: {
-  //   fontSize: 16,
-  //   textAlign: 'center',
-  //   marginBottom: 10,
-  // },
-  // ranksContainer: {
-  //   flexDirection: 'row',
-  //   flexWrap: 'wrap',
-  //   justifyContent: 'center',
-  //   marginVertical: 10,
-  // },
-  // rank: {
-  //   fontSize: 12,
-  //   backgroundColor: '#e0e0e0',
-  //   borderRadius: 10,
-  //   paddingHorizontal: 10,
-  //   paddingVertical: 5,
-  //   margin: 5,
-  // },
   bottomBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
