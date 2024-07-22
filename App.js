@@ -50,21 +50,71 @@ const App = () => {
               headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }}
           />
-          <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+          <Stack.Screen name="UserProfile"
+           component={UserProfileScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
           <Stack.Screen name="ProfileScreen" component={CurrentUserProfile} options={{ 
               headerTitle: AppHeaderTitle,
               headerLeft: () => null,
               headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }}/>
-          <Stack.Screen name="Restaurant" component={RestaurantScreen} />
-          <Stack.Screen name="MyLists" component={MyListsScreen} />
-          <Stack.Screen name="Network" component={NetworkScreen} />
-          <Stack.Screen name="Recipes" component={RecipesScreen} />
-          <Stack.Screen name="PostCreation" component={PostCreationScreen} />
-          <Stack.Screen name="Search" component={SearchScreen} />
-          <Stack.Screen name="Posts" component={PostsScreen} />
-          <Stack.Screen name="LoginScreen" component={LoginScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="Restaurant"
+           component={RestaurantScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }}/>
+          <Stack.Screen name="MyLists"
+           component={MyListsScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
+          <Stack.Screen name="Network"
+           component={NetworkScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
+          <Stack.Screen name="Recipes"
+           component={RecipesScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
+          <Stack.Screen name="PostCreation"
+           component={PostCreationScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
+          <Stack.Screen name="Search"
+           component={SearchScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
+          <Stack.Screen name="Posts"
+           component={PostsScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
+          <Stack.Screen name="LoginScreen"
+           component={LoginScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
+          <Stack.Screen name="SignUp"
+           component={SignUpScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>
