@@ -33,7 +33,7 @@ console.error = (...args) => {
 const Stack = createStackNavigator();
 const AppHeaderTitle = () =>{
   return (<Image
-  style={{ width: 200, height: 70 }}
+  style={{ width: 200, height: 70, top: -5 }}
   source={require('./assets/icons/HomeName.png')} 
 />);
 };
