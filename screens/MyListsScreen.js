@@ -104,7 +104,7 @@ const MyListsScreen = ({ route }) => {
     const fetchLists = async () => {
       if (!currentUser) return;
       try {
-        const fetchedLists = await firestoreDB().GetUserLists(user.userName.toLowerCase());
+        const fetchedLists = await firestoreDB().GetUserLists(user.userName);
         setLists(fetchedLists);
       } catch (error) {
         console.error("Error fetching lists: ", error);

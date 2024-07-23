@@ -151,10 +151,10 @@ export const firestoreDB = () => {
     };
 
     const GetUserLists = async (userName) => {
-        const listsCollection = collection(firestore, 'users', userName, 'lists');
-        const querySnapshot = await getDocs(listsCollection);
-        const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        return lists;
+		const q = query(collection(firestore, 'usersLists'),  where('userName', '==', userName));
+		const querySnapshot = await getDocs(q);
+		const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+		return lists;
     };
 
     const GetUserName = async (userName) => {
