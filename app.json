@@ -7,7 +7,7 @@
     "userInterfaceStyle": "automatic",
     "icon": "./assets/symbol.png",
     "splash": {
-      "image": "./assets/newlogo.png",
+      "image": "./assets/logo_communEATy.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
