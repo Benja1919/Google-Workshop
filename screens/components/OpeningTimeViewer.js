@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment-timezone';
 import { firestoreDB } from '../FirebaseDB';
-import { padding } from '@mui/system';
 images = {
     tri : require("../../assets/icons/Tri1.png"),
 };

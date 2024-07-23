@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { collection, onSnapshot, getDocs, doc, getDoc, addDoc, updateDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, getDocs, doc, getDoc, addDoc, updateDoc, setDoc, query, where, orderBy,limit } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -50,7 +50,20 @@ export const firestoreDB = () => {
             throw error;
         }
     };
-
+	const FetchRestaurants = async () =>{
+		try {
+			const q = query(collection(firestore, 'restaurants'), limit(100));
+			const querySnapshot = await getDocs(q);
+			const restaurantsData = querySnapshot.docs.map(doc => ({
+			id: doc.id,
+			...doc.data(),
+			}));
+			return restaurantsData;
+			}
+		catch (error){
+			console.error('Error fetching restaurants: ', error);
+		}
+	};
     const UnlikePost = async (postId, currentUserId) => {
         const postRef = doc(firestore, 'posts', postId);
         try {
@@ -258,7 +271,8 @@ export const firestoreDB = () => {
         GetUsers,
         CreateUser,
         checkUsernameExists,
-        checkEmailExists
+        checkEmailExists,
+		FetchRestaurants,
     };
 };
 
