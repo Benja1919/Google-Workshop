@@ -13,7 +13,7 @@ const CurrentUserProfile = ({ navigation }) => {
             navigation.navigate('PostCreation');
           }
           else{
-            navigation.navigate('Search');
+            navigation.navigate('MapView');
           }
         }
         else if (event.nativeEvent.translationX < -100) {

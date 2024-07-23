@@ -25,7 +25,7 @@ const PostCreationScreen = ({ navigation }) => {
       navigation.navigate('ProfileScreen');
     }
     else if (event.nativeEvent.translationX > 100) {
-      navigation.navigate('Search');
+      navigation.navigate('MapView');
     }
   };
   const {currentUser } = useContext(AuthContext);

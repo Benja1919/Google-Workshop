@@ -46,12 +46,28 @@ const App = () => {
         <Stack.Screen 
             name="HomeScreen" 
             component={HomeScreen} 
-            options={{ 
+            options={({ navigation }) => ({
               headerStyle: {
-                height: 110},
-              headerTitle: AppHeaderTitle,
-              headerTitleAlign: 'center' // יישור למרכז, אופציונלי
-            }}
+                height: 110,
+              },
+              headerTitle: () => <AppHeaderTitle />,
+              headerTitleAlign: 'center',
+              headerRight: () => (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Search"); // Replace "Details" with the desired screen name
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Image
+                      source={require("./assets/icons/search.png")}
+                      style={{ tintColor: 'black', width: 50, height: 30, marginLeft: 5, resizeMode: 'contain' }}
+                    />
+                    <Text style={{ color: 'black', marginLeft: 8 }}></Text>
+                  </View>
+                </TouchableOpacity>
+              ),
+            })}
           />
           <Stack.Screen name="UserProfile"
            component={UserProfileScreen}
@@ -154,8 +170,8 @@ const App = () => {
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Image
-                    source={require("./assets/icons/SideMenu.png")}
-                    style={{ tintColor: 'black', width: 35, height: 25,marginLeft:5,resizeMode:'contain' }}
+                    source={require("./assets/icons/sidemenu3.png")}
+                    style={{ tintColor: 'black', width: 35, height: 25,marginLeft:10,resizeMode:'contain' }}
                   />
                   <Text style={{ color: 'black', marginLeft: 8 }}></Text>
                 </View>

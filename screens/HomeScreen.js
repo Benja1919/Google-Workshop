@@ -10,7 +10,7 @@ const HomeScreen = ({ navigation }) => {
   const { isLoggedIn} = useContext(AuthContext);
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -50) {
-      navigation.navigate('Search');
+      navigation.navigate('MapView');
     }
     else if (event.nativeEvent.translationX > 50) {
       if(isLoggedIn){

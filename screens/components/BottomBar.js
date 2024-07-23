@@ -42,8 +42,8 @@ const BottomBarComponent = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Button for search */}
-        <TouchableOpacity style={route.name != "Search" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToSearch}>
-          <Image source={require('../../assets/icons/search.png')} style={styles.icon} />
+        <TouchableOpacity style={route.name != "MapView" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={() => navigation.navigate("MapView")}>
+          <Image source={require('../../assets/icons/mapview6.png')} style={styles.icon} />
         </TouchableOpacity>
 
         {/* Button to navigate to post creation */}
