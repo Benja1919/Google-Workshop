@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
-import { Image, LogBox } from 'react-native';
+import { Image, LogBox, View, TouchableOpacity,Text } from 'react-native';
 import UserProfileScreen from './screens/UserProfileScreen';
 import RestaurantScreen from './screens/RestaurantScreen';
 import PostsScreen from './screens/PostsScreen';
@@ -38,6 +38,7 @@ const AppHeaderTitle = () =>{
 />);
 };
 const App = () => {
+  const [MapHeaderFunction, setMapHeaderFunction] = useState(null);
   return (
     <AuthProvider>
       <NavigationContainer>
@@ -137,14 +138,37 @@ const App = () => {
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
-          <Stack.Screen name="MapView"
-           component={MapMenu}
-           options={{  
-            headerStyle: {
-              height: 110},
+          <Stack.Screen 
+          name="MapView" 
+          options={{ 
             headerTitle: AppHeaderTitle,
-            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
-            }} />
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => {
+                  if (MapHeaderFunction) {
+                    MapHeaderFunction();
+                  }
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Image
+                    source={require("./assets/icons/SideMenu.png")}
+                    style={{ tintColor: 'black', width: 35, height: 25,marginLeft:5,resizeMode:'contain' }}
+                  />
+                  <Text style={{ color: 'black', marginLeft: 8 }}></Text>
+                </View>
+              </TouchableOpacity>
+            ),
+            headerTitleAlign: 'center'
+          }}
+        >
+          {props => (
+            <MapMenu
+              {...props}
+              onHeaderLeftPress={toggleMenu => setMapHeaderFunction(() => toggleMenu)}
+            />
+          )}
+        </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

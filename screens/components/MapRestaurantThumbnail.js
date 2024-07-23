@@ -34,22 +34,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: 'white',
         padding: 5,
-        borderRadius: 5,
+        borderRadius: 10,
         borderColor: 'black',
-        borderWidth: 1,
+        borderWidth: 2,
     },
     markerparent: {
         alignItems: 'center',
         justifyContent: 'center',
     },
-        blackDot: {
+    blackDot: {
         width: 15,
         height: 8,
         transform: [{ rotate: '180deg' }],
         tintColor: 'black'
         
     },
-        markerText: {
+    markerText: {
         fontSize: 14,
         color: 'black',
     },

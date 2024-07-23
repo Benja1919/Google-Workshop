@@ -129,6 +129,7 @@ const SearchScreen = () => {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
+      <View style={{ flex: 1}}>
       <View style={{ flex: 1, padding: 20 }}>
         <View style={styles.buttonContainer}>
           {/* <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
@@ -180,11 +181,13 @@ const SearchScreen = () => {
           keyExtractor={(item) => item.id ? item.id.toString() : item.userName}
           renderItem={renderResultItem}
         />
-        <TouchableOpacity onPress={() =>navigation.navigate('MapView')}> {/*Delete me when sorted*/}
+        <TouchableOpacity onPress={() =>navigation.navigate('MapView')}>
           <Text fontSize={{fontWeight:50}}>Temporary: Goto MapMenu</Text>
         </TouchableOpacity>
-        <View style={styles.Pusher} />
-        <BottomBarComponent navigation={navigation} />
+        
+      </View>
+      <View style={styles.Pusher} />
+      <BottomBarComponent navigation={navigation} />
       </View>
     </PanGestureHandler>
   );
