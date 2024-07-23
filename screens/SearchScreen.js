@@ -180,7 +180,9 @@ const SearchScreen = () => {
           keyExtractor={(item) => item.id ? item.id.toString() : item.userName}
           renderItem={renderResultItem}
         />
-
+        <TouchableOpacity onPress={() =>navigation.navigate('MapView')}> {/*Delete me when sorted*/}
+          <Text fontSize={{fontWeight:50}}>Temporary: Goto MapMenu</Text>
+        </TouchableOpacity>
         <View style={styles.Pusher} />
         <BottomBarComponent navigation={navigation} />
       </View>

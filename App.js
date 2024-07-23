@@ -15,7 +15,7 @@ import SearchScreen from './screens/SearchScreen'
 import { AuthProvider } from './screens/AuthContext';
 import CurrentUserProfile from './screens/CurrentUserProfileScreen'
 import SignUpScreen from './screens/SignUpScreen'; // Import the SignInScreen component
-
+import MapMenu from './screens/MapMenu';
 //caused by a library component DateTimePickerModal
 LogBox.ignoreLogs([ //suppresses in expo go
   /defaultProps will be removed/
@@ -111,6 +111,12 @@ const App = () => {
             }} />
           <Stack.Screen name="SignUp"
            component={SignUpScreen}
+           options={{ 
+            headerTitle: AppHeaderTitle,
+            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+            }} />
+          <Stack.Screen name="MapView"
+           component={MapMenu}
            options={{ 
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
