@@ -33,7 +33,7 @@ console.error = (...args) => {
 const Stack = createStackNavigator();
 const AppHeaderTitle = () =>{
   return (<Image
-  style={{ width: 200, height: 60 }}
+  style={{ width: 200, height: 70 }}
   source={require('./assets/icons/HomeName.png')} 
 />);
 };
@@ -46,13 +46,17 @@ const App = () => {
             name="HomeScreen" 
             component={HomeScreen} 
             options={{ 
+              headerStyle: {
+                height: 110},
               headerTitle: AppHeaderTitle,
               headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }}
           />
           <Stack.Screen name="UserProfile"
            component={UserProfileScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
@@ -63,61 +67,81 @@ const App = () => {
             }}/>
           <Stack.Screen name="Restaurant"
            component={RestaurantScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }}/>
           <Stack.Screen name="MyLists"
            component={MyListsScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
           <Stack.Screen name="Network"
            component={NetworkScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
           <Stack.Screen name="Recipes"
            component={RecipesScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
           <Stack.Screen name="PostCreation"
            component={PostCreationScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
           <Stack.Screen name="Search"
            component={SearchScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
           <Stack.Screen name="Posts"
            component={PostsScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
           <Stack.Screen name="LoginScreen"
            component={LoginScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
           <Stack.Screen name="SignUp"
            component={SignUpScreen}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
           <Stack.Screen name="MapView"
            component={MapMenu}
-           options={{ 
+           options={{  
+            headerStyle: {
+              height: 110},
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
