@@ -142,6 +142,8 @@ const App = () => {
           name="MapView" 
           options={{ 
             headerTitle: AppHeaderTitle,
+            headerStyle: {
+              height: 110},
             headerLeft: () => (
               <TouchableOpacity
                 onPress={() => {
