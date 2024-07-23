@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { firestoreDB } from './FirebaseDB'; // Adjust your imports based on your file structure
 import { Timestamp } from 'firebase/firestore';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +12,7 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
+  const [isRestaurant, setisRestaurant] = useState(false); 
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,13 +66,14 @@ const SignUpScreen = () => {
       email: email,
       friends: [],
       profileImageUrl: profileImageUrl,
+      isRest: isRestaurant,
       createTime: Timestamp.now(),
     };
 
     await firestoreDB().CreateUser(newUser);
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (!email || !username || !password || !confirmPassword || !profileImageUrl) {
       Alert.alert('Error', 'All fields must be filled!');
       return;
@@ -81,12 +84,24 @@ const SignUpScreen = () => {
       return;
     }
 
+    const usernameExists = await firestoreDB().checkUsernameExists(username);
+    if (usernameExists) {
+      Alert.alert('Error', 'Username already exists! Please choose a different username.');
+      return;
+    }
+
+    const emailExists = await firestoreDB().checkEmailExists(email);
+    if (emailExists) {
+      Alert.alert('Error', 'Email address already exists! Please choose a different email.');
+      return;
+    }
+
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match!');
       return;
     }
 
-    createNewUser();
+    await createNewUser();
     Alert.alert('Sign Up Successful', `Username: ${username}\nEmail: ${email}`);
   };
 
@@ -122,6 +137,17 @@ const SignUpScreen = () => {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
+      <View style={styles.checkboxContainer}>
+        <BouncyCheckbox
+          size={25}
+          fillColor="#0B99E8"
+          unfillColor="#FFFFFF"
+          text="This is a Restaurant profile"
+          innerIconStyle={{ borderWidth: 2 }}
+          textStyle={{ textDecorationLine: "none" }}
+          onPress={(isChecked) => setisRestaurant(isChecked)}
+        />
+      </View>
       <TouchableOpacity onPress={pickProfileImage} style={styles.imagePicker}>
         {profileImageUrl ? (
           <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
@@ -174,6 +200,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 5,
+  },
+  checkboxContainer: {
+    width: '100%',
+    marginBottom: 15,
   },
 });
 

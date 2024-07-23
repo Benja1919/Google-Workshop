@@ -1,8 +1,7 @@
-import React from 'react';
 import { initializeApp } from "firebase/app";
 import { getFirestore, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { collection, onSnapshot, getDocs, doc, getDoc, addDoc,updateDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, getDocs, doc, getDoc, addDoc, updateDoc, setDoc, query, where, orderBy } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -27,100 +26,93 @@ export const firestoreDB = () => {
         return postsList;
     };
 
+    const LikePost = async (postId, currentUserId) => {
+        const postRef = doc(firestore, 'posts', postId);
+        try {
+            const postDoc = await getDoc(postRef);
+            if (!postDoc.exists()) {
+                throw new Error('Post not found');
+            }
 
-	// Function to like a post
-	const LikePost = async (postId, currentUserId) => {
-		const postRef = doc(firestore, 'posts', postId);
-		try {
-			const postDoc = await getDoc(postRef);
-			if (!postDoc.exists()) {
-				throw new Error('Post not found');
-			}
-	
-			const postData = postDoc.data();
-			console.log(currentUserId);
-			const likesCount = postData.likes ?? 0; // Use nullish coalescing to ensure default value
-			const like_users = postData.like_users ?? []; // Ensure default to empty array
-			if (!like_users.includes(currentUserId)) {
-				await updateDoc(postRef, {
-					likes: likesCount + 1, // Increment the like count
-					like_users: [currentUserId, ...like_users], // Add user ID to array
-				});
-			}
-	
-			return await getDoc(postRef); // Return the updated post
-		} catch (error) {
-			console.error('Error liking post:', error);
-			throw error;
-		}
-	};
-	
-	// Function to unlike a post
-	const UnlikePost = async (postId, currentUserId) => {
-		const postRef = doc(firestore, 'posts', postId);
-		try {
-			const postDoc = await getDoc(postRef);
-			if (!postDoc.exists()) {
-				throw new Error('Post not found');
-			}
-	
-			const postData = postDoc.data();
-			const likesCount = postData.likes ?? 0; // Use nullish coalescing to ensure default value
-			const like_users = postData.like_users ?? []; // Ensure default to empty array
-			console.log(likesCount);
-			if (like_users.includes(currentUserId)) {
-				await updateDoc(postRef, {
-					likes: likesCount - 1, // Decrement the like count
-					like_users: like_users.filter(id => id !== currentUserId), // Remove user ID from array
-				});
-			}
-	
-			return await getDoc(postRef); // Return the updated post
-		} catch (error) {
-			console.error('Error unliking post:', error);
-			throw error;
-		}
-	};
-	
-	
+            const postData = postDoc.data();
+            const likesCount = postData.likes ?? 0; // Use nullish coalescing to ensure default value
+            const like_users = postData.like_users ?? []; // Ensure default to empty array
+            if (!like_users.includes(currentUserId)) {
+                await updateDoc(postRef, {
+                    likes: likesCount + 1, // Increment the like count
+                    like_users: [currentUserId, ...like_users], // Add user ID to array
+                });
+            }
 
-	const SubscribeToPosts = (callback) => {
-    const postsCollection = collection(firestore, 'posts');
-    const q = query(postsCollection, orderBy("creationTime", "desc"));
-    
-    return onSnapshot(q, (snapshot) => {
-        const postsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        callback(postsList);
-    }, (error) => {
-        console.error('Error fetching real-time posts:', error);
-    });
-};
+            return await getDoc(postRef); // Return the updated post
+        } catch (error) {
+            console.error('Error liking post:', error);
+            throw error;
+        }
+    };
 
-	const AddPost = async (post) => {
-        const currentUser = await GetUserName(post.userName.toLowerCase())
-		const newPost = {
-			userName: post.userName,
-			restaurantName: post.restaurantName,
-			stars: post.stars,
-			likes: 0,
-			like_users: [],
-			content: post.content,
-			mediaUrls: post.mediaUrls || [], // Assuming post.mediaUrls is an array of URLs
-			mediaTypes: post.mediaTypes || [], // Assuming post.mediaTypes is an array of types (optional)
-			profileImageUrl: currentUser.profileImageUrl,
-			creationTime: new Date()
-		};
+    const UnlikePost = async (postId, currentUserId) => {
+        const postRef = doc(firestore, 'posts', postId);
+        try {
+            const postDoc = await getDoc(postRef);
+            if (!postDoc.exists()) {
+                throw new Error('Post not found');
+            }
+
+            const postData = postDoc.data();
+            const likesCount = postData.likes ?? 0; // Use nullish coalescing to ensure default value
+            const like_users = postData.like_users ?? []; // Ensure default to empty array
+            if (like_users.includes(currentUserId)) {
+                await updateDoc(postRef, {
+                    likes: likesCount - 1, // Decrement the like count
+                    like_users: like_users.filter(id => id !== currentUserId), // Remove user ID from array
+                });
+            }
+
+            return await getDoc(postRef); // Return the updated post
+        } catch (error) {
+            console.error('Error unliking post:', error);
+            throw error;
+        }
+    };
+
+    const SubscribeToPosts = (callback) => {
+        const postsCollection = collection(firestore, 'posts');
+        const q = query(postsCollection, orderBy("creationTime", "desc"));
+
+        return onSnapshot(q, (snapshot) => {
+            const postsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            callback(postsList);
+        }, (error) => {
+            console.error('Error fetching real-time posts:', error);
+        });
+    };
+
+    const AddPost = async (post) => {
+        const currentUser = await GetUserName(post.userName.toLowerCase());
+        const newPost = {
+            userName: post.userName,
+            restaurantName: post.restaurantName,
+            stars: post.stars,
+            likes: 0,
+            like_users: [],
+            content: post.content,
+            mediaUrls: post.mediaUrls || [], // Assuming post.mediaUrls is an array of URLs
+            mediaTypes: post.mediaTypes || [], // Assuming post.mediaTypes is an array of types (optional)
+            profileImageUrl: currentUser.profileImageUrl,
+            creationTime: new Date()
+        };
         const postsCollectionRef = collection(firestore, 'posts');
         const docRef = await addDoc(postsCollectionRef, newPost);
-		let postDoc = await getDoc(docRef);
-		while (!postDoc.exists || !postDoc.data().creationTime) {
-			// Small delay before checking again
-			await new Promise(resolve => setTimeout(resolve, 100));
-			postDoc = await getDoc(postRef);
-		}
-		GetRestaurant(post.restaurantName).starcount += post.stars;
-		GetRestaurant(post.restaurantName).reviewcount += 1;
-	};
+        let postDoc = await getDoc(docRef);
+        while (!postDoc.exists || !postDoc.data().creationTime) {
+            // Small delay before checking again
+            await new Promise(resolve => setTimeout(resolve, 100));
+            postDoc = await getDoc(postRef);
+        }
+        GetRestaurant(post.restaurantName).starcount += post.stars;
+        GetRestaurant(post.restaurantName).reviewcount += 1;
+    };
 
     const CreateList = async (list) => {
         const currentUser = await GetUserName(list.userName.toLowerCase());
@@ -128,21 +120,35 @@ export const firestoreDB = () => {
         await addDoc(usersListsCollectionRef, list);
     };
 
-	const CreateUser = async(user) => {
-		const usersCollectionRef = collection(firestore, 'users');
+    const CreateUser = async (user) => {
+        const usersCollectionRef = collection(firestore, 'users');
         await addDoc(usersCollectionRef, user);
-	}
+    }
 
-	const TryLoginUser = async (userName, password) => {
-		const userDoc = doc(firestore, 'users', userName.toLowerCase());
+    const TryLoginUser = async (userName, password) => {
+        const userDoc = doc(firestore, 'users', userName.toLowerCase());
         const userSnapshot = await getDoc(userDoc);
         const user = { id: userSnapshot.id, ...userSnapshot.data() }
-		if (user && user.password === password) {
-			return user;
-		} else {
-			return null;
-		}
-	};
+        if (user && user.password === password) {
+            return user;
+        } else {
+            return null;
+        }
+    };
+
+    const checkUsernameExists = async (username) => {
+        const usersCollection = collection(firestore, 'users');
+        const q = query(usersCollection, where("userName", "==", username.toLowerCase()));
+        const querySnapshot = await getDocs(q);
+        return !querySnapshot.empty;
+    };
+
+    const checkEmailExists = async (email) => {
+        const usersCollection = collection(firestore, 'users');
+        const q = query(usersCollection, where("email", "==", email.toLowerCase()));
+        const querySnapshot = await getDocs(q);
+        return !querySnapshot.empty;
+    };
 
     const GetUserLists = async (userName) => {
         const listsCollection = collection(firestore, 'users', userName, 'lists');
@@ -158,106 +164,101 @@ export const firestoreDB = () => {
     };
 
     const GetRestaurant = async (restaurantName) => {
-		const restaurantCollection = collection(firestore, 'restaurants');
-		const q = query(restaurantCollection, where("name", "==", restaurantName));
-		const querySnapshot = await getDocs(q);
+        const restaurantCollection = collection(firestore, 'restaurants');
+        const q = query(restaurantCollection, where("name", "==", restaurantName));
+        const querySnapshot = await getDocs(q);
         const restaurantDoc = querySnapshot.docs[0];
         return restaurantDoc != undefined ? restaurantDoc.data() : null;
     };
 
-	const GetRestaurantbyOwner = async (user) => {
+    const GetRestaurantbyOwner = async (user) => {
         const restaurantDoc = doc(firestore, 'restaurants', user.RestaurantID);
         const restaurantSnapshot = await getDoc(restaurantDoc);
         return { id: restaurantSnapshot.id, ...restaurantSnapshot.data() };
-	};
+    };
 
-	const UpdateRestaurantContent = async (Restaurant) => {
-		//Alert.alert(RestaurantUser);
-		const userRef = doc(firestore, "restaurants", Restaurant.id);
+    const UpdateRestaurantContent = async (Restaurant) => {
+        const userRef = doc(firestore, "restaurants", Restaurant.id);
 
-		// Create the new contents object
-		const updatedData = {
-			ContentTitles: Restaurant.ContentTitles,
-			ContentData: Restaurant.ContentData,
-			description: Restaurant.description,
-			Address: Restaurant.Address,
-			Coordinates: Restaurant.Coordinates,
-			OpeningHours: Restaurant.OpeningHours,
-			ProfileImageURI: Restaurant.ProfileImageURI,
-			name: Restaurant.name,
-		};
-		try {
-		    await setDoc(userRef, updatedData, { merge: true });
-		} catch (error) {
-			
-		}
-	};
-	const GetUsers = async () => {
+        // Create the new contents object
+        const updatedData = {
+            ContentTitles: Restaurant.ContentTitles,
+            ContentData: Restaurant.ContentData,
+            description: Restaurant.description,
+            Address: Restaurant.Address,
+            Coordinates: Restaurant.Coordinates,
+            OpeningHours: Restaurant.OpeningHours,
+            ProfileImageURI: Restaurant.ProfileImageURI,
+            name: Restaurant.name,
+        };
+        try {
+            await setDoc(userRef, updatedData, { merge: true });
+        } catch (error) {
+            console.error('Error updating restaurant content:', error);
+        }
+    };
+
+    const GetUsers = async () => {
         const usersCollection = collection(firestore, 'users');
         const usersSnapshot = await getDocs(usersCollection);
         const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-		return users;
-	};
+        return users;
+    };
 
-	const GetUserFriends = async (userName) => {
-		try {		  
-		  // קבל את מסמך המשתמש
-		  const userDocRef = doc(firestore, 'users', userName);
-		  const userDoc = await getDoc(userDocRef);
-	  
-		  // בדוק אם המסמך קיים
-		  if (userDoc.exists()) {
-			const userData = userDoc.data();	  
-			// קבל את רשימת החברים
-			const friendsIds = userData.friends || [];	  
-			// בדוק אם יש רשימה ריקה
-			if (friendsIds.length === 0) {
-			  return [];
-			}
-	  
-			// קבל את פרטי החברים
-			const friendsCollection = collection(firestore, 'users');
-			// יצר שגיאה בשימוש ב-where עם רשימה גדולה
-			// נשתמש בלולאת for כדי לטעון חברים כל אחד בנפרד
-			const friends = [];
-			for (const id of friendsIds) {
-			  const friendDocRef = doc(friendsCollection, id.toLowerCase());
-			  const friendDoc = await getDoc(friendDocRef);
-			  if (friendDoc.exists()) {
-				friends.push({ id: friendDoc.id, ...friendDoc.data() });
-			  } 
-			}
-			return friends;
-		  } else {
-			return [];
-		  }
-		} catch (error) {
-		  console.error('Error getting user friends:', error);
-		  return [];
-		}
-	  };
+    const GetUserFriends = async (userName) => {
+        try {
+            const userDocRef = doc(firestore, 'users', userName);
+            const userDoc = await getDoc(userDocRef);
 
-	  const getUserRef = (userName) => {
-		return firestore.collection('users').doc(userName);
-	  };
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const friendsIds = userData.friends || [];
+                if (friendsIds.length === 0) {
+                    return [];
+                }
+
+                const friendsCollection = collection(firestore, 'users');
+                const friends = [];
+                for (const id of friendsIds) {
+                    const friendDocRef = doc(friendsCollection, id.toLowerCase());
+                    const friendDoc = await getDoc(friendDocRef);
+                    if (friendDoc.exists()) {
+                        friends.push({ id: friendDoc.id, ...friendDoc.data() });
+                    }
+                }
+                return friends;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.error('Error getting user friends:', error);
+            return [];
+        }
+    };
+
+    const getUserRef = (userName) => {
+        return firestore.collection('users').doc(userName);
+    };
 
     return {
         GetPosts,
-		SubscribeToPosts,
+        SubscribeToPosts,
         AddPost,
-		getUserRef,
+        getUserRef,
         CreateList,
-		TryLoginUser,
-		GetUserFriends,
+        TryLoginUser,
+        GetUserFriends,
         GetUserLists,
         LikePost,
         UnlikePost,
         GetUserName,
         GetRestaurant,
-		UpdateRestaurantContent,
-		GetRestaurantbyOwner,
-		GetUsers,
-		CreateUser,
+        UpdateRestaurantContent,
+        GetRestaurantbyOwner,
+        GetUsers,
+        CreateUser,
+        checkUsernameExists,
+        checkEmailExists
     };
 };
 
@@ -270,19 +271,15 @@ export const uploadImageToStorage = async (uri, fileName) => {
     return downloadURL;
 };
 
-export const DeleteImageByURI = async (uri) =>{
-	const match = uri.match(/\/o\/(.*?)\?/);
-	if (match && match[1]) {
-		imagePath = decodeURIComponent(match[1]);
-		try {
-			// Create a reference to the file to delete
-			const imageRef = ref(storage,imagePath);
-		
-			// Delete the file
-			await deleteObject(imageRef);
-			} 
-		catch (error) {
-			console.error('Error deleting image:', error);
-		}
-	}
+export const DeleteImageByURI = async (uri) => {
+    const match = uri.match(/\/o\/(.*?)\?/);
+    if (match && match[1]) {
+        const imagePath = decodeURIComponent(match[1]);
+        try {
+            const imageRef = ref(storage, imagePath);
+            await deleteObject(imageRef);
+        } catch (error) {
+            console.error('Error deleting image:', error);
+        }
+    }
 };
