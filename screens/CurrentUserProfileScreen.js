@@ -33,7 +33,7 @@ const CurrentUserProfile = ({ navigation }) => {
         }
       };
     const navigateToRestaurant = (rid) => {
-        navigation.navigate('Restaurant', { restaurantName: rid });
+        navigation.navigate('Restaurant', {restaurantName: null, restaurantID: rid });
     };
     if(isLoggedIn && !currentUser.isRestaurant){
       return (

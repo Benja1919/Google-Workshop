@@ -81,7 +81,7 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
    * @param {string} restaurantName - The restaurant name to navigate to.
    */
   const navigateToRestaurant = (restaurantName) => {
-    navigation.navigate('Restaurant', { restaurantName });
+    navigation.navigate('Restaurant', { restaurantName:restaurantName, restaurantID:null });
   };
 
   /**

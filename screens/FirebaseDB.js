@@ -190,6 +190,12 @@ export const firestoreDB = () => {
         return { id: restaurantSnapshot.id, ...restaurantSnapshot.data() };
     };
 
+    const GetRestaurantByID = async (id) => {
+        const restaurantDoc = doc(firestore, 'restaurants', id);
+        const restaurantSnapshot = await getDoc(restaurantDoc);
+        return { id: restaurantSnapshot.id, ...restaurantSnapshot.data() };
+    };
+
     const UpdateRestaurantContent = async (Restaurant) => {
         const userRef = doc(firestore, "restaurants", Restaurant.id);
 
@@ -203,6 +209,7 @@ export const firestoreDB = () => {
             OpeningHours: Restaurant.OpeningHours,
             ProfileImageURI: Restaurant.ProfileImageURI,
             name: Restaurant.name,
+            Tags: Restaurant.Tags
         };
         try {
             await setDoc(userRef, updatedData, { merge: true });
@@ -273,6 +280,7 @@ export const firestoreDB = () => {
         checkUsernameExists,
         checkEmailExists,
 		FetchRestaurants,
+        GetRestaurantByID,
     };
 };
 

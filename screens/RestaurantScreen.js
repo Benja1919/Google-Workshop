@@ -44,11 +44,17 @@ const RestaurantScreen = ({ route, navigation }) => {
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLocationMapEnbaled, setLocationMap] = useState(false);
-  const { restaurantName } = route.params;
+  const { restaurantName, restaurantID } = route.params;
   useEffect(() => {
     const fetchRestaurant = async () => {
-      setRestaurant(await firestoreDB().GetRestaurant(restaurantName));
-      setLoading(false);
+      if(restaurantName != null){
+        setRestaurant(await firestoreDB().GetRestaurant(restaurantName));
+        setLoading(false);
+      }
+      else if(restaurantID != null){
+        setRestaurant(await firestoreDB().GetRestaurantByID(restaurantID));
+        setLoading(false);
+      }
     };
 
     fetchRestaurant();
@@ -111,7 +117,16 @@ const RestaurantScreen = ({ route, navigation }) => {
         <Text style={{...styles.detailsText,marginLeft:20}}>{restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>
       </View>
       <AdditionalDetailsComponent restaurant={restaurant}/>
-      
+      <Text style={styles.sectionTitle}>Tags</Text>
+      <FlatList
+        data={restaurant.Tags}
+        renderItem={({ item, index }) => (
+            <Text style={{fontSize:16}}>{item}{index === restaurant.Tags.length -1 ? '      ' : ', '}</Text>
+        )}
+        keyExtractor={(tag, index) => index.toString()}
+        horizontal
+        style={{...styles.item,padding:15}}
+      />
       <Text style={styles.sectionTitle}>Posts</Text>
 
       {/* Display posts for the specific restaurant */}

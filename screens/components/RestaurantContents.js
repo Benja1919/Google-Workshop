@@ -7,6 +7,8 @@ import ImprovedImageComponent from './ImprovedImage';
 import * as ImagePicker from 'expo-image-picker';
 import OpeningTimes from './OpeningTimeViewer';
 import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'firebase/storage';
+import Autocomplete from './AutoComplete';
+export const AllTags = ["Fast Food","Hamburger","Shawarma","Asian","Bakery","Coffee","Luxury","Pizza","Cheap","Kebab","Italian","Sushi","Noodles","Kosher","Not Kosher","Meat","Vegan","Gluten Free","Pasta","Steak","Spicy","Bread","Breakfast","Hummus"]
 const col2 = '#fbfbfb';
 const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor,imageicon, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
     const DeleteButton = () =>{
@@ -177,7 +179,20 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
             setAddressText(CoordinateAddress);
             firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
         }
-
+        const AddTag = (tag) =>{
+            CurrentRestaurantLocal.Tags.push(tag);
+            firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
+        };
+        function RemoveTag(tag) {
+            const index = CurrentRestaurantLocal.Tags.indexOf(tag);
+            console.log(index,tag);
+            if (index > -1) {
+                CurrentRestaurantLocal.Tags.splice(index, 1);
+                firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
+                forceUpdate(Math.random());
+            }
+            
+        }
         const renderItem = ({ item }) => (
             <View style={styles.item1}>
                 <CustomTextInput
@@ -281,6 +296,24 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
                                 resizeMode="center"/>
                         </TouchableOpacity>
                         <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={CurrentRestaurantLocal.Coordinates} mapclickfunction={GetMapCoordinate}/>
+                    </View>
+                    <Text style={styles.SectionTitle}>Tags</Text>
+                    <View style={styles.item}>
+                        <Autocomplete data={AllTags} placeholder={'Add Tag'} resultFunction={AddTag} exclude={CurrentRestaurantLocal.Tags}/>
+                        <View  style={{borderBottomWidth: 1, borderBottomColor: '#ccc',}}></View>
+                        <FlatList
+                            data={CurrentRestaurantLocal.Tags}
+                            renderItem={({item})=>{
+                                return (
+                                    <TouchableOpacity style={{padding:5,marginLeft:5}} onPress={()=> RemoveTag(item)}>
+                                        <Text style={{fontSize: 16}}>{item}</Text>
+                                    </TouchableOpacity>
+                                );
+                            }}
+                            keyExtractor={(tag, index) => index.toString()}
+                            scrollEnabled={false} // Disable FlatList's own scrolling
+                            contentContainerStyle={styles.flatList}
+                        />
                     </View>
                     <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',padding:10}}>
                         <Text style={styles.SectionTitle}>Addional Information</Text>
