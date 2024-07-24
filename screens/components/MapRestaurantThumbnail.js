@@ -1,6 +1,14 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { StyleSheet, View,Alert, Text, Image,TouchableOpacity } from 'react-native';
 import ImprovedImageComponent from './ImprovedImage';
+const CommunEATYReviewsToString = (restaurant) => {
+    if(restaurant.reviewcount > 0){
+        return `(${restaurant.starcount/restaurant.reviewcount}✮)`;
+    }
+    else{
+        return '';
+    }
+};
 images = {
     tri : require("../../assets/icons/Tri1.png"),
 };
@@ -9,7 +17,7 @@ const MapRestaurantThumbnail = ({isEnabled,restaurant,navigation})=>{
         return (
             <View style={styles.markerparent}>
                 <View style={styles.marker}>
-                    <Text style={styles.markerText}>{`${restaurant.name} (${restaurant.starcount/restaurant.reviewcount} 🌟)`}</Text>
+                    <Text style={styles.markerText}>{`${restaurant.name} ${CommunEATYReviewsToString(restaurant)}`}</Text>
                 </View>
                 <Image style={styles.blackDot} source={images.tri}/>
             </View>
@@ -19,7 +27,7 @@ const MapRestaurantThumbnail = ({isEnabled,restaurant,navigation})=>{
         return (
             <View style={styles.markerparent}>
                 <View style={styles.marker}>
-                    <Text style={styles.markerText}>{`${restaurant.name} (${restaurant.starcount/restaurant.reviewcount} 🌟)`}</Text>
+                    <Text style={styles.markerText}>{`${restaurant.name} ${CommunEATYReviewsToString(restaurant)}`}</Text>
                     <ImprovedImageComponent ImageURI={restaurant.ProfileImageURI} ImageStyle={styles.profileImage}/>
                     <Text style={styles.markerText}>{`${restaurant.description}`}</Text>
                 </View>

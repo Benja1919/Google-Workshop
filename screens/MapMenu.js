@@ -7,20 +7,25 @@ import { firestoreDB } from './FirebaseDB';
 import MapRestaurantThumbnail from './components/MapRestaurantThumbnail';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import BottomBarComponent from './components/BottomBar';
+import {isOpen, GetNow} from './components/OpeningTimeViewer';
+import Slider from '@react-native-community/slider';
 
 const { width } = Dimensions.get('window');
+
 const SIDEMENU_WIDTH = 200;
 images = {
     tri : require("../assets/icons/Tri1.png"),
 };
 const MapMenu = ({navigation, onHeaderLeftPress}) =>{
+    now = GetNow();
     const [location, setLocation] = useState(null);
     const {currentUser } = useContext(AuthContext);
     const [restaurants, setRestaurants] = useState([]);
     const [ThumbnailOn, setThumbnailVisibilty] = useState(-1);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isOpenFilter, SetOpen] = useState(false);
     const translateX = useSharedValue(-SIDEMENU_WIDTH);
-
+    const [MinRating, SetMinRating] = useState(0);
     const menuStyle = useAnimatedStyle(() => {
         return {
         transform: [{ translateX: translateX.value }],
@@ -93,7 +98,16 @@ const MapMenu = ({navigation, onHeaderLeftPress}) =>{
             <View/>
         );
     }
-    else if(location != null){
+    else if(location != null && restaurants.length > 0){
+        dayidx = new Date().getDay();
+        availableRestaurantsIndeces = [];
+        for (let index = 0; index < restaurants.length; index++) {
+            const restaurant = restaurants[index];
+            if((isOpenFilter || (!isOpenFilter && isOpen({restaurant:restaurant,day:dayidx,time:now}))) && ((restaurant.reviewcount > 0 && (restaurant.starcount / restaurant.reviewcount) >= MinRating) || (restaurant.reviewcount == 0 && MinRating <= 0.1))){
+                availableRestaurantsIndeces.push(index);
+            }
+            
+        }
         const initialRegion = {
             latitude:location.coords.latitude,
             longitude: location.coords.longitude,
@@ -109,21 +123,47 @@ const MapMenu = ({navigation, onHeaderLeftPress}) =>{
                     showsUserLocation = {true}
                     onPress={MapPress}
                     >
-                    {restaurants.map((restaurant, index) => (
+                    {availableRestaurantsIndeces.map((restaurantIndex, index) => (
                     <Marker
                         key={index}
-                        coordinate={{ latitude: restaurant.Coordinates.latitude, longitude: restaurant.Coordinates.longitude }}
+                        coordinate={{ latitude: restaurants[restaurantIndex].Coordinates.latitude, longitude: restaurants[restaurantIndex].Coordinates.longitude }}
                         onPress={() => MarkerPress(index)}
                     >
-                        <MapRestaurantThumbnail isEnabled={ThumbnailOn==index} restaurant={restaurant} navigation={navigation} pointerEvents="box-none"/>
+                        <MapRestaurantThumbnail isEnabled={ThumbnailOn==index} restaurant={restaurants[restaurantIndex]} navigation={navigation} pointerEvents="box-none"/>
                     </Marker>
                     ))}
 
                 </MapView>
                 <View >
                     <Animated.View style={[styles.sideMenu, menuStyle]}>
-                    <Text style={styles.menuItem}>Item 1</Text>
-                    <Text style={styles.menuItem}>Item 2</Text>
+                    <View style={{...styles.menuItem,flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Text style={{fontSize:16}}>Closed Restaurants</Text>
+                        <Switch
+                            trackColor={{ false: "#767577", true: "#81b0ff" }}
+                            thumbColor={isOpenFilter ? "#0056b4" : "#f4f3f4"}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() => SetOpen(previousState => !previousState)}
+                            value={isOpenFilter}
+                            style={{alignSelf: 'flex-end'}}
+                        />
+                    </View>
+                    <View style={{...styles.menuItem}}>
+                        <Text style={{fontSize:16}}>Minimum Rating</Text>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <Slider
+                                style={{ width: 150, height: 40}}
+                                minimumValue={0}
+                                maximumValue={5}
+                                step={0.1}
+                                value={0}
+                                minimumTrackTintColor="#81b0ff" // Color of the filled track
+                                maximumTrackTintColor="#81b0ff" // Color of the unfilled track
+                                thumbTintColor="#0056b4" // Color of the thumb
+                                onValueChange={value => {SetMinRating(value.toFixed(1))}}
+                            />
+                            <Text style={{left : -8,fontSize:16}}>{MinRating}</Text>
+                        </View>
+                    </View>
                     </Animated.View>
                 </View>
                 
@@ -179,7 +219,7 @@ const styles = StyleSheet.create({
         zIndex: 1,
       },
       menuItem: {
-        padding: 20,
+        padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
       },

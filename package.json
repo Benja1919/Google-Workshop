@@ -61,7 +61,8 @@
     "react-native-web": "~0.19.12",
     "vis-network": "^9.1.9",
     "yargs": "^17.7.2",
-    "yargs-parser": "^21.1.1"
+    "yargs-parser": "^21.1.1",
+    "@react-native-community/slider": "4.5.2"
   },
   "resolutions": {
     "mem": "^4.0.0",

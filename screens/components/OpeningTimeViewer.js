@@ -27,6 +27,7 @@ const TimeToHourMinutes = (time) =>{
     return [hour,min];
 };
 export const isOpen = ({restaurant,day,time}) =>{
+    
     if(restaurant.OpeningHours[day] == '-'){
         return false;
     }
@@ -38,13 +39,21 @@ export const isOpen = ({restaurant,day,time}) =>{
     parts2 = TimeToHourMinutes(time);
     TimeHour = parts2[0];
     TimeMin = parts2[1];
+    
     return (parseInt(TimeHour) > parseInt(OpenHour) && parseInt(TimeHour) < parseInt(CloseHour)) || 
-            (parseInt(TimeHour) == parseInt(OpenHour) && parseInt(TimeMin) < parseInt(CloseMin));
+            (parseInt(TimeHour) == parseInt(OpenHour) && parseInt(TimeMin) > parseInt(OpenMin)) ||
+            (parseInt(TimeHour) == parseInt(CloseHour) && parseInt(TimeMin) < parseInt(CloseMin)) ; 
 };
 const MergeTimes = ({times1,times2,is1}) => {
     const parts1 = times1.split("-");
     const parts2 = times2.split("-");
     return is1 ? `${parts1[0]}-${parts2[1]}` : `${parts1[1]}-${parts2[0]}`;
+};
+export const GetNow = () => {
+    const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
 };
 const ChangeTimes = ({times1,time,is1}) => {
     const parts1 = times1.split("-");
