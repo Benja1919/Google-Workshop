@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert, Modal, Button,TouchableWithoutFeedback, TextInput, FlatList  } from 'react-native';
-import {useAddressToCoord, useCoordToAddress,searchNearbyPlaces} from './Maps';
-
+import {useAddressToCoord, useCoordToAddress,searchNearbyPlaces, getPhotoUri} from './Maps';
+import { firestoreDB } from '../FirebaseDB';
 
 const AddRestaurantComponent = ({isEnabled,OnClose}) =>{
     
@@ -34,7 +34,7 @@ const AddRestaurantComponent = ({isEnabled,OnClose}) =>{
             let CloseHour = day.close.hour;
             let CloseMin = day.close.minute;
             if(day.close.day != day.open.day){
-                CloseHour += 24
+                CloseHour += 24;
             }
             OpenHour = ZeroExtend(OpenHour);
             OpenMin = ZeroExtend(OpenMin);
@@ -43,7 +43,6 @@ const AddRestaurantComponent = ({isEnabled,OnClose}) =>{
             oh[day.open.day] = `${OpenHour}:${OpenMin}-${CloseHour}:${CloseMin}`;
 
         }
-        console.log(oh);
         return oh;
     };
     const ScalpRestaurant = (restaurant_idx) =>{
@@ -57,8 +56,15 @@ const AddRestaurantComponent = ({isEnabled,OnClose}) =>{
             Phone : data.nationalPhoneNumber,
             Website : data.websiteUri,
             OpeningHours: ParseGoogleOpeningTime(data.regularOpeningHours.periods),
+            ProfileImageURI: getPhotoUri(data.photos[0].name.split('/')[3])._j,
+            description: '',
+            ContentTitles: [],
+            ContentData: [],
+            Tags: [],
+            starcount : 0,
+            reviewcount : 0,
         };
-        //console.log(data.photos);
+        firestoreDB().AddRestaurant(Restaurant);
     };
 
 

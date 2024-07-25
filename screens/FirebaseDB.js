@@ -126,7 +126,11 @@ export const firestoreDB = () => {
         GetRestaurant(post.restaurantName).starcount += post.stars;
         GetRestaurant(post.restaurantName).reviewcount += 1;
     };
-
+    const AddRestaurant =async (Restaurant) =>{
+        const collectionRef = await collection(firestore, 'restaurants');
+        const docRef = await addDoc(collectionRef, Restaurant);
+        return docRef.id;
+    };
 	const CreateList = async (list) => {
 		try {
 		  const currentUser = await GetUserName(list.userName.toLowerCase());
@@ -289,6 +293,7 @@ export const firestoreDB = () => {
         checkEmailExists,
 		FetchRestaurants,
         GetRestaurantByID,
+        AddRestaurant,
     };
 };
 

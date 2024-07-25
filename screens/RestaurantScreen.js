@@ -1,7 +1,7 @@
 // Updated RestaurantScreen.js
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet,TouchableOpacity, } from 'react-native';
+import { View, Text, Image, StyleSheet,TouchableOpacity, Linking} from 'react-native';
 import PostsScreen from './PostsScreen';
 import { firestoreDB } from './FirebaseDB';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
@@ -110,7 +110,16 @@ const RestaurantScreen = ({ route, navigation }) => {
         <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={restaurant.Coordinates}/>
       </View>
       <Text style={styles.sectionTitle}>Opening Times </Text>
-                      <OpeningTimes restaurant={restaurant} isEditable ={false}/>
+          <OpeningTimes restaurant={restaurant} isEditable ={false}/>
+      <Text style={styles.sectionTitle}>Contact</Text>
+      <View style={{...styles.item,padding:5}} >
+        <TouchableOpacity  onPress={()=>{Linking.openURL(`tel:${restaurant.Phone}`)}} >
+          <Text style={{...styles.details,marginLeft:10,padding:2}}>Phone: {restaurant.Phone}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity  onPress={()=>{Linking.openURL(restaurant.Website)}} >
+          <Text style={{...styles.details,marginLeft:10,padding:2}}>Website: {restaurant.Website}</Text>
+        </TouchableOpacity>
+      </View>
       <Text style={styles.sectionTitle}>Rating</Text>
       <View style={styles.item}>
         <Text style={{...styles.detailsHeader,marginLeft:10}}>Average Rating:</Text>

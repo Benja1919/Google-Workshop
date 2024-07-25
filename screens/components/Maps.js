@@ -2,8 +2,8 @@ import React, { useContext, useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert} from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
-
-Geocoder.init('AIzaSyD6nDtPRXSBhTCkYemwC9fJ4YUxnAqnC1E');
+apiKey = 'AIzaSyD6nDtPRXSBhTCkYemwC9fJ4YUxnAqnC1E';
+Geocoder.init(apiKey);
 //conversions Address <--> Coordinates(N,W)
 export const useCoordToAddress = (latitude, longitude) => {
     const [address, setAddress] = useState('');
@@ -28,7 +28,10 @@ export const useCoordToAddress = (latitude, longitude) => {
 
     return address;
 };
-
+export const getPhotoUri = async (photoReference) => {
+    const url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&photoreference=${photoReference}&key=${apiKey}`;
+    return url;
+  };
 export const useAddressToCoord = (address) => {
     
     const [coordinates, setCoordinates] = useState({"latitude": null, "longitude": null});
@@ -53,7 +56,6 @@ export const searchNearbyPlaces = (Coords) => {
     useEffect(() => {
         if(Coords.latitude != null){
             const get = async (Coords) => {
-                apiKey = 'AIzaSyD6nDtPRXSBhTCkYemwC9fJ4YUxnAqnC1E';
                 const url = 'https://places.googleapis.com/v1/places:searchNearby';
             
                 const headers = {
