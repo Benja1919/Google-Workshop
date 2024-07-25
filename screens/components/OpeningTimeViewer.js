@@ -9,15 +9,15 @@ images = {
 const dayArray = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const col2 = '#fbfbfb';
 const SplitTimes = (Times) => {
-    const parts = Times.split("-");
-    OpenTime = parts[0];
-    CloseTime = parts[1];
-    const parts2 = OpenTime.split(":");
-    OpenHour = parts2[0];
-    OpenMin = parts2[1];
-    const parts3 = CloseTime.split(":");
-    CloseHour = parts3[0];
-    CloseMin = parts3[1];
+    const _parts = Times.split("-");
+    const OpenTime = _parts[0];
+    const CloseTime = _parts[1];
+    const _parts2 = OpenTime.split(":");
+    const OpenHour = _parts2[0];
+    const OpenMin = _parts2[1];
+    const _parts3 = CloseTime.split(":");
+    const CloseHour = _parts3[0];
+    const CloseMin = _parts3[1];
     return [OpenHour,OpenMin,CloseHour,CloseMin];
 };
 const TimeToHourMinutes = (time) =>{
@@ -26,23 +26,40 @@ const TimeToHourMinutes = (time) =>{
     min = parts2[1];
     return [hour,min];
 };
+const TimesToDisplayable = (times,day) =>{
+    const parts = SplitTimes(times);
+    OpenHour = parts[0];
+    OpenMin = parts[1];
+    CloseHour = parts[2];
+    CloseMin = parts[3];
+    if(CloseHour > 23){
+        return `${OpenHour}:${OpenMin}-${parseInt(CloseHour)%24}:${CloseMin}(${dayArray[(day+1) % 7]})`;
+    }
+    else{
+        return `${OpenHour}:${OpenMin}-${CloseHour}:${CloseMin}`;
+    }
+};
 export const isOpen = ({restaurant,day,time}) =>{
     
     if(restaurant.OpeningHours[day] == '-'){
         return false;
     }
-    parts = SplitTimes(restaurant.OpeningHours[day]);
-    OpenHour = parts[0];
-    OpenMin = parts[1];
-    CloseHour = parts[2];
-    CloseMin = parts[3];
-    parts2 = TimeToHourMinutes(time);
-    TimeHour = parts2[0];
-    TimeMin = parts2[1];
-    
-    return (parseInt(TimeHour) > parseInt(OpenHour) && parseInt(TimeHour) < parseInt(CloseHour)) || 
-            (parseInt(TimeHour) == parseInt(OpenHour) && parseInt(TimeMin) > parseInt(OpenMin)) ||
-            (parseInt(TimeHour) == parseInt(CloseHour) && parseInt(TimeMin) < parseInt(CloseMin)) ; 
+    const parts = SplitTimes(restaurant.OpeningHours[day]);
+    const OpenHour = parseInt(parts[0]);
+    const OpenMin = parseInt(parts[1]);
+    const CloseHour = parseInt(parts[2]);
+    const CloseMin = parseInt(parts[3]);
+    const parts2 = TimeToHourMinutes(time);
+    const TimeHour = parseInt(parts2[0]);
+    const TimeMin = parseInt(parts2[1]);
+    const parts3 = SplitTimes(restaurant.OpeningHours[(day-1)%7]);
+    const CloseHourYesterday = parseInt(parts3[2]);
+    const CloseMinYesterday = parseInt(parts3[3]);
+    return (TimeHour > OpenHour && TimeHour < CloseHour) || 
+            (TimeHour == OpenHour && TimeMin > OpenMin) ||
+            (TimeHour == CloseHour && TimeMin < CloseMin) ||
+            (CloseHourYesterday - 24 > TimeHour) ||
+            (CloseHourYesterday - 24 == TimeHour && TimeMin < CloseMinYesterday)
 };
 const MergeTimes = ({times1,times2,is1}) => {
     const parts1 = times1.split("-");
@@ -116,12 +133,27 @@ const OpeningTimes = ({restaurant,isEditable}) => {
     const DayData = ({day,isEditable, oh}) =>{
         const [isExtendedOpen, setisExtendedOpen] = useState(false);
         const [isRestaurantOpen, setOpenRestaurnt] = useState(oh[day] == '-' ? "Closed" : "Open")
-        
+        const [CloseNextDay, setCloseNextDay] = useState(parseInt(SplitTimes(oh[day])[2]) > 23);
+        const UpdateCloseNextDay = (day) =>{
+            const parts = SplitTimes(restaurant.OpeningHours[day]);
+            OpenHour = parts[0];
+            OpenMin = parts[1];
+            CloseHour = parts[2];
+            CloseMin = parts[3];
+            if(CloseNextDay){   //turn it off
+                restaurant.OpeningHours[day] = `${OpenHour}:${OpenMin}-${parseInt(CloseHour)-24}:${CloseMin}`;
+            }
+            else{ 
+                restaurant.OpeningHours[day] = `${OpenHour}:${OpenMin}-${parseInt(CloseHour)+24}:${CloseMin}`;
+            }
+            setCloseNextDay(!CloseNextDay);
+            firestoreDB().UpdateRestaurantContent(restaurant);
+        };
         if(isEditable){
             if(!isExtendedOpen){
                 return (
                     <TouchableOpacity disabled={!isEditable} onPress={()=>setisExtendedOpen(true)} style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',marginLeft:5}}>
-                        <Text style={{fontSize:16,flex:1,fontWeight: (day == dayidx) ? 'bold' : 'regular'}}> {dayArray[day]}: {oh[day] == '-' ? "Closed" : oh[day]}</Text>
+                        <Text style={{fontSize:16,flex:1,fontWeight: (day == dayidx) ? 'bold' : 'regular'}}> {dayArray[day]}: {oh[day] == '-' ? "Closed" : TimesToDisplayable(oh[day],day)}</Text>
                         <Image source={images.tri}
                                 style={{...styles.icon,alignSelf: 'flex-end',transform: [{rotate: isExtendedOpen ? '0deg' : '180deg' }]}}
                                 resizeMode="center"/>
@@ -132,7 +164,7 @@ const OpeningTimes = ({restaurant,isEditable}) => {
                 return (
                     <View>
                         <TouchableOpacity disabled={!isEditable} onPress={()=>setisExtendedOpen(false)} style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',marginLeft:5}}>
-                            <Text style={{fontSize:16,flex:1,fontWeight: (day == dayidx) ? 'bold' : 'regular'}}> {dayArray[day]}: {oh[day] == '-' ? "Closed" : oh[day]}</Text>
+                            <Text style={{fontSize:16,flex:1,fontWeight: (day == dayidx) ? 'bold' : 'regular'}}> {dayArray[day]}: {oh[day] == '-' ? "Closed" : TimesToDisplayable(oh[day],day)}</Text>
                             <Image source={images.tri}
                                     style={{...styles.icon,alignSelf: 'flex-end',transform: [{rotate: isExtendedOpen ? '0deg' : '180deg' }]}}
                                     resizeMode="center"/>
@@ -147,6 +179,9 @@ const OpeningTimes = ({restaurant,isEditable}) => {
                             <TouchableOpacity disabled={!isEditable} onPress={()=>showCloseTimePicker(day)}>
                                 <Text style={{fontSize:14,padding:1}}>Set Closing time</Text>
                             </TouchableOpacity>
+                            <TouchableOpacity disabled={!isEditable} onPress={()=>UpdateCloseNextDay(day)}>
+                                <Text style={{fontSize:14,padding:1}}>Close {CloseNextDay ? 'today' :'tommorow'}</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 );
@@ -155,7 +190,7 @@ const OpeningTimes = ({restaurant,isEditable}) => {
         else{
             //console.log(`${dayArray[day]}: ${oh[day] == '-' ? "Closed" : oh[day]}`,(day == dayidx));
             return (
-                <Text style={{fontSize:16,marginLeft:5,fontWeight: (day == dayidx) ? 'bold' : 'regular'}}> {dayArray[day]}: {oh[day] == '-' ? "Closed" : oh[day]}</Text>
+                <Text style={{fontSize:16,marginLeft:5,fontWeight: (day == dayidx) ? 'bold' : 'regular'}}> {dayArray[day]}: {oh[day] == '-' ? "Closed" : TimesToDisplayable(oh[day],day)}</Text>
             );
         }
     };

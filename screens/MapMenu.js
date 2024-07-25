@@ -9,6 +9,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-na
 import BottomBarComponent from './components/BottomBar';
 import {isOpen, GetNow} from './components/OpeningTimeViewer';
 import Slider from '@react-native-community/slider';
+import AddRestaurantComponent from './components/AddRestaurant';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +25,7 @@ const MapMenu = ({navigation, onHeaderLeftPress}) =>{
     const [ThumbnailOn, setThumbnailVisibilty] = useState(-1);
     const [menuOpen, setMenuOpen] = useState(false);
     const [isOpenFilter, SetOpen] = useState(false);
+    const [isOpenRestaurantAdder, SetAddRestaurant] = useState(false);
     const translateX = useSharedValue(-SIDEMENU_WIDTH);
     const [MinRating, SetMinRating] = useState(0);
     const menuStyle = useAnimatedStyle(() => {
@@ -116,6 +118,7 @@ const MapMenu = ({navigation, onHeaderLeftPress}) =>{
         };
         return (
             <View style={{flex:1}}>
+
             <View style={{flexDirection:'row',flex:1}}>
                 <MapView
                     style={styles.map}
@@ -161,7 +164,7 @@ const MapMenu = ({navigation, onHeaderLeftPress}) =>{
                                 thumbTintColor="#0056b4" // Color of the thumb
                                 onValueChange={value => {SetMinRating(value.toFixed(1))}}
                             />
-                            <Text style={{left : -8,fontSize:16}}>{MinRating}</Text>
+                            <Text style={{left : -8,fontSize:16}}>{MinRating}✮</Text>
                         </View>
                     </View>
                     </Animated.View>
@@ -169,6 +172,10 @@ const MapMenu = ({navigation, onHeaderLeftPress}) =>{
                 
             </View>
             <View style={{zIndex: 2,}}>
+            <TouchableOpacity style={{position: 'absolute', bottom: 80,right: 10,}} onPress={()=>SetAddRestaurant(true)}>
+                <Text style={{fontSize:50}}>+</Text>
+            </TouchableOpacity>
+            <AddRestaurantComponent isEnabled={isOpenRestaurantAdder} OnClose={() => SetAddRestaurant(false)}/>
             <BottomBarComponent navigation={navigation} />
             </View>
             </View>

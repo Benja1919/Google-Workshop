@@ -10,6 +10,12 @@ import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'f
 import Autocomplete from './AutoComplete';
 export const AllTags = ["Fast Food","Hamburger","Shawarma","Asian","Bakery","Coffee","Luxury","Pizza","Cheap","Kebab","Italian","Sushi","Noodles","Kosher","Not Kosher","Meat","Vegan","Gluten Free","Pasta","Steak","Spicy","Bread","Breakfast","Hummus"]
 const col2 = '#fbfbfb';
+images = {
+    editimage :require("../../assets/icons/edittransparent.png"),
+    mapimage : require("../../assets/icons/mapicon2.png"),
+    locationimage : require("../../assets/icons/LocationIcon.png"),
+    tri : require("../../assets/icons/Tri1.png"),
+};
 const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor,imageicon, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
     const DeleteButton = () =>{
         if(!hasdelete){
@@ -67,12 +73,7 @@ const setName = (text) =>{
     firestoreDB().UpdateRestaurantContent(CurrentRestaurant);
 }
 
-images = {
-    editimage :require("../../assets/icons/edittransparent.png"),
-    mapimage : require("../../assets/icons/mapicon2.png"),
-    locationimage : require("../../assets/icons/LocationIcon.png"),
-    tri : require("../../assets/icons/Tri1.png"),
-};
+
 
 const RestaurantContentComponent = ({ RestaurantUser }) => {
     if(RestaurantUser != null){
@@ -185,7 +186,6 @@ const RestaurantContentComponent = ({ RestaurantUser }) => {
         };
         function RemoveTag(tag) {
             const index = CurrentRestaurantLocal.Tags.indexOf(tag);
-            console.log(index,tag);
             if (index > -1) {
                 CurrentRestaurantLocal.Tags.splice(index, 1);
                 firestoreDB().UpdateRestaurantContent(CurrentRestaurantLocal);
