@@ -122,54 +122,54 @@ const MyListsScreen = ({ route }) => {
     // Clear interval on component unmount
     return () => clearInterval(intervalId);  }, [currentUser]);
 
-  // const addItemToList = (listId) => {
-  //   if (newItemText.trim() === '') {
-  //     alert('Please enter a valid item name');
-  //     return;
-  //   }
-  //   const updatedLists = lists.map(list => {
-  //     if (list.id === listId) {
-  //       const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
-  //       const updatedList = { ...list, items: updatedItems };
-  //       if (selectedList && selectedList.id === listId) {
-  //         setSelectedList(updatedList);
-  //       }
-  //       return updatedList;
-  //     }
-  //     return list;
-  //   });
-  //   setLists(updatedLists);
-  //   setNewItemText('');
-  // };
+  const addItemToList = (listId) => {
+    if (newItemText.trim() === '') {
+      alert('Please enter a valid item name');
+      return;
+    }
+    const updatedLists = lists.map(list => {
+      if (list.id === listId) {
+        const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
+        const updatedList = { ...list, items: updatedItems };
+        if (selectedList && selectedList.id === listId) {
+          setSelectedList(updatedList);
+        }
+        return updatedList;
+      }
+      return list;
+    });
+    setLists(updatedLists);
+    setNewItemText('');
+  };
 
-  // const startEditItem = (itemId, itemName) => {
-  //   setEditItemId(itemId);
-  //   setEditItemText(itemName);
-  // };
+  const startEditItem = (itemId, itemName) => {
+    setEditItemId(itemId);
+    setEditItemText(itemName);
+  };
 
-  // const saveEditItem = () => {
-  //   const updatedLists = lists.map(list => ({
-  //     ...list,
-  //     items: list.items.map(item =>
-  //       item.id === editItemId ? { ...item, name: editItemText } : item
-  //     )
-  //   }));
-  //   setLists(updatedLists);
-  //   setEditItemId(null);
-  //   setEditItemText('');
-  // };
+  const saveEditItem = () => {
+    const updatedLists = lists.map(list => ({
+      ...list,
+      items: list.items.map(item =>
+        item.id === editItemId ? { ...item, name: editItemText } : item
+      )
+    }));
+    setLists(updatedLists);
+    setEditItemId(null);
+    setEditItemText('');
+  };
 
-  // const cancelEditItem = () => {
-  //   setEditItemId(null);
-  //   setEditItemText('');
-  // };
+  const cancelEditItem = () => {
+    setEditItemId(null);
+    setEditItemText('');
+  };
 
-  // const deleteItem = (listId, itemId) => {
-  //   const updatedLists = lists.map(list =>
-  //     list.id === listId ? { ...list, items: list.items.filter(item => item.id !== itemId) } : list
-  //   );
-  //   setLists(updatedLists);
-  // };
+  const deleteItem = (listId, itemId) => {
+    const updatedLists = lists.map(list =>
+      list.id === listId ? { ...list, items: list.items.filter(item => item.id !== itemId) } : list
+    );
+    setLists(updatedLists);
+  };
 
   const openList = (list) => {
     setSelectedList(list);

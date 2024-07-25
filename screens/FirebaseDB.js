@@ -127,11 +127,19 @@ export const firestoreDB = () => {
         GetRestaurant(post.restaurantName).reviewcount += 1;
     };
 
-    const CreateList = async (list) => {
-        const currentUser = await GetUserName(list.userName.toLowerCase());
-        const usersListsCollectionRef = collection(firestore, 'users', list.userName, 'lists');
-        await addDoc(usersListsCollectionRef, list);
-    };
+	const CreateList = async (list) => {
+		try {
+		  const currentUser = await GetUserName(list.userName.toLowerCase());
+		  if (!currentUser) {
+			throw new Error('User not found');
+		  }
+		  const listsCollectionRef = collection(firestore, 'usersLists');
+		  // בדוק את הנתונים שנשלחים למסמך	  
+		  await addDoc(listsCollectionRef, list);
+		} catch (error) {
+		  console.error('Error creating list:', error);
+		}
+	  };
 
     const CreateUser = async (user) => {
         const usersCollectionRef = collection(firestore, 'users');

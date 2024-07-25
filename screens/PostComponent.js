@@ -38,29 +38,37 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     }, [post.userName]);
 
     const mediaItems = Array.isArray(post.mediaUrls)
-        ? post.mediaUrls.map((url, index) => ({
-            url,
-            type: post.mediaTypes ? post.mediaTypes[index] : url.endsWith('.mp4') ? 'video' : url.endsWith('.gif') ? 'gif' : 'image'
-        }))
-        : [{ url: post.imageUrl, type: 'image' }];
+    ? post.mediaUrls.map((url) => {
+      const [baseUrl, queryString] = url.split('?');
+      if (baseUrl.endsWith('.mp4') || baseUrl.endsWith('.mov') || baseUrl.endsWith('.avi')) {
+            return { url, type: 'video' };
+        } else if (baseUrl.endsWith('.gif')) {
+            return { url, type: 'gif' };
+        } else {
+            return { url, type: 'image' };
+        }
+    })
+    : [{ url: post.imageUrl, type: 'image' }];
+
 
     const renderItem = ({ item }) => {
         if (item.type === 'video') {
-            return (
-                <Video
-                    source={{ uri: item.url }}
-                    style={styles.media}
-                    resizeMode="cover"
-                    controls={true}
-                    paused={paused}
-                    onLoad={() => setPaused(false)}
-                    onBuffer={({ isBuffering }) => setPaused(isBuffering)}
-                    onError={(error) => {
-                        console.log('Video Error:', error);
-                        setVideoError('Unable to play video');
-                    }}
-                />
-            );
+         // console.log(item.url);
+            // return (
+            //     <Video
+            //         source={{ uri: item.url }}
+            //         style={styles.media}
+            //         resizeMode="cover"
+            //         controls={true}
+            //         paused={paused}
+            //         onLoad={() => setPaused(false)}
+            //         onBuffer={({ isBuffering }) => setPaused(isBuffering)}
+            //         onError={(error) => {
+            //             console.log('Video Error:', error);
+            //             setVideoError('Unable to play video');
+            //         }}
+            //     />
+            // );
         } else {
             return <Image source={{ uri: item.url }} style={styles.media} />;
         }
