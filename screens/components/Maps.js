@@ -28,9 +28,10 @@ export const useCoordToAddress = (latitude, longitude) => {
 
     return address;
 };
-export const useAddressToCoord = (address) => {
-    const [coordinates, setCoordinates] = useState({"latitude": null, "longitude": null});
 
+export const useAddressToCoord = (address) => {
+    
+    const [coordinates, setCoordinates] = useState({"latitude": null, "longitude": null});
     useEffect(() => {
         if (address !== '') {
             const getCoordinates = async (addr) => {
@@ -45,10 +46,56 @@ export const useAddressToCoord = (address) => {
             getCoordinates(address);
         }
     }, [address]);
-
     return coordinates;
 };
-
+export const searchNearbyPlaces = (Coords) => {
+    const [restaurants, setRestaurants] = useState(null);
+    useEffect(() => {
+        if(Coords.latitude != null){
+            const get = async (Coords) => {
+                apiKey = 'AIzaSyD6nDtPRXSBhTCkYemwC9fJ4YUxnAqnC1E';
+                const url = 'https://places.googleapis.com/v1/places:searchNearby';
+            
+                const headers = {
+                'Content-Type': 'application/json',
+                'X-Goog-Api-Key': apiKey,
+                'X-Goog-FieldMask': 'places.name,places.photos,places.attributions,places.displayName,places.websiteUri,places.formattedAddress,places.regularOpeningHours,places.types,places.id,places.location,places.priceLevel,places.rating,places.userRatingCount,places.nationalPhoneNumber,places.editorialSummary,places.servesBeer,places.servesBreakfast,places.servesBrunch,places.servesCocktails,places.servesCoffee,places.servesDessert,places.servesDinner,places.servesLunch,places.servesVegetarianFood,places.servesWine,places.takeout'
+                };
+            
+                const requestBody = {
+                includedTypes: ["restaurant"],
+                maxResultCount: 5,
+                locationRestriction: {
+                    circle: {
+                    center: {
+                        latitude: Coords.latitude,
+                        longitude: Coords.longitude
+                    },
+                    radius: 50.0
+                    }
+                }
+                };
+            
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(requestBody)
+                    });
+                
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                
+                    const data = await response.json();
+                    setRestaurants(data);
+                } catch{}
+            };
+            get(Coords);
+        }
+    }, [Coords]);
+    return restaurants;
+};
 const BasicMap = ({isEnabled, initialMarkerCoords, mapclickfunction}) =>{
     const initialRegion = {
         latitude: initialMarkerCoords.latitude,

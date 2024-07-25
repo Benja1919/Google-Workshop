@@ -1,11 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Image, Alert , TextInput } from 'react-native';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, ScrollView } from 'react-native-gesture-handler';
 import RestaurantContentComponent from './components/RestaurantContents';
 
-const CurrentUserProfile = ({ navigation }) => {
+const CurrentUserProfile = ({ navigation, onHeaderLeftPress}) => {
+    useEffect(() => {
+      onHeaderLeftPress(handlePress);
+    }, []);
     const { isLoggedIn, logout, currentUser } = useContext(AuthContext);
     const onGestureEvent = (event) => {
         if (event.nativeEvent.translationX > 100) {
@@ -26,8 +29,9 @@ const CurrentUserProfile = ({ navigation }) => {
       };
     const handlePress = () => {
         if (isLoggedIn) {
-          logout();
           navigation.navigate('HomeScreen');
+          logout();
+          
         } else {
           navigateToLoginScreen();
         }
@@ -36,15 +40,11 @@ const CurrentUserProfile = ({ navigation }) => {
         navigation.navigate('Restaurant', {restaurantName: null, restaurantID: rid });
     };
     if(isLoggedIn && !currentUser.isRestaurant){
+      
       return (
           <PanGestureHandler onGestureEvent={onGestureEvent} >
               <View Main style={styles.container}>
               <Text style={styles.basictext}> User Profile </Text>
-                  <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
-                      <Text style={styles.loginButtonText}> 
-                          {isLoggedIn ? 'Logout' : 'Login'}
-                      </Text>
-                  </TouchableOpacity>
                   <View Push style={styles.Pusher}/>
                   <BottomBarComponent navigation={navigation}/>
               </View>
@@ -67,11 +67,6 @@ const CurrentUserProfile = ({ navigation }) => {
                         
               <RestaurantContentComponent RestaurantUser={currentUser}/>
               <Text style={{fontSize:40}}></Text>
-              <TouchableOpacity style={styles.loginButton} onPress={handlePress}>
-                <Image style={styles.logoutimage}
-                  source ={require("../assets/icons/logout3.png")}        
-                />
-              </TouchableOpacity> 
             </ScrollView>
             <View Push style={styles.Pusher}/>
             <BottomBarComponent navigation={navigation}/>

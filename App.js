@@ -39,6 +39,8 @@ const AppHeaderTitle = () =>{
 };
 const App = () => {
   const [MapHeaderFunction, setMapHeaderFunction] = useState(null);
+  const [CurrentUserScreenLeftFunction, setCurrentUserScreenLeftFunction] = useState(null);
+  const [CurrentUserScreenRightFunction, setCurrentUserScreenRightFunction] = useState(null);
   return (
     <AuthProvider>
       <NavigationContainer>
@@ -77,11 +79,34 @@ const App = () => {
             headerTitle: AppHeaderTitle,
             headerTitleAlign: 'center' // יישור למרכז, אופציונלי
             }} />
-          <Stack.Screen name="ProfileScreen" component={CurrentUserProfile} options={{ 
-              headerTitle: AppHeaderTitle,
-              headerLeft: () => null,
-              headerTitleAlign: 'center' // יישור למרכז, אופציונלי
-            }}/>
+          <Stack.Screen 
+  name="ProfileScreen" 
+  options={{ 
+    headerTitle: AppHeaderTitle,
+    headerLeft: () => ( 
+      <TouchableOpacity 
+        style={{
+
+          marginLeft:5
+        }} 
+        onPress={CurrentUserScreenLeftFunction}
+      >
+        <Image 
+          style={{width: 40, height: 30, tintColor:"black"}}
+          source={require("./assets/icons/logout3.png")}        
+        />
+      </TouchableOpacity> 
+    ),
+    headerTitleAlign: 'center' // Optional
+  }}
+>
+  {props => (
+    <CurrentUserProfile
+      {...props}
+      onHeaderLeftPress={handlePress => setCurrentUserScreenLeftFunction(() => handlePress)}
+    />
+  )}
+</Stack.Screen>
           <Stack.Screen name="Restaurant"
            component={RestaurantScreen}
            options={{  
