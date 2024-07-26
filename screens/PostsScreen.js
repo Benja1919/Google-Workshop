@@ -20,13 +20,13 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
     const loadPosts = async () => {
       try {
         const allPosts = await firestoreDB().GetPosts();
-        const filterRestaurantName = route?.params?.filterrestaurantName; // Optional chaining
+        const filterRestaurantID = route?.params?.filterrestaurantID; // Optional chaining
         const filterUserName = route?.params?.filterUserName; // Optional chaining
 
         let filteredPosts = allPosts;
 
-        if (filterRestaurantName) {
-          filteredPosts = filteredPosts.filter(post => post.restaurantName === filterRestaurantName);
+        if (filterRestaurantID) {
+          filteredPosts = filteredPosts.filter(post => post.restaurantID === filterRestaurantID);
         }
 
         if (filterUserName) {
@@ -43,13 +43,13 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
 
     // Set up real-time listener
     const unsubscribe = firestoreDB().SubscribeToPosts((allPosts) => {
-      const filterRestaurantName = route?.params?.filterrestaurantName;
+      const filterrestaurantID = route?.params?.filterrestaurantID;
       const filterUserName = route?.params?.filterUserName;
 
       let filteredPosts = allPosts;
 
-      if (filterRestaurantName) {
-        filteredPosts = filteredPosts.filter(post => post.restaurantName === filterRestaurantName);
+      if (filterrestaurantID) {
+        filteredPosts = filteredPosts.filter(post => post.RestaurantID === filterrestaurantID);
       }
 
       if (filterUserName) {
@@ -78,10 +78,10 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
    *
    * Navigates to the restaurant's screen.
    *
-   * @param {string} restaurantName - The restaurant name to navigate to.
+   * @param {string} restaurantID - The restaurant name to navigate to.
    */
-  const navigateToRestaurant = (restaurantName) => {
-    navigation.navigate('Restaurant', { restaurantName:restaurantName, restaurantID:null });
+  const navigateToRestaurant = (restaurantID) => {
+    navigation.navigate('Restaurant', { restaurantName:null, restaurantID: restaurantID });
   };
 
   /**

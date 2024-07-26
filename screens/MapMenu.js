@@ -72,7 +72,7 @@ const MapMenu = ({navigation, onHeaderLeftPress}) =>{
     }, []);
     const MarkerPress=(index)=>{
         if(ThumbnailOn == index){
-            navigation.navigate('Restaurant', {restaurantName: restaurants[index].name, restaurantID:null});
+            navigation.navigate('Restaurant', {restaurantName: null, restaurantID: restaurants[index].id});
         }
         else{
             setThumbnailVisibilty(index);

@@ -129,7 +129,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                 <Text style={styles.stars}>{'⭐'.repeat(post.stars)}</Text>
                 <Text>{postDate.toLocaleDateString() + "\n" + postDate.toLocaleTimeString()}</Text>
             </View>
-            <TouchableOpacity onPress={() => navigateToRestaurant(post.restaurantName)}>
+            <TouchableOpacity onPress={() => navigateToRestaurant(post.RestaurantID)}>
                 <Text style={styles.restaurantName}>{post.restaurantName}</Text>
             </TouchableOpacity>
             <FlatList
