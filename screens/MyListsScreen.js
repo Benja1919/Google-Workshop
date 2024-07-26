@@ -1,12 +1,10 @@
-import React, { useState,useEffect, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet,  Alert } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet, Alert } from 'react-native';
 import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
 import { Timestamp } from 'firebase/firestore';
 
-
-
-const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEditing, editItemText, setEditItemText }) => {
+const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEditing, editItemText, setEditItemText, navigateToRestaurant }) => {
   if (isEditing) {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
@@ -31,7 +29,10 @@ const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEdi
     );
   } else {
     return (
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+      <TouchableOpacity
+        style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}
+        onPress={() => navigateToRestaurant(item.name)}
+      >
         <Text style={{ flex: 1, marginLeft: 10 }}>{item.name}</Text>
         <TouchableOpacity
           style={{ backgroundColor: 'blue', padding: 5, marginLeft: 10, borderRadius: 5 }}
@@ -45,12 +46,12 @@ const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEdi
         >
           <Text style={{ color: 'white' }}>Delete</Text>
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   }
 };
 
-const MyListsScreen = ({ route }) => {
+const MyListsScreen = ({ route, navigation }) => {
   const { user, profileImageUrl } = route.params;
   const [lists, setLists] = useState([]);
   const [newListName, setNewListName] = useState('');
@@ -61,17 +62,17 @@ const MyListsScreen = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [createListModalVisible, setCreateListModalVisible] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState(null); // State for selected icon
-	
+
   const [listDescription, setNewlistDescription] = useState('');
-	const [rank, setListRank] = useState(0);
-	const [restCount, setRestCount] = useState(0);
-	const [savedCount, setSavedCount] = useState(0);
+  const [rank, setListRank] = useState(0);
+  const [restCount, setRestCount] = useState(0);
+  const [savedCount, setSavedCount] = useState(0);
   const [listPic, setListPic] = useState([]);
   const [mediaTypes, setMediaTypes] = useState('');
 
   const [loading, setLoading] = useState(true);
 
-  const {currentUser} = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   const createNewList = async (icon) => { // Create a new List, store it in the DB
     if (newListName.trim() === '') {
@@ -82,20 +83,18 @@ const MyListsScreen = ({ route }) => {
       id: Math.random().toString(),
       userName: currentUser.userName,
       listName: newListName,
-      listDescription : listDescription,
-      rank : rank,
-      restCount : restCount,
-      savedCount : savedCount,
-      listPic : listPic,
+      listDescription: listDescription,
+      rank: rank,
+      restCount: restCount,
+      savedCount: savedCount,
+      listPic: listPic,
       items: [],
       Image: icon,
       profileImageUrl: currentUser.profileImageUrl,
-      createTime: Timestamp.now() 
-
+      createTime: Timestamp.now()
     };
 
     await firestoreDB().CreateList(newList);
-    // setLists([...lists, newList]);
     setNewListName('');
     setCreateListModalVisible(false);
   };
@@ -116,29 +115,28 @@ const MyListsScreen = ({ route }) => {
     // Fetch lists immediately
     fetchLists();
 
-    }, [currentUser]);
+  }, [currentUser]);
 
-    const addItemToList = (listId) => {
-      if (newItemText.trim() === '') {
-        alert('Please enter a valid item name');
-        return;
-      }
-      const updatedLists = lists.map(list => {
-        if (list.id === listId) {
-          const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
-          const updatedList = { ...list, items: updatedItems };
-          if (selectedList && selectedList.id === listId) {
-            setSelectedList(updatedList);
-          }
-          // Update the list in Firebase
-          firestoreDB().updateListInFirebase(listId, updatedItems);
-          return updatedList;
+  const addItemToList = (listId) => {
+    if (newItemText.trim() === '') {
+      alert('Please enter a valid item name');
+      return;
+    }
+    const updatedLists = lists.map(list => {
+      if (list.id === listId) {
+        const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
+        const updatedList = { ...list, items: updatedItems };
+        if (selectedList && selectedList.id === listId) {
+          setSelectedList(updatedList);
         }
-        return list;
-      });
-     // setLists(updatedLists);
-      setNewItemText('');
-    };
+        // Update the list in Firebase
+        firestoreDB().updateListInFirebase(listId, updatedItems);
+        return updatedList;
+      }
+      return list;
+    });
+    setNewItemText('');
+  };
 
   const startEditItem = (itemId, itemName) => {
     setEditItemId(itemId);
@@ -188,6 +186,10 @@ const MyListsScreen = ({ route }) => {
     setModalVisible(false);
   };
 
+  const navigateToRestaurant = (restaurantName) => {
+    navigation.navigate('Restaurant', { restaurantName });
+  };
+
   const renderDefaultButtons = () => (
     <View style={styles.buttonsContainer}>
       {lists.map((list, index) => (
@@ -202,16 +204,16 @@ const MyListsScreen = ({ route }) => {
           <Image source={list.Image} style={{ width: 30, height: 30 }} />
         </TouchableOpacity>
       ))}
-      { currentUser && user.userName.toLowerCase() == currentUser.userName.toLowerCase() &&( //only curr user can add lists to his own page
-      <TouchableOpacity
-        style={[styles.categoryButtonIcon, {
-          right: 20,
-          top: -30,
-        }]}
-        onPress={() => setCreateListModalVisible(true)}
-      >
-        <Image source={require('../assets/icons/pluslists.png')} style={styles.categoryButtonIcon} />
-      </TouchableOpacity>
+      {currentUser && user.userName.toLowerCase() === currentUser.userName.toLowerCase() && ( //only curr user can add lists to his own page
+        <TouchableOpacity
+          style={[styles.categoryButtonIcon, {
+            right: 20,
+            top: -30,
+          }]}
+          onPress={() => setCreateListModalVisible(true)}
+        >
+          <Image source={require('../assets/icons/pluslists.png')} style={styles.categoryButtonIcon} />
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -231,6 +233,7 @@ const MyListsScreen = ({ route }) => {
           isEditing={editItemId === item.id}
           editItemText={editItemText}
           setEditItemText={setEditItemText}
+          navigateToRestaurant={navigateToRestaurant}
         />
       )}
     />
