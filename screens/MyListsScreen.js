@@ -80,7 +80,7 @@ const MyListsScreen = ({ route }) => {
     }
     const newList = {
       id: Math.random().toString(),
-      userName: currentUser.userName.toLowerCase(),
+      userName: currentUser.userName,
       listName: newListName,
       listDescription : listDescription,
       rank : rank,
@@ -146,12 +146,16 @@ const MyListsScreen = ({ route }) => {
   };
 
   const saveEditItem = () => {
-    const updatedLists = lists.map(list => ({
-      ...list,
-      items: list.items.map(item =>
+    const updatedLists = lists.map(list => {
+      const updatedItems = list.items.map(item =>
         item.id === editItemId ? { ...item, name: editItemText } : item
-      )
-    }));
+      );
+      if (list.id === selectedList.id) {
+        // Update the list in Firebase
+        firestoreDB().updateListInFirebase(list.id, updatedItems);
+      }
+      return { ...list, items: updatedItems };
+    });
     setLists(updatedLists);
     setEditItemId(null);
     setEditItemText('');
@@ -163,9 +167,14 @@ const MyListsScreen = ({ route }) => {
   };
 
   const deleteItem = (listId, itemId) => {
-    const updatedLists = lists.map(list =>
-      list.id === listId ? { ...list, items: list.items.filter(item => item.id !== itemId) } : list
-    );
+    const updatedLists = lists.map(list => {
+      const updatedItems = list.items.filter(item => item.id !== itemId);
+      if (list.id === listId) {
+        // Update the list in Firebase
+        firestoreDB().updateListInFirebase(listId, updatedItems);
+      }
+      return list.id === listId ? { ...list, items: updatedItems } : list;
+    });
     setLists(updatedLists);
   };
 
