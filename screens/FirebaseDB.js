@@ -133,18 +133,30 @@ export const firestoreDB = () => {
     };
 	const CreateList = async (list) => {
 		try {
-		  const currentUser = await GetUserName(list.userName.toLowerCase());
+		  const currentUser = await GetUserName(list.userName).toLowerCase();
 		  if (!currentUser) {
 			throw new Error('User not found');
 		  }
 		  const listsCollectionRef = collection(firestore, 'usersLists');
 		  // בדוק את הנתונים שנשלחים למסמך	  
-		  await addDoc(listsCollectionRef, list);
+		  const listDoc = doc(firestore, 'usersLists', list.id)
+		  await setDoc(listDoc, list);
+		  console.log(list.userName);
 		} catch (error) {
 		  console.error('Error creating list:', error);
 		}
 	  };
 
+	  const updateListInFirebase = async (listId, updatedItems) => {
+		try {
+		  const listRef = doc(firestore, 'usersLists', listId);
+		  await updateDoc(listRef, {
+			items: updatedItems,
+		  });
+		} catch (error) {
+		  console.error('Error updating list in Firebase:', error);
+		}
+	  };
     const CreateUser = async (user) => {
         const userDoc = doc(firestore, 'users', user.userName.toLowerCase())
         await setDoc(userDoc, user);
@@ -277,6 +289,7 @@ export const firestoreDB = () => {
         AddPost,
         getUserRef,
         CreateList,
+		updateListInFirebase,
         TryLoginUser,
         GetUserFriends,
         GetUserLists,

@@ -118,25 +118,27 @@ const MyListsScreen = ({ route }) => {
 
     }, [currentUser]);
 
-  const addItemToList = (listId) => {
-    if (newItemText.trim() === '') {
-      alert('Please enter a valid item name');
-      return;
-    }
-    const updatedLists = lists.map(list => {
-      if (list.id === listId) {
-        const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
-        const updatedList = { ...list, items: updatedItems };
-        if (selectedList && selectedList.id === listId) {
-          setSelectedList(updatedList);
-        }
-        return updatedList;
+    const addItemToList = (listId) => {
+      if (newItemText.trim() === '') {
+        alert('Please enter a valid item name');
+        return;
       }
-      return list;
-    });
-    setLists(updatedLists);
-    setNewItemText('');
-  };
+      const updatedLists = lists.map(list => {
+        if (list.id === listId) {
+          const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
+          const updatedList = { ...list, items: updatedItems };
+          if (selectedList && selectedList.id === listId) {
+            setSelectedList(updatedList);
+          }
+          // Update the list in Firebase
+          firestoreDB().updateListInFirebase(listId, updatedItems);
+          return updatedList;
+        }
+        return list;
+      });
+     // setLists(updatedLists);
+      setNewItemText('');
+    };
 
   const startEditItem = (itemId, itemName) => {
     setEditItemId(itemId);
