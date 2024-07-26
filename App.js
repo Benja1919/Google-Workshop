@@ -16,6 +16,7 @@ import { AuthProvider } from './screens/AuthContext';
 import CurrentUserProfile from './screens/CurrentUserProfileScreen'
 import SignUpScreen from './screens/SignUpScreen'; // Import the SignInScreen component
 import MapMenu from './screens/MapMenu';
+import Landingpage from './screens/Landing';
 //caused by a library component DateTimePickerModal
 LogBox.ignoreLogs([ //suppresses in expo go
   /defaultProps will be removed/
@@ -44,7 +45,16 @@ const App = () => {
   return (
     <AuthProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="Landingpage">
+        <Stack.Screen 
+        name = "Landingpage"
+        component={Landingpage}
+        options={{  
+          headerStyle: {
+            height: 110},
+          headerTitle: AppHeaderTitle,
+          headerTitleAlign: 'center' // יישור למרכז, אופציונלי
+          }} />
         <Stack.Screen 
             name="HomeScreen" 
             component={HomeScreen} 
@@ -222,4 +232,4 @@ export default App;
 
 
 
-'./screens/HomeScreen'
+'./screens/Landing'
