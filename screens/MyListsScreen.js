@@ -57,7 +57,10 @@ const MyListsScreen = ({ route, navigation }) => {
         </View>
       );
     } else {
-       if (currentUser.userName === selectedList.userName){
+    //  console.log(currentUser.userName);
+   //   console.log(selectedList.userName);
+   if(currentUser){
+       if (currentUser.userName === user.userName){
       return (
         <TouchableOpacity
           style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}
@@ -79,6 +82,7 @@ const MyListsScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       );
     }
+  }
     else { //other user viewing elses lists
       return (
       <TouchableOpacity
@@ -120,7 +124,7 @@ const MyListsScreen = ({ route, navigation }) => {
 
   useEffect(() => { //fetch the list of user from the DB
     const fetchLists = async () => {
-      if (!currentUser) return;
+    //  if (!currentUser) return;
       try {
         const fetchedLists = await firestoreDB().GetUserLists(user.userName);
         setLists(fetchedLists);
@@ -284,6 +288,8 @@ const MyListsScreen = ({ route, navigation }) => {
 
 
   // Render the main content
+  if(currentUser){
+    if (currentUser.userName === user.userName){
   return (
     <View style={styles.container}>
       <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
@@ -371,6 +377,86 @@ const MyListsScreen = ({ route, navigation }) => {
       </Modal>
     </View>
   );
+}
+  }
+  else{
+    return (
+      <View style={styles.container}>
+        <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
+        {renderDefaultButtons()}
+  
+        <Modal  //List Window
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={closeList}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.listTitle}>{selectedList?.name}</Text>
+              {renderItemList()}
+
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={closeList}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+  
+        <Modal  //Create New List window
+          animationType="slide" 
+          transparent={true}
+          visible={createListModalVisible}
+          onRequestClose={() => setCreateListModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.listTitle}>Create New List</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter new list name"
+                value={newListName}
+                onChangeText={text => setNewListName(text)}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Enter description"
+                value={listDescription}
+                onChangeText={text => setNewlistDescription(text)}
+              />
+              {/* Display icons for selection */}
+              <View style={styles.iconSelectionContainer}>
+                {iconData.map((icon, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.iconOption}
+                    onPress={() => setSelectedIcon(icon)}
+                  >
+                    <Image source={icon} style={{ width: 30, height: 30 }} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={() => createNewList(selectedIcon)} // Pass selectedIcon to createNewList function
+              >
+                <Text style={styles.createButtonText}>Create New List</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setCreateListModalVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+  );
+};
 };
 
 const iconData = [
