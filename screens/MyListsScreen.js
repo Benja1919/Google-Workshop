@@ -116,11 +116,7 @@ const MyListsScreen = ({ route }) => {
     // Fetch lists immediately
     fetchLists();
 
-    // Fetch lists every 60 seconds
-    const intervalId = setInterval(fetchLists, 500);
-
-    // Clear interval on component unmount
-    return () => clearInterval(intervalId);  }, [currentUser]);
+    }, [currentUser]);
 
   const addItemToList = (listId) => {
     if (newItemText.trim() === '') {
