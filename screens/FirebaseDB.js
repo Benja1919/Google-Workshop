@@ -133,7 +133,7 @@ export const firestoreDB = () => {
     };
 	const CreateList = async (list) => {
 		try {
-		  const currentUser = await GetUserName(list.userName).toLowerCase();
+		  const currentUser = await GetUserName(list.userName.toLowerCase());
 		  if (!currentUser) {
 			throw new Error('User not found');
 		  }
