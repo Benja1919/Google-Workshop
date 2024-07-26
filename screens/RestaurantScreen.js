@@ -54,12 +54,12 @@ const RestaurantScreen = ({ route, navigation }) => {
       else if(restaurantID != null){
         setRestaurant(await firestoreDB().GetRestaurantByID(restaurantID));
         setLoading(false);
+        
       }
     };
 
     fetchRestaurant();
-  }, [restaurantName]);
-
+  }, [restaurantName, restaurantID]);
   if (loading) {
     return (
       <View style={styles.container}>
@@ -139,7 +139,7 @@ const RestaurantScreen = ({ route, navigation }) => {
       <Text style={styles.sectionTitle}>Posts</Text>
 
       {/* Display posts for the specific restaurant */}
-      <PostsScreen navigation={navigation} route={{ params: { filterrestaurantName: restaurantName } }} isScrollEnabled={false}/>
+      <PostsScreen navigation={navigation} route={{ params: { filterrestaurantID: restaurantID } }} isScrollEnabled={false}/>
     </ScrollView>
   );
 };
