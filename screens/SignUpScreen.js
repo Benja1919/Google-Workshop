@@ -6,7 +6,7 @@ import { firestoreDB } from './FirebaseDB'; // Adjust your imports based on your
 import { Timestamp } from 'firebase/firestore';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
-const SignUpScreen = () => {
+const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -60,10 +60,9 @@ const SignUpScreen = () => {
 
   const createNewUser = async () => {
     const newUser = {
-      id: Math.random().toString(),
       userName: username,
       password: password,
-      email: email,
+      email: email.toLocaleLowerCase(),
       friends: [],
       profileImageUrl: profileImageUrl,
       isRest: isRestaurant,
@@ -103,6 +102,7 @@ const SignUpScreen = () => {
 
     await createNewUser();
     Alert.alert('Sign Up Successful', `Username: ${username}\nEmail: ${email}`);
+    navigation.navigate('LoginScreen');
   };
 
   return (

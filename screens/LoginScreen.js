@@ -71,7 +71,7 @@ const LoginScreen = ({ navigation }) => {
         <Button title="Login" onPress={handleLogin} />
         <Pressable onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.link}>
-            Don't have an account? Sign in Here!
+            Don't have an account? Sign up Here!
           </Text>
         </Pressable>
         <View pusher style={styles.pusher}/>

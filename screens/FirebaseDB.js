@@ -146,8 +146,8 @@ export const firestoreDB = () => {
 	  };
 
     const CreateUser = async (user) => {
-        const usersCollectionRef = collection(firestore, 'users');
-        await addDoc(usersCollectionRef, user);
+        const userDoc = doc(firestore, 'users', user.userName.toLowerCase())
+        await setDoc(userDoc, user);
     }
 
     const TryLoginUser = async (userName, password) => {
@@ -162,10 +162,9 @@ export const firestoreDB = () => {
     };
 
     const checkUsernameExists = async (username) => {
-        const usersCollection = collection(firestore, 'users');
-        const q = query(usersCollection, where("userName", "==", username.toLowerCase()));
-        const querySnapshot = await getDocs(q);
-        return !querySnapshot.empty;
+        const userDoc = doc(firestore, 'users', username.toLowerCase());
+        const userSnapshot = await getDoc(userDoc);
+        return userSnapshot.exists();
     };
 
     const checkEmailExists = async (email) => {
