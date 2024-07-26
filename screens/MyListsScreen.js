@@ -4,54 +4,13 @@ import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
 import { Timestamp } from 'firebase/firestore';
 
-const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEditing, editItemText, setEditItemText, navigateToRestaurant }) => {
-  if (isEditing) {
-    return (
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-        <TextInput
-          style={{ flex: 1, height: 40, borderColor: 'gray', borderWidth: 1, padding: 5 }}
-          value={editItemText}
-          onChangeText={text => setEditItemText(text)}
-        />
-        <TouchableOpacity
-          style={{ backgroundColor: 'green', padding: 5, marginLeft: 10, borderRadius: 5 }}
-          onPress={onSave}
-        >
-          <Text style={{ color: 'white' }}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ backgroundColor: 'red', padding: 5, marginLeft: 10, borderRadius: 5 }}
-          onPress={onCancel}
-        >
-          <Text style={{ color: 'white' }}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  } else {
-    return (
-      <TouchableOpacity
-        style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}
-        onPress={() => navigateToRestaurant(item.name)}
-      >
-        <Text style={{ flex: 1, marginLeft: 10 }}>{item.name}</Text>
-        <TouchableOpacity
-          style={{ backgroundColor: 'blue', padding: 5, marginLeft: 10, borderRadius: 5 }}
-          onPress={onStartEdit}
-        >
-          <Text style={{ color: 'white' }}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ backgroundColor: 'red', padding: 5, marginLeft: 10, borderRadius: 5 }}
-          onPress={onDelete}
-        >
-          <Text style={{ color: 'white' }}>Delete</Text>
-        </TouchableOpacity>
-      </TouchableOpacity>
-    );
-  }
-};
+
+
 
 const MyListsScreen = ({ route, navigation }) => {
+
+
+
   const { user, profileImageUrl } = route.params;
   const [lists, setLists] = useState([]);
   const [newListName, setNewListName] = useState('');
@@ -73,6 +32,66 @@ const MyListsScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
 
   const { currentUser } = useContext(AuthContext);
+
+  const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEditing, editItemText, setEditItemText, navigateToRestaurant }) => {
+    if (isEditing) {
+      return (
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+          <TextInput
+            style={{ flex: 1, height: 40, borderColor: 'gray', borderWidth: 1, padding: 5 }}
+            value={editItemText}
+            onChangeText={text => setEditItemText(text)}
+          />
+          <TouchableOpacity
+            style={{ backgroundColor: 'green', padding: 5, marginLeft: 10, borderRadius: 5 }}
+            onPress={onSave}
+          >
+            <Text style={{ color: 'white' }}>Save</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ backgroundColor: 'red', padding: 5, marginLeft: 10, borderRadius: 5 }}
+            onPress={onCancel}
+          >
+            <Text style={{ color: 'white' }}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } else {
+       if (currentUser.userName === selectedList.userName){
+      return (
+        <TouchableOpacity
+          style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}
+          onPress={() => navigateToRestaurant(item.name)}
+        >
+          <Text style={{ flex: 1, marginLeft: 10 }}>{item.name}</Text>
+          <TouchableOpacity
+            style={{ backgroundColor: 'blue', padding: 5, marginLeft: 10, borderRadius: 5 }}
+            onPress={onStartEdit}
+          >
+            <Text style={{ color: 'white' }}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ backgroundColor: 'red', padding: 5, marginLeft: 10, borderRadius: 5 }}
+            onPress={onDelete}
+          >
+            <Text style={{ color: 'white' }}>Delete</Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      );
+    }
+    else { //other user viewing elses lists
+      return (
+      <TouchableOpacity
+      style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}
+      onPress={() => navigateToRestaurant(item.name)}
+    >
+      <Text style={{ flex: 1, marginLeft: 10 }}>{item.name}</Text>
+      </TouchableOpacity>
+      );
+    } 
+
+    }
+  };
 
   const createNewList = async (icon) => { // Create a new List, store it in the DB
     if (newListName.trim() === '') {
