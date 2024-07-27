@@ -105,7 +105,7 @@ const MapMenu = ({navigation, onHeaderLeftPress}) =>{
         availableRestaurantsIndeces = [];
         for (let index = 0; index < restaurants.length; index++) {
             const restaurant = restaurants[index];
-            if((isOpenFilter || (!isOpenFilter && isOpen({restaurant:restaurant,day:dayidx,time:now}))) && ((restaurant.reviewcount > 0 && (restaurant.starcount / restaurant.reviewcount) >= MinRating) || (restaurant.reviewcount == 0 && MinRating <= 0.1))){
+            if(/*(isOpenFilter || (!isOpenFilter && isOpen({restaurant:restaurant,day:dayidx,time:now}))) && */ ((restaurant.reviewcount > 0 && (restaurant.starcount / restaurant.reviewcount) >= MinRating) || (restaurant.reviewcount == 0 && MinRating <= 0.1))){
                 availableRestaurantsIndeces.push(index);
             }
             
