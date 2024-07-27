@@ -5,9 +5,11 @@ import { useFonts } from 'expo-font';
 
 const Landing = () => {
   const navigation = useNavigation();
-  // const [fontsLoaded] = useFonts({
-  //   "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf")
-  // })
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
 
   return (
     <ImageBackground 
