@@ -7,11 +7,21 @@ import myNetworkIcon from '../assets/icons/network.png';
 import { firestoreDB } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
+import { useFonts } from 'expo-font';
+
 
 const UserProfileScreen = ({ route, navigation }) => {
   const { userName } = route.params;
   const [user, setUser] = useState(null);
   const { isLoggedIn, logout } = useContext(AuthContext);
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
+  if (!fontsLoaded){
+    return undefined;
+  }
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -140,9 +150,11 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 24,
-    fontWeight: 'bold',
+  //  fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    fontFamily: 'Oswald-Medium',
+
   },
   bottomBar: {
     flexDirection: 'row',
@@ -167,7 +179,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#fde040',
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -180,7 +192,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'black',
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 13,
+    fontFamily: 'Oswald-Medium',
+
   },
 });
 
