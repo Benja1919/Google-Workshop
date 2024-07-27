@@ -46,6 +46,7 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
       const filterrestaurantID = route?.params?.filterrestaurantID;
       const filterUserName = route?.params?.filterUserName;
 
+      
       let filteredPosts = allPosts;
 
       if (filterrestaurantID) {

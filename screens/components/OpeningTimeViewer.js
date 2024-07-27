@@ -76,7 +76,7 @@ const ChangeTimes = ({times1,time,is1}) => {
     const parts1 = times1.split("-");
     return is1 ? `${parts1[0]}-${time}` : `${time}-${parts1[1]}`;
 };
-const OpeningTimes = ({restaurant,isEditable}) => {
+const OpeningTimes = ({restaurant,isEditable,Globaloh,isGlobalOpen}) => {
     dayidx = new Date().getDay();
     const now = new Date();
       const hours = String(now.getHours()).padStart(2, '0');
@@ -194,7 +194,7 @@ const OpeningTimes = ({restaurant,isEditable}) => {
             );
         }
     };
-
+    
     if(isExtended){
         if(isEditable){
             return(
@@ -224,7 +224,7 @@ const OpeningTimes = ({restaurant,isEditable}) => {
                 <View style={{ ...styles.item, padding: 5, justifyContent: 'center' }}>
                     
                     {dayArray.map((day, index) => (
-                        <DayData key={index} day={index} isEditable={isEditable} oh={restaurant.OpeningHours} />
+                        <DayData key={index} day={index} isEditable={isEditable} oh={Globaloh} />
                     ))}
                     
                     <View style={{ position: 'absolute', top:5,right: 5, alignSelf: 'center' }}>
@@ -241,8 +241,8 @@ const OpeningTimes = ({restaurant,isEditable}) => {
         }
     }
     else{
-        isClosedToday = restaurant.OpeningHours[dayidx] == '-';
-        isClosedNow = !isOpen({restaurant:restaurant,day:dayidx,time:CurrentTime});
+        isClosedToday = Globaloh[dayidx] == '-';
+        isClosedNow = !isGlobalOpen;
         return(
             <TouchableOpacity onPress={()=>ExtendMain(true)} style={{...styles.item,padding:5,flexDirection: 'row', alignItems: 'center', justifyContent: 'left',marginLeft:3}}>
                 <Text style={{fontSize:16,marginLeft:5,flex:1,color: isClosedToday || isClosedNow ? '#8a1b00' : '#078a00'}}>{isClosedToday ? "Closed today" : (isClosedNow ? "Closed now" : "Open")}</Text>

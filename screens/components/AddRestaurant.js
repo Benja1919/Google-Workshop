@@ -2,7 +2,38 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert, Modal, Button,TouchableWithoutFeedback, TextInput, FlatList  } from 'react-native';
 import {useAddressToCoord, useCoordToAddress,searchNearbyPlaces, getPhotoUri} from './Maps';
 import { firestoreDB } from '../FirebaseDB';
+const ZeroExtend = (num) =>{
+    if(num < 10){
+        return `0${num}`;
+    }
+    else{
+        return num;
+    }
+};
+export const ParseGoogleOpeningTime = (got) =>{
+    oh = []
+    for (let index = 0; index < 7; index++) {
+        oh.push('-');
+        
+    }
+    for (let index = 0; index < got.length; index++) {
+        let day = got[index];
+        let OpenHour = day.open.hour;
+        let OpenMin = day.open.minute;
+        let CloseHour = day.close.hour;
+        let CloseMin = day.close.minute;
+        if(day.close.day != day.open.day){
+            CloseHour += 24;
+        }
+        OpenHour = ZeroExtend(OpenHour);
+        OpenMin = ZeroExtend(OpenMin);
+        CloseHour = ZeroExtend(CloseHour);
+        CloseMin = ZeroExtend(CloseMin);
+        oh[day.open.day] = `${OpenHour}:${OpenMin}-${CloseHour}:${CloseMin}`;
 
+    }
+    return oh;
+};
 const AddRestaurantComponent = ({isEnabled,OnClose}) =>{
     
     const [modalVisible, setModalVisible] = useState(isEnabled);
@@ -13,38 +44,7 @@ const AddRestaurantComponent = ({isEnabled,OnClose}) =>{
     const [RestaurantNameArray, setRestaurantNameArray] = useState([]);
     const [isEmpty, setEmpty] = useState(false);
 
-    const ZeroExtend = (num) =>{
-        if(num < 10){
-            return `0${num}`;
-        }
-        else{
-            return num;
-        }
-    };
-    const ParseGoogleOpeningTime = (got) =>{
-        oh = []
-        for (let index = 0; index < 7; index++) {
-            oh.push('-');
-            
-        }
-        for (let index = 0; index < got.length; index++) {
-            let day = got[index];
-            let OpenHour = day.open.hour;
-            let OpenMin = day.open.minute;
-            let CloseHour = day.close.hour;
-            let CloseMin = day.close.minute;
-            if(day.close.day != day.open.day){
-                CloseHour += 24;
-            }
-            OpenHour = ZeroExtend(OpenHour);
-            OpenMin = ZeroExtend(OpenMin);
-            CloseHour = ZeroExtend(CloseHour);
-            CloseMin = ZeroExtend(CloseMin);
-            oh[day.open.day] = `${OpenHour}:${OpenMin}-${CloseHour}:${CloseMin}`;
-
-        }
-        return oh;
-    };
+    
     const ScalpRestaurant = (restaurant_idx) =>{
         data = Restaurants[restaurant_idx];
         Restaurant = {

@@ -5,11 +5,14 @@ import { View, Text, Image, StyleSheet,TouchableOpacity, Linking} from 'react-na
 import PostsScreen from './PostsScreen';
 import { firestoreDB } from './FirebaseDB';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
-import BasicMap from './components/Maps';
+import BasicMap ,{GetPlaceDetails, getPhotoUri} from './components/Maps';
 import OpeningTimes from './components/OpeningTimeViewer';
+import {ParseGoogleOpeningTime} from './components/AddRestaurant';
 const col2 = '#fbfbfb';
 const AdditionalDetailsComponent = ({restaurant}) =>{
-  if(restaurant.ContentTitles.length > 0){
+  
+  const myMap = new Map(Object.entries(restaurant));
+  if(myMap.has('ContentTitles') && restaurant.ContentTitles.length > 0){
     const renderItem = ({ item }) => (
       <View>
         <Text style={{...styles.detailsHeader,marginLeft:10}}>{restaurant.ContentTitles[item]}</Text>
@@ -59,15 +62,19 @@ const RestaurantScreen = ({ route, navigation }) => {
     };
 
     fetchRestaurant();
+    
   }, [restaurantName, restaurantID]);
-  if (loading) {
+  const Details = GetPlaceDetails(restaurant);
+
+  
+  if (loading || Details == null) {
     return (
       <View style={styles.container}>
         <Text style={styles.header}>LOADING</Text>
       </View>
     );
   }
-
+  
   if (!restaurant) {
     return (
       <View style={styles.container}>
@@ -75,14 +82,40 @@ const RestaurantScreen = ({ route, navigation }) => {
       </View>
     );
   }
-
-  
-
-  
+  const OpeningTime = ParseGoogleOpeningTime(Details.regularOpeningHours.periods);
+  const OpenNow = Details.regularOpeningHours.openNow;
+  const Website = Details.websiteUri;
+  const Phone = Details.nationalPhoneNumber;
+  const GoogleReviews = Details.rating;
+  const GoogleReviewsCount = Details.userRatingCount;
+  const ProfileURI = getPhotoUri(Details.photos[0].name.split('/')[3])._j;
+  TagArray = [];
+  for (let index = 0; index < Details.types.length; index++) {
+    const element = Details.types[index];
+    parts = element.split("_");
+    if(parts[1] == 'restaurant'){
+      
+      tag = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+      TagArray.push(tag);
+    }
+  }
+  Details.dineIn ? TagArray.push("Dine in") : '';
+  Details.takeout ? TagArray.push("Takeout") : '';
+  Details.delivery ? TagArray.push("Delivey") : '';
+  Details.reservable ? TagArray.push("Reservable") : '';
+  Details.servesBreakfast ? TagArray.push("Breakfast") : '';
+  Details.servesBrunch ? TagArray.push("Brunch") : '';
+  Details.servesLunch ? TagArray.push("Lunch") : '';
+  Details.servesDinner ? TagArray.push("Dinner") : '';
+  Details.servesCocktails ? TagArray.push("Cocktails") : '';
+  Details.servesDessert ? TagArray.push("Dessert") : '';
+  Details.servesWine ? TagArray.push("Wine") : '';
+  Details.servesBeer ? TagArray.push("Beer") : '';
+  Details.servesVegetarianFood ? TagArray.push("Vegetarian food") : '';
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>{restaurant.name}</Text>
-      <Image source={{ uri: restaurant.ProfileImageURI}} style={styles.profileImage} />
+      <Image source={{ uri: ProfileURI}} style={styles.profileImage} />
       <Text style={styles.description}>{restaurant.description}</Text>
       <Text style={styles.sectionTitle}>Location</Text>
       <View style={{...styles.item,padding: 10}}> 
@@ -110,27 +143,27 @@ const RestaurantScreen = ({ route, navigation }) => {
         <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={restaurant.Coordinates}/>
       </View>
       <Text style={styles.sectionTitle}>Opening Times </Text>
-          <OpeningTimes restaurant={restaurant} isEditable ={false}/>
+          <OpeningTimes restaurant={restaurant} Globaloh={OpeningTime} isGlobalOpen={OpenNow} isEditable ={false}/>
       <Text style={styles.sectionTitle}>Contact</Text>
       <View style={{...styles.item,padding:5}} >
-        <TouchableOpacity  onPress={()=>{Linking.openURL(`tel:${restaurant.Phone}`)}} >
-          <Text style={{...styles.details,marginLeft:10,padding:2}}>Phone: {restaurant.Phone}</Text>
+        <TouchableOpacity  onPress={()=>{Linking.openURL(`tel:${Phone}`)}} >
+          <Text style={{...styles.details,marginLeft:10,padding:2}}>Phone: {Phone}</Text>
         </TouchableOpacity>
-        <TouchableOpacity  onPress={()=>{Linking.openURL(restaurant.Website)}} >
-          <Text style={{...styles.details,marginLeft:10,padding:2}}>Website: {restaurant.Website}</Text>
+        <TouchableOpacity  onPress={()=>{Linking.openURL(Website)}} >
+          <Text style={{...styles.details,marginLeft:10,padding:2}}>Website: {Website}</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.sectionTitle}>Rating</Text>
-      <View style={styles.item}>
-        <Text style={{...styles.detailsHeader,marginLeft:10}}>Average Rating:</Text>
-        <Text style={{...styles.detailsText,marginLeft:20}}>{restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>
+      <View style={{...styles.item,padding:10}}>
+        <Text style={{...styles.details,marginLeft:10}}>CommunEATy: {restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>
+        <Text style={{...styles.details,marginLeft:10}}>Google: {GoogleReviewsCount > 0 ? GoogleReviews : "No Reviews"} {GoogleReviewsCount > 0 ? `(${GoogleReviewsCount})` : ''}</Text>
       </View>
       <AdditionalDetailsComponent restaurant={restaurant}/>
       <Text style={styles.sectionTitle}>Tags</Text>
       <FlatList
-        data={restaurant.Tags}
+        data={TagArray}
         renderItem={({ item, index }) => (
-            <Text style={{fontSize:16}}>{item}{index === restaurant.Tags.length -1 ? '      ' : ', '}</Text>
+            <Text style={{fontSize:16}}>{item}{index === TagArray.length -1 ? '      ' : ', '}</Text>
         )}
         keyExtractor={(tag, index) => index.toString()}
         horizontal
@@ -147,10 +180,9 @@ const RestaurantScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
+    width: 120,
+    height: 120,
+    borderRadius: 100,
   },
   item: {
     backgroundColor: col2,
@@ -160,8 +192,8 @@ const styles = StyleSheet.create({
     width: 13,
     height: 15,
   },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-  description: { fontSize: 16, marginBottom: 5 },
+  header: { fontSize: 30, fontWeight: 'bold', marginBottom: 10 },
+  description: { fontSize: 16, },
   detailsContainer: { marginTop: 10 },
   detailsHeader: { fontSize: 18, fontWeight: 'bold', marginBottom: 5 },
   sectionTitle: { fontSize: 25, fontWeight: 'bold', marginBottom: 3 },

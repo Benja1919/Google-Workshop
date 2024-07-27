@@ -98,6 +98,40 @@ export const searchNearbyPlaces = (Coords) => {
     }, [Coords]);
     return restaurants;
 };
+export const GetPlaceDetails = (restaurant) => {
+    const [Details, setDetails] = useState(null);
+    useEffect(() => {
+        
+        if(restaurant != null ){
+            const place_id = restaurant.GoogleMapsID;
+            const get = async (place_id) => {
+                
+                const url = `https://places.googleapis.com/v1/places/${place_id}?fields=id,displayName,servesBeer,servesBreakfast,servesBrunch,servesCocktails,servesCoffee,servesDessert,servesDinner,servesLunch,servesVegetarianFood,servesWine,takeout,allowsDogs,delivery,dineIn,reservable,delivery,types,nationalPhoneNumber,regularOpeningHours,websiteUri,formattedAddress,photos,rating,userRatingCount&key=${apiKey}`;
+                const headers = {
+                'Content-Type': 'application/json',
+                'X-Goog-Api-Key': apiKey,
+                'X-Goog-FieldMask': 'id,displayName,formattedAddress,photos,rating,userRatingCount'
+                };
+                
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                    });
+                
+                    if (!response.ok) {
+                        console.log(`HTTP error! Status: ${response.status}`);
+                    }
+                
+                    const data = await response.json();
+                    setDetails(data);
+                   
+                } catch{}
+            };
+            get(place_id);
+        }
+    }, [restaurant == null]);
+    return Details;
+};
 const BasicMap = ({isEnabled, initialMarkerCoords, mapclickfunction}) =>{
     const initialRegion = {
         latitude: initialMarkerCoords.latitude,
