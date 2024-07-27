@@ -99,6 +99,11 @@ const RestaurantScreen = ({ route, navigation }) => {
       TagArray.push(tag);
     }
   }
+  PhotoURIArray = [];
+  for (let index = 1; index < Details.photos.length; index++) {
+    PhotoURIArray.push(getPhotoUri(Details.photos[index].name.split('/')[3])._j);
+    
+  }
   Details.dineIn ? TagArray.push("Dine in") : '';
   Details.takeout ? TagArray.push("Takeout") : '';
   Details.delivery ? TagArray.push("Delivey") : '';
@@ -117,6 +122,23 @@ const RestaurantScreen = ({ route, navigation }) => {
       <Text style={styles.header}>{restaurant.name}</Text>
       <Image source={{ uri: ProfileURI}} style={styles.profileImage} />
       <Text style={styles.description}>{restaurant.description}</Text>
+      <Text style={styles.sectionTitle}>Photos</Text>
+      <View style={{...styles.item,padding: 10}}>
+        <FlatList
+          data={PhotoURIArray}
+          renderItem={({ item, index }) => (
+            <View style={{padding:5}}>
+              <Image source={{ uri: item }} style={styles.photo} />
+            </View>
+          )}
+          keyExtractor={item => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={true}
+          snapToAlignment="center"
+          decelerationRate="fast"
+        />
+      </View>
       <Text style={styles.sectionTitle}>Location</Text>
       <View style={{...styles.item,padding: 10}}> 
         <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left'}}>
@@ -142,7 +164,7 @@ const RestaurantScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={restaurant.Coordinates}/>
       </View>
-      <Text style={styles.sectionTitle}>Opening Times </Text>
+      <Text style={styles.sectionTitle}>Opening Times</Text>
           <OpeningTimes restaurant={restaurant} Globaloh={OpeningTime} isGlobalOpen={OpenNow} isEditable ={false}/>
       <Text style={styles.sectionTitle}>Contact</Text>
       <View style={{...styles.item,padding:5}} >
@@ -180,9 +202,14 @@ const RestaurantScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   profileImage: {
-    width: 120,
-    height: 120,
+    width: 150,
+    height: 150,
     borderRadius: 100,
+  },
+  photo: {
+    width: 341,
+    height: 200,
+    borderRadius: 10,
   },
   item: {
     backgroundColor: col2,
@@ -192,7 +219,7 @@ const styles = StyleSheet.create({
     width: 13,
     height: 15,
   },
-  header: { fontSize: 30, fontWeight: 'bold', marginBottom: 10 },
+  header: { fontSize: 40, fontWeight: 'bold', marginBottom: 10 },
   description: { fontSize: 16, },
   detailsContainer: { marginTop: 10 },
   detailsHeader: { fontSize: 18, fontWeight: 'bold', marginBottom: 5 },
