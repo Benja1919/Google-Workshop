@@ -4,6 +4,8 @@ import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { firestoreDB } from './FirebaseDB';
+import { useFonts } from 'expo-font';
+
 /**
  * LoginScreen component that allows users to log in by entering their username and password.
  *
@@ -21,6 +23,14 @@ const LoginScreen = ({ navigation }) => {
   // State variables to store user input for username and password
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
+  if (!fontsLoaded){
+    return undefined;
+  }
   
   // Get the login function from AuthContext
   const { login } = useContext(AuthContext);
@@ -68,7 +78,11 @@ const LoginScreen = ({ navigation }) => {
 
       
         
-        <Button title="Login" onPress={handleLogin} />
+        <Pressable onPress={handleLogin}>
+        <Text style={styles.loginbutton}>
+        Login
+        </Text>
+        </Pressable>
         <Pressable onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.link}>
             Don't have an account? Sign up Here!
@@ -95,12 +109,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: '#fff',
     
+    
+  },
+  loginbutton: {
+    fontSize: 15,
+    textAlign: 'center',
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    marginHorizontal: "25%",
+    fontFamily: 'Oswald-Medium',
+    color: 'white',
+    backgroundColor: 'black',
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+   // fontWeight: 'bold',
     marginTop : "45%",
     marginBottom: 24,
+    fontFamily: 'Oswald-Medium',
     textAlign: 'center',
   },
   input: {
@@ -110,6 +138,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 8,
     borderRadius: 4,
+    fontFamily: 'Oswald-Medium',
+
   },
 
   link: {
@@ -118,6 +148,8 @@ const styles = StyleSheet.create({
     color: 'grey',
     justifyContent: 'center',
     marginTop : 10,
+    fontFamily: 'Oswald-Medium',
+
     textDecorationLine: 'underline',
   }
 });
