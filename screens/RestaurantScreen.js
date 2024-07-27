@@ -131,7 +131,7 @@ const RestaurantScreen = ({ route, navigation }) => {
               <Image source={{ uri: item }} style={styles.photo} />
             </View>
           )}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.toString()}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={true}

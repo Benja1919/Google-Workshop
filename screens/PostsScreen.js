@@ -22,11 +22,10 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
         const allPosts = await firestoreDB().GetPosts();
         const filterRestaurantID = route?.params?.filterrestaurantID; // Optional chaining
         const filterUserName = route?.params?.filterUserName; // Optional chaining
-
         let filteredPosts = allPosts;
 
         if (filterRestaurantID) {
-          filteredPosts = filteredPosts.filter(post => post.restaurantID === filterRestaurantID);
+          filteredPosts = filteredPosts.filter(post => post.RestaurantID === filterRestaurantID);
         }
 
         if (filterUserName) {
