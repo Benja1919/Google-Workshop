@@ -17,6 +17,8 @@ import CurrentUserProfile from './screens/CurrentUserProfileScreen'
 import SignUpScreen from './screens/SignUpScreen'; // Import the SignInScreen component
 import MapMenu from './screens/MapMenu';
 import Landingpage from './screens/Landing';
+import { useFonts } from 'expo-font';
+
 //caused by a library component DateTimePickerModal
 LogBox.ignoreLogs([ //suppresses in expo go
   /defaultProps will be removed/
@@ -42,6 +44,11 @@ const App = () => {
   const [MapHeaderFunction, setMapHeaderFunction] = useState(null);
   const [CurrentUserScreenLeftFunction, setCurrentUserScreenLeftFunction] = useState(null);
   const [CurrentUserScreenRightFunction, setCurrentUserScreenRightFunction] = useState(null);
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("./assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("./assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("./assets/fonts/Oswald-Medium.ttf")
+  })
   return (
     <AuthProvider>
       <NavigationContainer>

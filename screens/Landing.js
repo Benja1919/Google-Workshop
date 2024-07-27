@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 
 const Landing = () => {
   const navigation = useNavigation();
+  // const [fontsLoaded] = useFonts({
+  //   "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf")
+  // })
 
   return (
     <ImageBackground 
@@ -67,13 +71,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 50,
     color: 'white',
-    fontWeight: 'bold',
-    marginVertical: 20,
-    top: 28,
+    // fontWeight: 'bold',
+    marginVertical: 10,
+    top: 20,
+    fontFamily: 'Oswald-Medium',
+
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
+    fontFamily: 'Oswald-Medium',
     // marginBottom: 0,
   },
   buttonContainer: {
@@ -83,14 +90,14 @@ const styles = StyleSheet.create({
     right: 20,
   },
   ctaButton: {
-    backgroundColor: '#007bff',
+    // backgroundColor: '#007bff',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     marginRight: 10,
   },
   loginButton: {
-    backgroundColor: '#28a745',
+    // backgroundColor: '#28a745',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -98,14 +105,19 @@ const styles = StyleSheet.create({
   ctaText: {
     color: '#fff',
     fontSize: 16,
+    fontFamily: 'Oswald-Medium',
+
   },
   footer: {
     padding: 20,
     alignItems: 'center',
+    
   },
   footerText: {
     fontSize: 14,
     color: '#666',
+    fontFamily: 'Oswald-Medium',
+
   },
 });
 
