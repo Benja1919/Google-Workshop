@@ -3,6 +3,8 @@ import { AuthContext } from './AuthContext';
 import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import Video from 'react-native-video';
 import { firestoreDB } from './FirebaseDB';
+import { useFonts } from 'expo-font';
+
 
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [paused, setPaused] = useState(false);
@@ -11,6 +13,14 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [activeIndex, setActiveIndex] = useState(0); // Track active dot index
     const [setLikesCount] = useState(post.likes ? post.likes.length : 0);
     const {currentUser} = useContext(AuthContext);
+    const [fontsLoaded] = useFonts({
+      "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+      "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+      "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+    })
+    if (!fontsLoaded){
+      return undefined;
+    }
     curr_user = '0';
     if (!currentUser){
       const curr_user = '';
@@ -127,7 +137,9 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                     <Text style={styles.userName}>{post.userName}</Text>
                 </TouchableOpacity>
                 <Text style={styles.stars}>{'⭐'.repeat(post.stars)}</Text>
-                <Text>{postDate.toLocaleDateString() + "\n" + postDate.toLocaleTimeString()}</Text>
+                <Text style={styles.date}>{postDate.toLocaleDateString() + "\n" + postDate.toLocaleTimeString()}
+                  
+                  </Text> 
             </View>
             <TouchableOpacity onPress={() => navigateToRestaurant(post.RestaurantID)}>
                 <Text style={styles.restaurantName}>{post.restaurantName}</Text>
@@ -173,6 +185,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 8,
         elevation: 3,
+
     },
     header: {
         flexDirection: 'row',
@@ -192,26 +205,36 @@ const styles = StyleSheet.create({
     },
     userName: {
         fontSize: 18,
-        fontWeight: 'bold',
-        color: '#1e90ff',
+       // fontWeight: 'bold',
+        color: 'black',
+        fontFamily: 'Oswald-Medium',
+
+    },
+    date: {
+      fontFamily: 'Oswald-Medium',
+
     },
     restaurantName: {
         fontSize: 16,
         color: '#1e90ff',
         marginBottom: 5,
+        fontFamily: 'Oswald-Medium',
+
     },
     stars: {
         fontSize: 16,
+        
     },
     icon: {
       width: 25,
       height: 20,
     },
     media: {
-        width: Dimensions.get('window').width - 30,
-        height: Dimensions.get('window').width - 30,
+        width: Dimensions.get('window').width - 55,
+        height: Dimensions.get('window').width - 150,
         borderRadius: 8,
-        marginBottom: 10,
+        borderCurve: 'continous',
+        marginBottom: 5,
     },
     errorText: {
         color: 'red',
@@ -219,7 +242,9 @@ const styles = StyleSheet.create({
     },
     content: {
         fontSize: 16,
-        marginBottom: 10,
+        marginBottom: 2,
+        fontFamily: 'Oswald-Medium',
+
     },
     likeContainer: {
         flexDirection: 'row',
@@ -228,6 +253,8 @@ const styles = StyleSheet.create({
     },
     likesCountText: {
       fontSize: 16,
+      fontFamily: 'Oswald-Medium',
+
       
     },
     likeButton: {
@@ -236,7 +263,8 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     likeText: {
-        fontWeight: 'bold',
+        //fontWeight: 'bold',
+        fontFamily: 'Oswald-Medium',
     },
     paginationContainer: {
         flexDirection: 'row',
