@@ -8,6 +8,8 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { AuthContext } from './AuthContext';
 import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'firebase/storage';
 import { firestoreDB } from './FirebaseDB';
+import { useFonts } from 'expo-font';
+
 
 const GOOGLE_PLACES_API_KEY = 'AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E'; // Replace with your Google Places API key
 
@@ -19,6 +21,14 @@ const PostCreationScreen = ({ navigation }) => {
   const [mediaType, setMediaType] = useState('');
   const [location, setLocation] = useState(null);
   const [places, setPlaces] = useState([]);
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
+  if (!fontsLoaded){
+    return undefined;
+  }
 
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -100) {
@@ -241,12 +251,16 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    fontFamily: 'Oswald-Medium',
+
     marginBottom: 5,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
+    fontFamily: 'Oswald-Medium',
+
     borderRadius: 4,
     padding: 10,
     marginBottom: 10,
@@ -285,8 +299,10 @@ const styles = StyleSheet.create({
     height: 35,
   },
   buttonText: {
+    fontFamily: 'Oswald-Medium',
+
     color: 'white',
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
   },
   mediaContainer: {
     flexDirection: 'row',
@@ -315,7 +331,9 @@ const styles = StyleSheet.create({
   },
   removeButtonText: {
     color: 'white',
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    fontFamily: 'Oswald-Medium',
+
   },
   placeItem: {
     padding: 10,
@@ -331,8 +349,10 @@ const styles = StyleSheet.create({
     marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
   },
   submitButtonText: {
+    fontFamily: 'Oswald-Medium',
+
     color: 'white',
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
     textAlign: 'center',
   },
 });

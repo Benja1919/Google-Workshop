@@ -13,6 +13,8 @@ import { AuthContext } from './AuthContext'; // Import AuthContext
 import { firestoreDB } from './FirebaseDB';
 import { doc, updateDoc } from 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
+import { useFonts } from 'expo-font';
+
 
 // Initialize Firestore
 const firestore = getFirestore();
@@ -24,6 +26,15 @@ const NetworkScreen = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [userSelected, setUserSelected] = useState({});
   const [followedUsers, setFollowedUsers] = useState(new Set()); // State to track followed users
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
+  if (!fontsLoaded){
+    return undefined;
+  }
+
 
   const navigateToProfile = (userName) => {
     navigation.navigate('UserProfile', { userName });
@@ -196,7 +207,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: 'left',
     color: '#008080',
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    fontFamily: 'Oswald-Medium',
+
   },
   position: {
     fontSize: 14,
@@ -244,14 +257,20 @@ const styles = StyleSheet.create({
   unfollowButtonText: {
     color: '#FFFFFF',
     fontSize: 20,
+    fontFamily: 'Oswald-Medium',
+
   },
   followButtonText: {
     color: '#FFFFFF',
     fontSize: 20,
+    fontFamily: 'Oswald-Medium',
+
   },
   followingButtonText: {
     color: '#FFFFFF',
     fontSize: 20,
+    fontFamily: 'Oswald-Medium',
+
   },
   popup: {
     backgroundColor: 'white',
