@@ -3,13 +3,21 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleS
 import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
 import { Timestamp } from 'firebase/firestore';
+import { useFonts } from 'expo-font';
 
 
 
 
 const MyListsScreen = ({ route, navigation }) => {
 
-
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
+  if (!fontsLoaded){
+    return undefined;
+  }
 
   const { user, profileImageUrl } = route.params;
   const [lists, setLists] = useState([]);
@@ -289,7 +297,7 @@ const MyListsScreen = ({ route, navigation }) => {
 
   // Render the main content
   if(currentUser){
-    if (currentUser.userName === user.userName){
+    if (currentUser.userName === user.userName){ //current user logged in to his lists page
   return (
     <View style={styles.container}>
       <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
@@ -379,7 +387,7 @@ const MyListsScreen = ({ route, navigation }) => {
   );
 }
   }
-  else{
+  else{ //someone's viewing other lists
     return (
       <View style={styles.container}>
         <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
@@ -474,6 +482,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',
+    
   },
   profileImage: {
     width: 200,
@@ -486,6 +495,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    
   },
   modalContent: {
     backgroundColor: '#fff',
@@ -493,9 +503,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '80%',
     maxHeight: '80%',
+    
   },
   listTitle: {
     fontSize: 20,
+    
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
@@ -506,6 +518,8 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+    fontFamily: 'Oswald-Medium',
+
   },
   addButton: {
     backgroundColor: 'green',
@@ -516,7 +530,9 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    fontFamily: 'Oswald-Medium',
+
   },
   closeButton: {
     backgroundColor: 'red',
@@ -527,7 +543,9 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    fontFamily: 'Oswald-Medium',
+
   },
   createButton: {
     backgroundColor: 'blue',
@@ -538,7 +556,9 @@ const styles = StyleSheet.create({
   },
   createButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    fontFamily: 'Oswald-Medium',
+
   },
   cancelButton: {
     backgroundColor: 'gray',
@@ -549,7 +569,9 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    fontFamily: 'Oswald-Medium',
+
   },
   buttonsContainer: {
     position: 'absolute',
@@ -560,6 +582,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     padding: 20,
+    
   },
   categoryButtonIcon: {
     width: 60,
