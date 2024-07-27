@@ -1,197 +1,88 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { AuthContext } from './AuthContext';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions } from 'react-native';
-import Video from 'react-native-video';
 import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
 
-
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
-    const [paused, setPaused] = useState(false);
-    const [videoError, setVideoError] = useState(null);
     const [profileImageUrl, setProfileImageUrl] = useState('');
-    const [activeIndex, setActiveIndex] = useState(0); // Track active dot index
-    const [setLikesCount] = useState(post.likes ? post.likes.length : 0);
-    const {currentUser} = useContext(AuthContext);
+    const { currentUser } = useContext(AuthContext);
     const [fontsLoaded] = useFonts({
-      "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
-      "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
-      "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
-    })
-    if (!fontsLoaded){
-      return undefined;
-    }
-    curr_user = '0';
-    if (!currentUser){
-      const curr_user = '';
-    }
-    else {
-      curr_user = currentUser.userName;
+        "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+        "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+        "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+    });
+
+    // Ensure post is defined and has essential properties
+    if (!post || !post.userName || !post.mediaUrls || !post.creationTime) {
+        return <Text>Post data is incomplete.</Text>;
     }
 
     useEffect(() => {
         const fetchProfileImage = async () => {
+            if (!post.userName) return;  // Early return if userName is not defined
             try {
-                const user = await firestoreDB().GetUserName(post.userName.toLowerCase());
-                if (user && user.profileImageUrl && user.profileImageUrl !== '') {
-                    setProfileImageUrl(user.profileImageUrl);
-                } else {
-                    setProfileImageUrl(''); // Empty URL if no image
-                }
+                const user = await firestoreDB().GetUserName(post.userName.toLowerCase()) || {};
+                setProfileImageUrl(user.profileImageUrl || 'defaultProfileImageUri');
             } catch (error) {
                 console.error('Error fetching profile image:', error);
-                setProfileImageUrl(''); // Empty URL if error
+                setProfileImageUrl('defaultProfileImageUri'); // Set default image URI on error
             }
         };
 
         fetchProfileImage();
     }, [post.userName]);
 
-    const mediaItems = Array.isArray(post.mediaUrls)
-    ? post.mediaUrls.map((url) => {
-      const [baseUrl, queryString] = url.split('?');
-      if (baseUrl.endsWith('.mp4') || baseUrl.endsWith('.mov') || baseUrl.endsWith('.avi')) {
-            return { url, type: 'video' };
-        } else if (baseUrl.endsWith('.gif')) {
-            return { url, type: 'gif' };
-        } else {
-            return { url, type: 'image' };
-        }
-    })
-    : [{ url: post.imageUrl, type: 'image' }];
+    if (!fontsLoaded) {
+        return <Text>Loading...</Text>; // Display a loading text while fonts are loading
+    }
 
-
-    const renderItem = ({ item }) => {
-        if (item.type === 'video') {
-         // console.log(item.url);
-            // return (
-            //     <Video
-            //         source={{ uri: item.url }}
-            //         style={styles.media}
-            //         resizeMode="cover"
-            //         controls={true}
-            //         paused={paused}
-            //         onLoad={() => setPaused(false)}
-            //         onBuffer={({ isBuffering }) => setPaused(isBuffering)}
-            //         onError={(error) => {
-            //             console.log('Video Error:', error);
-            //             setVideoError('Unable to play video');
-            //         }}
-            //     />
-            // );
-        } else {
-            return <Image source={{ uri: item.url }} style={styles.media} />;
-        }
-    };
-
-    const viewabilityConfig = {
-        itemVisiblePercentThreshold: 50,
-    };
-
-    const onViewableItemsChanged = ({ viewableItems }) => {
-        if (viewableItems.length > 0) {
-            setActiveIndex(viewableItems[0].index || 0);
-        }
-    };
-
-    const PaginationDots = ({ index, length }) => {
-        return (
-            <View style={styles.paginationContainer}>
-                {Array.from({ length }).map((_, i) => (
-                    <View
-                        key={i}
-                        style={[
-                            styles.paginationDot,
-                            { opacity: index === i ? 1 : 0.5 },
-                        ]}
-                    />
-                ))}
-            </View>
-        );
-    };
-
-    const postDate = new Date(post.creationTime.seconds * 1000);
-    const toggleLike = async () => {
-      if(currentUser){
-        if (!post.like_users.includes(currentUser.userName)) {
-            try {
-                const updatedPost = await firestoreDB().LikePost(post.id, currentUser.userName);
-            } catch (error) {
-                console.error('Error liking post:', error);
-            }
-        } else {
-            try {
-                const updatedPost = await firestoreDB().UnlikePost(post.id, currentUser.userName);
-            } catch (error) {
-                console.error('Error unliking post:', error);
-            }
-        }
-      }
-    };
+    const postDate = new Date(post.creationTime.seconds * 1000).toLocaleDateString();
 
     return (
-        <View style={styles.postCard}>
-            <View style={styles.header}>
+        <View style={styles.postCard}> 
+            <Image source={{ uri: post.mediaUrls[0] }} style={styles.backgroundImage} />
+            <View style={styles.textContainer}>
                 <TouchableOpacity style={styles.userContainer} onPress={() => navigateToProfile(post.userName)}>
-                    <Image source={{ uri: profileImageUrl || 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQA5QMBIgACEQEDEQH/xAAYAAEBAQEBAAAAAAAAAAAAAAAAAQIDB//EABYQAQEBAAAAAAAAAAAAAAAAAAABEf/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwD2GNJFAMWKCRRcAhi4sgM4uNYYDOLi4AmGNAM4Y0AzhjWJgJiNYYDKY1hQZRpAQVAGa1UBijVigi4YoBBrAFFABQAUEFARQBBQBFAQUBkUoIilBlGkBkVAEUAWJFgDRFgCgAoAAAAAAAAQAWoAAAACCoCI0gMUaqUGcFQCXVSNQFXEaAVFAAAAAAAAAAAC0AAAAABAAAZqY1UoMgAkajMaBYsCAqooAAAAAAAAAAAAAAAACKAgAIy0lBkACLGY1AWLEigqoAoAAAAAAAAAAAAAAAAAIACVBKCYACRqMNaDSs6oNCKCiAKAAAAAAAAAAAACAAAgJoCUTQBAGY0wsBvV1klB0GVBoQBRFAVAFEAUQBRAFEAATQAQBKagCFSgtRAGVjMqg1KuxhYDcrWuetQGxmVdBoZ00GlZAaGVBRAFETQaRNAVE1NBqolrNoNWs7U0AqABogDEaAFABTVANWUAXQAXTQBZQAAAEAAAESgCaACJqgIUAQAH/9k='}} style={styles.userImage} />
+                    <Image source={{ uri: profileImageUrl }} style={styles.userImage} />
                     <Text style={styles.userName}>{post.userName}</Text>
                 </TouchableOpacity>
-                <Text style={styles.stars}>{'⭐'.repeat(post.stars)}</Text>
-                <Text style={styles.date}>{postDate.toLocaleDateString() + "\n" + postDate.toLocaleTimeString()}
-                  
-                  </Text> 
             </View>
-            <TouchableOpacity onPress={() => navigateToRestaurant(post.RestaurantID)}>
-                <Text style={styles.restaurantName}>{post.restaurantName}</Text>
-            </TouchableOpacity>
-            <FlatList
-                data={mediaItems}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-                snapToAlignment="center"
-                decelerationRate="fast"
-                viewabilityConfig={viewabilityConfig}
-                onViewableItemsChanged={onViewableItemsChanged}
-            />
-            {mediaItems.length > 1 && (
-                <PaginationDots index={activeIndex} length={mediaItems.length} />
-            )}
-            {videoError && <Text style={styles.errorText}>{videoError}</Text>}
-            <Text style={styles.content}>{post.content}</Text>
-            <View style={styles.likeContainer}>
-            <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
-                    <Image
-                        source={post.like_users.includes(curr_user) ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
-                        style={styles.icon}
-                    />
-                    </TouchableOpacity>
-                <Text style ={styles.likesCountText}>{post.likes} {'likes'}</Text>
-            </View>
+            <View style={styles.bottomTextContainer}>
+                <Text style={styles.content} onPress={() => navigateToRestaurant(post.RestaurantID)}> {post.restaurantName} </Text>
+                {/* <Text style={styles.date}>{postDate}</Text> */}
+                <Text style={styles.content}>{post.content}</Text>
+            </View>          
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     postCard: {
-        backgroundColor: '#fff',
+        flex: 1,
         borderRadius: 8,
-        marginBottom: 10,
-        padding: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 8,
-        elevation: 3,
-
+        marginVertical: 12,
+        overflow: 'hidden',
+        height: Dimensions.get('window').width * 0.75, // Height set to maintain aspect ratio
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 10,
+    backgroundImage: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
+    },
+    textContainer: {
+        // flex: 1,
+        justifyContent: 'flex-start',
+        padding: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)' // Semi-transparent overlay for better text readability
+    },
+    bottomTextContainer: {
+        flex: 0,
+        marginTop : 130,
+        justifyContent: 'flex-end',
+        padding: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)' // Semi-transparent overlay for better text readability
     },
     userContainer: {
         flexDirection: 'row',
@@ -204,80 +95,22 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     userName: {
-        fontSize: 18,
-       // fontWeight: 'bold',
-        color: 'black',
+        color: '#FFF',
         fontFamily: 'Oswald-Medium',
-
+        fontSize: 18,
     },
     date: {
-      fontFamily: 'Oswald-Medium',
-
-    },
-    restaurantName: {
-        fontSize: 16,
-        color: '#1e90ff',
-        marginBottom: 5,
-        fontFamily: 'Oswald-Medium',
-
-    },
-    stars: {
-        fontSize: 16,
-        
-    },
-    icon: {
-      width: 25,
-      height: 20,
-    },
-    media: {
-        width: Dimensions.get('window').width - 55,
-        height: Dimensions.get('window').width - 150,
-        borderRadius: 8,
-        borderCurve: 'continous',
-        marginBottom: 5,
-    },
-    errorText: {
-        color: 'red',
-        marginBottom: 10,
+        color: '#FFF',
+        fontFamily: 'Oswald-Light',
+        fontSize: 14,
+        // marginVertical: 5,
     },
     content: {
+        color: '#FFF',
+        fontFamily: 'Oswald-Medium',
         fontSize: 16,
-        marginBottom: 2,
-        fontFamily: 'Oswald-Medium',
-
-    },
-    likeContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    likesCountText: {
-      fontSize: 16,
-      fontFamily: 'Oswald-Medium',
-
-      
-    },
-    likeButton: {
-        backgroundColor: 'transparent',
-        padding: 5,
-        marginRight: 10,
-    },
-    likeText: {
-        //fontWeight: 'bold',
-        fontFamily: 'Oswald-Medium',
-    },
-    paginationContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    paginationDot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: '#1e90ff',
-        marginHorizontal: 5,
+        // marginTop : ,
+        marginBottom: 0, // Adds some spacing at the bottom
     },
 });
 
