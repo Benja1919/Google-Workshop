@@ -49,6 +49,9 @@ const App = () => {
     "Oswald-Light": require("./assets/fonts/Oswald-Light.ttf"),
     "Oswald-Medium": require("./assets/fonts/Oswald-Medium.ttf")
   })
+  if (!fontsLoaded){
+    return undefined;
+  }
   return (
     <AuthProvider>
       <NavigationContainer>
