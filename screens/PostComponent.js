@@ -5,8 +5,9 @@ import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
 
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
-    const [profileImageUrl, setProfileImageUrl] = useState('');
+    const [profileImageUrl, setProfileImageUrl] = useState('defaultProfileImageUri');
     const { currentUser } = useContext(AuthContext);
+    const [userProfileLoaded, setUserProfileLoaded] = useState(false);
     const [fontsLoaded] = useFonts({
         "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
         "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
@@ -20,20 +21,24 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
 
     useEffect(() => {
         const fetchProfileImage = async () => {
-            if (!post.userName) return;  // Early return if userName is not defined
             try {
+                if (!post.userName)
+                    return;  // Early return if userName is not defined
                 const user = await firestoreDB().GetUserName(post.userName.toLowerCase()) || {};
                 setProfileImageUrl(user.profileImageUrl || 'defaultProfileImageUri');
             } catch (error) {
                 console.error('Error fetching profile image:', error);
                 setProfileImageUrl('defaultProfileImageUri'); // Set default image URI on error
             }
+            finally {
+                setUserProfileLoaded(true);
+            }
         };
 
         fetchProfileImage();
     }, [post.userName]);
 
-    if (!fontsLoaded) {
+    if (!fontsLoaded || !userProfileLoaded) {
         return <Text>Loading...</Text>; // Display a loading text while fonts are loading
     }
 

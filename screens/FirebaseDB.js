@@ -147,16 +147,17 @@ export const firestoreDB = () => {
 		}
 	  };
 
-	  const updateListInFirebase = async (listId, updatedItems) => {
-		try {
-		  const listRef = doc(firestore, 'usersLists', listId);
-		  await updateDoc(listRef, {
-			items: updatedItems,
-		  });
-		} catch (error) {
-		  console.error('Error updating list in Firebase:', error);
-		}
-	  };
+    const updateListInFirebase = async (listId, updatedItems) => {
+        try {
+            const listRef = doc(firestore, 'usersLists', listId);
+            await updateDoc(listRef, {
+            items: updatedItems,
+        });
+        } catch (error) {
+            console.error('Error updating list in Firebase:', error);
+        }
+    };
+
     const CreateUser = async (user) => {
         const userDoc = doc(firestore, 'users', user.userName.toLowerCase())
         await setDoc(userDoc, user);
@@ -191,6 +192,17 @@ export const firestoreDB = () => {
 		const querySnapshot = await getDocs(q);
 		const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 		return lists;
+    };
+
+    const SubscribeToLists = (callback, userName) => {
+        const q = query(collection(firestore, 'usersLists'),  where('userName', '==', userName));
+
+        return onSnapshot(q, (snapshot) => {
+            const lists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            callback(lists);
+        }, (error) => {
+            console.error('Error fetching real-time lists:', error);
+        });
     };
 
     const GetUserName = async (userName) => {
@@ -293,6 +305,7 @@ export const firestoreDB = () => {
         TryLoginUser,
         GetUserFriends,
         GetUserLists,
+        SubscribeToLists,
         LikePost,
         UnlikePost,
         GetUserName,

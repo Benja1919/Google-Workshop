@@ -146,6 +146,11 @@ const MyListsScreen = ({ route, navigation }) => {
     // Fetch lists immediately
     fetchLists();
 
+    const unsubscribe = firestoreDB().SubscribeToLists((fetchedLists) => {
+      setLists(fetchedLists);
+    }, user.userName);
+
+    return () => unsubscribe();
   }, [currentUser]);
 
   const addItemToList = (listId) => {
