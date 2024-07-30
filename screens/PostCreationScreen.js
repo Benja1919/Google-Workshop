@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext,useCallback } from 'react';
 import { View, Text, TextInput, Button, Image, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
 import * as ImagePicker from 'expo-image-picker';
@@ -9,7 +9,7 @@ import { AuthContext } from './AuthContext';
 import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'firebase/storage';
 import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
-
+import RestaurantFinder from './components/RestaurantFinder'
 
 const GOOGLE_PLACES_API_KEY = 'AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E'; // Replace with your Google Places API key
 
@@ -21,6 +21,7 @@ const PostCreationScreen = ({ navigation }) => {
   const [mediaType, setMediaType] = useState('');
   const [location, setLocation] = useState(null);
   const [places, setPlaces] = useState([]);
+  const [RestaurantID, setRestaurantID] = useState(null);
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
     "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
@@ -124,7 +125,10 @@ const PostCreationScreen = ({ navigation }) => {
       Alert.alert('Error', 'Unable to fetch nearby places');
     }
   };
-
+  const ReceiveRestaurantData= ({ id, name }) => {
+    setRestaurantName(name);
+    setRestaurantID(id);
+  };
   const handlePlaceSelect = (place) => {
     setLocation({
       coords: {
@@ -149,6 +153,7 @@ const PostCreationScreen = ({ navigation }) => {
       id: Math.random().toString(),
       userName: currentUser.userName,
       restaurantName: restaurantName,
+      RestaurantID: RestaurantID,
       stars: stars,
       content: content,
       mediaUrls: mediaUris,
@@ -161,15 +166,12 @@ const PostCreationScreen = ({ navigation }) => {
   };
 
   return (
-    <PanGestureHandler onGestureEvent={onGestureEvent}>
+    <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.label}>Restaurant Name:</Text>
-        <TextInput
-          style={styles.input}
-          value={restaurantName}
-          onChangeText={text => setRestaurantName(text)}
-          placeholder="Enter restaurant name"
-        />
+        <RestaurantFinder textinputstyle={styles.input} placeholder="Enter restaurant name" Complete={ReceiveRestaurantData}/>
+
+        
 
         <Text style={styles.label}>Stars:</Text>
         <StarRating
@@ -231,9 +233,10 @@ const PostCreationScreen = ({ navigation }) => {
           />
         )}
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <TouchableOpacity style={RestaurantID== null ? styles.submitButtondisabled : styles.submitButton} onPress={handleSubmit} disabled={RestaurantID== null}>
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
+        <Text style={{fontSize:30}}></Text>
         <View Push style={styles.Pusher}/>
         <BottomBarComponent navigation={navigation}/>
       </ScrollView>
@@ -327,7 +330,10 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'rgba(255, 0, 0, 0.7)',
     borderRadius: 10,
-    padding: 5,
+    width: 20,
+    height: 20,
+    justifyContent: 'center', // Centers items vertically
+    alignItems: 'center', 
   },
   removeButtonText: {
     color: 'white',
@@ -342,6 +348,14 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    alignSelf: 'center', // מרכז את הכפתור במרכז האופקי של המסך
+    marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
+  },
+  submitButtondisabled: {
+    backgroundColor: '#cccccc',
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 8,

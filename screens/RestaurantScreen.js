@@ -89,6 +89,7 @@ const RestaurantScreen = ({ route, navigation }) => {
   const GoogleReviews = Details.rating;
   const GoogleReviewsCount = Details.userRatingCount;
   const ProfileURI = getPhotoUri(Details.photos[0].name.split('/')[3])._j;
+  const Address = Details.formattedAddress;
   TagArray = [];
   for (let index = 0; index < Details.types.length; index++) {
     const element = Details.types[index];
@@ -121,7 +122,6 @@ const RestaurantScreen = ({ route, navigation }) => {
     <ScrollView style={styles.container}>
       <Text style={styles.header}>{restaurant.name}</Text>
       <Image source={{ uri: ProfileURI}} style={styles.profileImage} />
-      <Text style={styles.description}>{restaurant.description}</Text>
       <Text style={styles.sectionTitle}>Photos</Text>
       <View style={{...styles.item,padding: 10}}>
         <FlatList
@@ -147,7 +147,7 @@ const RestaurantScreen = ({ route, navigation }) => {
               style={{...styles.icon,marginRight:3,marginLeft:1}}
               resizeMode="center"
             />
-          <Text style={{...styles.details}}>{restaurant.Address} </Text>
+          <Text style={{...styles.details}}>{Address} </Text>
         </View>
         <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left'}} onPress={() =>setLocationMap(!isLocationMapEnbaled)}>
           <View style={{flexDirection: 'row',flex: 1,alignItems: 'center'}}>

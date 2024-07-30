@@ -31,7 +31,7 @@ export const useCoordToAddress = (latitude, longitude) => {
 export const getPhotoUri = async (photoReference) => {
     const url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=300&photoreference=${photoReference}&key=${apiKey}`;
     return url;
-  };
+};
 export const useAddressToCoord = (address) => {
     
     const [coordinates, setCoordinates] = useState({"latitude": null, "longitude": null});
@@ -101,7 +101,6 @@ export const searchNearbyPlaces = (Coords) => {
 export const GetPlaceDetails = (restaurant) => {
     const [Details, setDetails] = useState(null);
     useEffect(() => {
-        
         if(restaurant != null ){
             const place_id = restaurant.GoogleMapsID;
             const get = async (place_id) => {
@@ -130,6 +129,55 @@ export const GetPlaceDetails = (restaurant) => {
             get(place_id);
         }
     }, [restaurant == null]);
+    return Details;
+};
+export const GetPlaces = (restaurant) => {
+    const [Details, setDetails] = useState(null);
+
+    useEffect(() => {
+        if (restaurant !== null && restaurant !== '') {
+            const textQuery = restaurant; // Use the appropriate field for the text query
+            const getPlaceDetails = async (textQuery) => {
+                const url = `https://places.googleapis.com/v1/places:searchText`;
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'X-Goog-Api-Key': apiKey,
+                    'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location'
+                };
+                const body = JSON.stringify({
+                    textQuery: textQuery,
+                    includedType: 'restaurant'
+                });
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: body
+                    });
+
+                    if (!response.ok) {
+                        console.log(`HTTP error! Status: ${response.status}`);
+                        return;
+                    }
+
+                    const data = await response.json();
+                    setDetails(data.places);
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                }
+            };
+
+            getPlaceDetails(textQuery);
+        }
+        else{
+            
+            setDetails(null);
+        }
+    }, [restaurant]);
+    if(restaurant == null){
+        return null;
+    }
     return Details;
 };
 const BasicMap = ({isEnabled, initialMarkerCoords, mapclickfunction}) =>{

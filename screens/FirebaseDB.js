@@ -106,6 +106,7 @@ export const firestoreDB = () => {
         const newPost = {
             userName: post.userName,
             restaurantName: post.restaurantName,
+            RestaurantID : post.RestaurantID,
             stars: post.stars,
             likes: 0,
             like_users: [],
@@ -123,8 +124,14 @@ export const firestoreDB = () => {
             await new Promise(resolve => setTimeout(resolve, 100));
             postDoc = await getDoc(postRef);
         }
-        GetRestaurant(post.restaurantName).starcount += post.stars;
-        GetRestaurant(post.restaurantName).reviewcount += 1;
+        const restaurant = await GetRestaurantByID(post.RestaurantID);
+        const restaurantDoc = doc(firestore, 'restaurants', post.RestaurantID);
+        updateddata = {
+            starcount : restaurant.starcount+ post.stars,
+            reviewcount : restaurant.reviewcount+ 1,
+        };
+        await setDoc(restaurantDoc, updateddata, { merge: true });
+
     };
     const AddRestaurant =async (Restaurant) =>{
         const collectionRef = await collection(firestore, 'restaurants');
@@ -252,7 +259,23 @@ export const firestoreDB = () => {
             console.error('Error updating restaurant content:', error);
         }
     };
+    const FetchRestaurantByGID = async (somegid) => {
 
+        try {
+            const q = query(collection(firestore, 'restaurants'), where("GoogleMapsID","==",somegid));
+			const restaurantSnapshot = await getDocs(q);
+        
+            if (!restaurantSnapshot.empty) {
+                const restaurantDoc = restaurantSnapshot.docs[0];
+                return restaurantDoc.id;
+            } else {
+                return '';
+            }
+        } catch (error) {
+            console.error("Error fetching restaurant: ", error);
+            return '';
+        }
+    };
     const GetUsers = async () => {
         const usersCollection = collection(firestore, 'users');
         const usersSnapshot = await getDocs(usersCollection);
@@ -319,6 +342,7 @@ export const firestoreDB = () => {
 		FetchRestaurants,
         GetRestaurantByID,
         AddRestaurant,
+        FetchRestaurantByGID,
     };
 };
 
