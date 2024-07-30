@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'rea
 import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
+import StarRating from 'react-native-star-rating-widget';
 
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     const [profileImageUrl, setProfileImageUrl] = useState('defaultProfileImageUri');
@@ -43,7 +44,6 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     }
 
     const postDate = new Date(post.creationTime.seconds * 1000).toLocaleDateString();
-
     return (
         <View style={styles.postCard}> 
             <Image source={{ uri: post.mediaUrls[0] }} style={styles.backgroundImage} />
@@ -52,12 +52,13 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                     <Image source={{ uri: profileImageUrl }} style={styles.userImage} />
                     <Text style={styles.userName}>{post.userName}</Text>
                 </TouchableOpacity>
+                <StarRating rating={post.stars} onChange={() => {}} starSize={25} starStyle={{ marginHorizontal: 0 }}/>
             </View>
-            <View style={styles.bottomTextContainer}>
-                <Text style={styles.content} onPress={() => navigateToRestaurant(post.RestaurantID)}> {post.restaurantName} </Text>
+            <TouchableOpacity style={styles.bottomTextContainer} onPress={() => navigateToRestaurant(post.RestaurantID)}>
+                <Text style={styles.contentBig} > {post.restaurantName} </Text>
                 {/* <Text style={styles.date}>{postDate}</Text> */}
                 <Text style={styles.content}>{post.content}</Text>
-            </View>          
+            </TouchableOpacity>          
         </View>
     );
 };
@@ -78,7 +79,9 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         // flex: 1,
-        justifyContent: 'flex-start',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         padding: 10,
         backgroundColor: 'rgba(0, 0, 0, 0.3)' // Semi-transparent overlay for better text readability
     },
@@ -114,6 +117,13 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: 'Oswald-Medium',
         fontSize: 16,
+        // marginTop : ,
+        marginBottom: 0, // Adds some spacing at the bottom
+    },
+    contentBig: {
+        color: '#FFF',
+        fontFamily: 'Oswald-Medium',
+        fontSize: 22,
         // marginTop : ,
         marginBottom: 0, // Adds some spacing at the bottom
     },

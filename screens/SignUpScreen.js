@@ -142,6 +142,7 @@ const SignUpScreen = ({ navigation }) => {
           size={25}
           fillColor="#0B99E8"
           unfillColor="#FFFFFF"
+          disabled={true}
           text="This is a Restaurant profile"
           innerIconStyle={{ borderWidth: 2 }}
           textStyle={{ textDecorationLine: "none" }}

@@ -168,18 +168,18 @@ const PostCreationScreen = ({ navigation }) => {
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.label}>Restaurant Name:</Text>
+        <Text style={styles.label}>Restaurant</Text>
         <RestaurantFinder textinputstyle={styles.input} placeholder="Enter restaurant name" Complete={ReceiveRestaurantData}/>
 
         
 
-        <Text style={styles.label}>Stars:</Text>
+        <Text style={styles.label}>Rating</Text>
         <StarRating
           rating={stars}
           onChange={setStars}
         />
 
-        <Text style={styles.label}>Content:</Text>
+        <Text style={styles.label}>Content</Text>
         <TextInput
           style={[styles.input, { height: 100 }]}
           value={content}
@@ -234,7 +234,7 @@ const PostCreationScreen = ({ navigation }) => {
         )}
 
         <TouchableOpacity style={RestaurantID== null ? styles.submitButtondisabled : styles.submitButton} onPress={handleSubmit} disabled={RestaurantID== null}>
-          <Text style={styles.submitButtonText}>Submit</Text>
+          <Text style={styles.submitButtonText}>Post</Text>
         </TouchableOpacity>
         <Text style={{fontSize:30}}></Text>
         <View Push style={styles.Pusher}/>
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: '#4CAF50',
     paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     borderRadius: 8,
     alignSelf: 'center', // מרכז את הכפתור במרכז האופקי של המסך
     marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   submitButtondisabled: {
     backgroundColor: '#cccccc',
     paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     borderRadius: 8,
     alignSelf: 'center', // מרכז את הכפתור במרכז האופקי של המסך
     marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
