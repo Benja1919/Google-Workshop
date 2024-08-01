@@ -7,14 +7,15 @@ import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 const HomeScreen = ({ navigation }) => {
-  const { isLoggedIn} = useContext(AuthContext);
+  const { isLoggedIn, currentUser} = useContext(AuthContext);
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -50) {
       navigation.navigate('MapView');
     }
     else if (event.nativeEvent.translationX > 50) {
       if(isLoggedIn){
-      navigation.navigate('ProfileScreen');
+        const name = currentUser.userName
+        navigation.navigate('UserProfile', { userName: name });
       }
       else{
         navigation.navigate('LoginScreen');

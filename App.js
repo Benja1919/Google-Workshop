@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
@@ -18,7 +18,7 @@ import SignUpScreen from './screens/SignUpScreen'; // Import the SignInScreen co
 import MapMenu from './screens/MapMenu';
 import Landingpage from './screens/Landing';
 import { useFonts } from 'expo-font';
-
+import LogoutButton from './screens/components/logoutbutton';
 //caused by a library component DateTimePickerModal
 LogBox.ignoreLogs([ //suppresses in expo go
   /defaultProps will be removed/
@@ -43,7 +43,8 @@ const AppHeaderTitle = () =>{
 const App = () => {
   const [MapHeaderFunction, setMapHeaderFunction] = useState(null);
   const [CurrentUserScreenLeftFunction, setCurrentUserScreenLeftFunction] = useState(null);
-  const [CurrentUserScreenRightFunction, setCurrentUserScreenRightFunction] = useState(null);
+  const [UserScreenLeftFunction, setUserScreenLeftFunction] = useState(null);
+  const [UserScreenLeftButton, setUserScreenLeftButton] = useState(null);
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("./assets/fonts/Oswald-Bold.ttf"),
     "Oswald-Light": require("./assets/fonts/Oswald-Light.ttf"),
@@ -91,15 +92,21 @@ const App = () => {
               ),
             })}
           />
-          <Stack.Screen name="UserProfile"
-           component={UserProfileScreen}
-           options={{  
-            headerStyle: {
-              height: 110},
-            headerTitle: AppHeaderTitle,
-            headerTitleAlign: 'center' // יישור למרכז, אופציונלי
-            }} />
-          <Stack.Screen 
+<Stack.Screen
+  name="UserProfile"
+  component={UserProfileScreen}
+  options={({ navigation }) => ({  
+    headerStyle: {
+      height: 110,
+    },
+    headerTitle: AppHeaderTitle,
+    headerLeft: () => ( 
+      <LogoutButton navigation={navigation}/>
+    ),
+    headerTitleAlign: 'center', // יישור למרכז, אופציונלי
+  })}
+/>
+<Stack.Screen
   name="ProfileScreen" 
   options={{ 
     headerTitle: AppHeaderTitle,
@@ -124,6 +131,7 @@ const App = () => {
     <CurrentUserProfile
       {...props}
       onHeaderLeftPress={handlePress => setCurrentUserScreenLeftFunction(() => handlePress)}
+
     />
   )}
 </Stack.Screen>

@@ -5,7 +5,7 @@ import { useNavigationState } from '@react-navigation/native';
 import { AuthContext } from '../AuthContext';
 const BottomBarComponent = ({ navigation }) => {
     const route = useNavigationState(state => state.routes[state.index]);
-    const {isLoggedIn} = useContext(AuthContext);
+    const {isLoggedIn, currentUser} = useContext(AuthContext);
     const navigateToPostCreation = () => {
         if(isLoggedIn){
             navigation.navigate('PostCreation');
@@ -18,7 +18,8 @@ const BottomBarComponent = ({ navigation }) => {
     
       const navigateToProfile = () => {
         if(isLoggedIn){
-            navigation.navigate('ProfileScreen');
+            const name = currentUser.userName
+            navigation.navigate('UserProfile', { userName: name });
         }
         else{
             navigation.navigate('LoginScreen');
@@ -52,7 +53,7 @@ const BottomBarComponent = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Button for profile */}
-        <TouchableOpacity style={route.name != "LoginScreen" && route.name != "ProfileScreen" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToProfile}>
+        <TouchableOpacity style={route.name != "LoginScreen" && route.name != "ProfileScreen" && route.name != 'UserProfile' ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToProfile}>
           <Image source={isLoggedIn ? require('../../assets/icons/profile.png') : require('../../assets/icons/login2.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>

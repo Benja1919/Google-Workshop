@@ -30,16 +30,22 @@ const PostCreationScreen = ({ navigation }) => {
   if (!fontsLoaded){
     return undefined;
   }
-
+  const {currentUser, isLoggedIn } = useContext(AuthContext);
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -100) {
-      navigation.navigate('ProfileScreen');
+      if(isLoggedIn){
+        const name = currentUser.userName
+        navigation.navigate('UserProfile', { userName: name });
+      }
+      else{
+        navigation.navigate('HomeScreen');
+      }
     }
     else if (event.nativeEvent.translationX > 100) {
       navigation.navigate('MapView');
     }
   };
-  const {currentUser } = useContext(AuthContext);
+  
 
   useEffect(() => {
     (async () => {

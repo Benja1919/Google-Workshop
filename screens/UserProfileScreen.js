@@ -8,12 +8,12 @@ import { firestoreDB } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { useFonts } from 'expo-font';
-
+import { PanGestureHandler, ScrollView } from 'react-native-gesture-handler';
 
 const UserProfileScreen = ({ route, navigation }) => {
   const { userName } = route.params;
   const [user, setUser] = useState(null);
-  const { isLoggedIn, logout } = useContext(AuthContext);
+  const { isLoggedIn, logout, currentUser } = useContext(AuthContext);
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
     "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
@@ -22,7 +22,6 @@ const UserProfileScreen = ({ route, navigation }) => {
   if (!fontsLoaded){
     return undefined;
   }
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -35,7 +34,19 @@ const UserProfileScreen = ({ route, navigation }) => {
 
     fetchUserData();
   }, [userName]);
-
+  const onGestureEvent = (event) => {
+    if (event.nativeEvent.translationX > 100) {
+      if(isLoggedIn){
+        navigation.navigate('PostCreation');
+      }
+      else{
+        navigation.navigate('MapView');
+      }
+    }
+    else if (event.nativeEvent.translationX < -100) {
+      navigation.navigate('HomeScreen');
+    }
+  };
   const navigateToPostCreation = () => {
     navigation.navigate('PostCreation');
   };
@@ -44,25 +55,7 @@ const UserProfileScreen = ({ route, navigation }) => {
     navigation.navigate('LoginScreen');
   };
 
-  const navigateToSearch = () => {
-    navigation.navigate('Search');
-  };
 
-  const navigateToProfile = () => {
-    navigation.navigate('ProfileScreen');
-  };
-
-  const navigateToHome = () => {
-    navigation.navigate('HomeScreen');
-  };
-
-  const handlePress = () => {
-    if (isLoggedIn) {
-      logout();
-    } else {
-      navigateToLoginScreen();
-    }
-  };
 
   const navigateToScreen = (screen) => {
     if (screen === 'Posts') {
@@ -104,27 +97,29 @@ const UserProfileScreen = ({ route, navigation }) => {
   });
 
   return (
-    <View style={{flex:1}}>
-      <View >
-        
-        {buttons.map((button, index) => (
-          <TouchableOpacity
-            key={index}
-            style={buttonStyles[index]}
-            onPress={() => navigateToScreen(button.screen)}
-          >
-            <Image source={buttons[index].icon} style={styles.icon} />
-            <Text style={styles.buttonText}>{button.label}</Text>
-          </TouchableOpacity>
-        ))}
-        <View style={styles.profileContainer}>
-          <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
-          <Text style={styles.header}>{userName}</Text>
+    <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
+      <View style={{flex:1}}>
+        <View >
+          
+          {buttons.map((button, index) => (
+            <TouchableOpacity
+              key={index}
+              style={buttonStyles[index]}
+              onPress={() => navigateToScreen(button.screen)}
+            >
+              <Image source={buttons[index].icon} style={styles.icon} />
+              <Text style={styles.buttonText}>{button.label}</Text>
+            </TouchableOpacity>
+          ))}
+          <View style={styles.profileContainer}>
+            <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
+            <Text style={styles.header}>{userName}</Text>
+          </View>
         </View>
+        <View style={{flex:1}}/>
+        <BottomBarComponent navigation={navigation} style={{justifyContent: 'flex-end'}}/>
       </View>
-      <View style={{flex:1}}/>
-      <BottomBarComponent navigation={navigation} style={{justifyContent: 'flex-end'}}/>
-    </View>
+    </PanGestureHandler>
   );
 };
 

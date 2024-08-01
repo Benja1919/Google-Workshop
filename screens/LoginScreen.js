@@ -48,7 +48,7 @@ const LoginScreen = ({ navigation }) => {
     const user = await firestoreDB().TryLoginUser(userName, password);
     if (user) {
       login(user);
-      navigation.navigate('ProfileScreen');
+      navigation.navigate('UserProfile', { userName: user.userName });
     } else {
       Alert.alert('Error', 'Invalid username or password');
     }
