@@ -106,7 +106,6 @@ export const firestoreDB = () => {
         const newPost = {
             userName: post.userName,
             restaurantName: post.restaurantName,
-            RestaurantID : post.RestaurantID,
             stars: post.stars,
             likes: 0,
             like_users: [],
@@ -124,14 +123,8 @@ export const firestoreDB = () => {
             await new Promise(resolve => setTimeout(resolve, 100));
             postDoc = await getDoc(postRef);
         }
-        const restaurant = await GetRestaurantByID(post.RestaurantID);
-        const restaurantDoc = doc(firestore, 'restaurants', post.RestaurantID);
-        updateddata = {
-            starcount : restaurant.starcount+ post.stars,
-            reviewcount : restaurant.reviewcount+ 1,
-        };
-        await setDoc(restaurantDoc, updateddata, { merge: true });
-
+        GetRestaurant(post.restaurantName).starcount += post.stars;
+        GetRestaurant(post.restaurantName).reviewcount += 1;
     };
     const AddRestaurant =async (Restaurant) =>{
         const collectionRef = await collection(firestore, 'restaurants');
@@ -154,17 +147,16 @@ export const firestoreDB = () => {
 		}
 	  };
 
-    const updateListInFirebase = async (listId, updatedItems) => {
-        try {
-            const listRef = doc(firestore, 'usersLists', listId);
-            await updateDoc(listRef, {
-            items: updatedItems,
-        });
-        } catch (error) {
-            console.error('Error updating list in Firebase:', error);
-        }
-    };
-
+	  const updateListInFirebase = async (listId, updatedItems) => {
+		try {
+		  const listRef = doc(firestore, 'usersLists', listId);
+		  await updateDoc(listRef, {
+			items: updatedItems,
+		  });
+		} catch (error) {
+		  console.error('Error updating list in Firebase:', error);
+		}
+	  };
     const CreateUser = async (user) => {
         const userDoc = doc(firestore, 'users', user.userName.toLowerCase())
         await setDoc(userDoc, user);
@@ -199,17 +191,6 @@ export const firestoreDB = () => {
 		const querySnapshot = await getDocs(q);
 		const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 		return lists;
-    };
-
-    const SubscribeToLists = (callback, userName) => {
-        const q = query(collection(firestore, 'usersLists'),  where('userName', '==', userName));
-
-        return onSnapshot(q, (snapshot) => {
-            const lists = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            callback(lists);
-        }, (error) => {
-            console.error('Error fetching real-time lists:', error);
-        });
     };
 
     const GetUserName = async (userName) => {
@@ -259,23 +240,19 @@ export const firestoreDB = () => {
             console.error('Error updating restaurant content:', error);
         }
     };
-    const FetchRestaurantByGID = async (somegid) => {
 
-        try {
-            const q = query(collection(firestore, 'restaurants'), where("GoogleMapsID","==",somegid));
-			const restaurantSnapshot = await getDocs(q);
-        
-            if (!restaurantSnapshot.empty) {
-                const restaurantDoc = restaurantSnapshot.docs[0];
-                return restaurantDoc.id;
-            } else {
-                return '';
-            }
-        } catch (error) {
-            console.error("Error fetching restaurant: ", error);
-            return '';
-        }
-    };
+	const updateUserProfile = async (userName, newName, newImageUrl) => {
+		const userRef = doc(firestore, 'users', userName.toLowerCase());
+		// const userdoc = await getDoc(userRef);
+		// console.log(userdoc);
+		await updateDoc(userRef, {
+		 // userName: newName,
+		  profileImageUrl: newImageUrl,
+		});
+	  };
+
+
+
     const GetUsers = async () => {
         const usersCollection = collection(firestore, 'users');
         const usersSnapshot = await getDocs(usersCollection);
@@ -328,9 +305,9 @@ export const firestoreDB = () => {
         TryLoginUser,
         GetUserFriends,
         GetUserLists,
-        SubscribeToLists,
         LikePost,
         UnlikePost,
+		updateUserProfile,
         GetUserName,
         GetRestaurant,
         UpdateRestaurantContent,
@@ -342,7 +319,6 @@ export const firestoreDB = () => {
 		FetchRestaurants,
         GetRestaurantByID,
         AddRestaurant,
-        FetchRestaurantByGID,
     };
 };
 

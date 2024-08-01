@@ -1,4 +1,3 @@
-// UserProfileScreen.js
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import postsIcon from '../assets/icons/posts.png';
@@ -7,21 +6,29 @@ import myNetworkIcon from '../assets/icons/network.png';
 import { firestoreDB } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFonts } from 'expo-font';
-import { PanGestureHandler, ScrollView } from 'react-native-gesture-handler';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import * as ImagePicker from 'expo-image-picker';
 
 const UserProfileScreen = ({ route, navigation }) => {
+  const storage = getStorage();
   const { userName } = route.params;
   const [user, setUser] = useState(null);
-  const { isLoggedIn, logout, currentUser } = useContext(AuthContext);
+  const { isLoggedIn, currentUser } = useContext(AuthContext);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newImage, setNewImage] = useState(null);
+
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
     "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
     "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
-  })
-  if (!fontsLoaded){
-    return undefined;
+  });
+
+  if (!fontsLoaded) {
+    return null;
   }
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -34,28 +41,18 @@ const UserProfileScreen = ({ route, navigation }) => {
 
     fetchUserData();
   }, [userName]);
+
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX > 100) {
-      if(isLoggedIn){
+      if (isLoggedIn) {
         navigation.navigate('PostCreation');
-      }
-      else{
+      } else {
         navigation.navigate('MapView');
       }
-    }
-    else if (event.nativeEvent.translationX < -100) {
+    } else if (event.nativeEvent.translationX < -100) {
       navigation.navigate('HomeScreen');
     }
   };
-  const navigateToPostCreation = () => {
-    navigation.navigate('PostCreation');
-  };
-
-  const navigateToLoginScreen = () => {
-    navigation.navigate('LoginScreen');
-  };
-
-
 
   const navigateToScreen = (screen) => {
     if (screen === 'Posts') {
@@ -65,6 +62,40 @@ const UserProfileScreen = ({ route, navigation }) => {
     } else {
       navigation.navigate(screen, { userName });
     }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      const filename = uri.substring(uri.lastIndexOf('/') + 1);
+      const storageRef = ref(storage, `images/${filename}`);
+  
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      await uploadBytes(storageRef, blob);
+
+      const downloadURL = await getDownloadURL(storageRef);
+      setNewImage(downloadURL);
+    }
+  };
+
+  const saveChanges = async () => {
+    try {
+      await firestoreDB().updateUserProfile(currentUser.userName, user.name, newImage || user.profileImageUrl);
+      setUser({ ...user, profileImageUrl: newImage || user.profileImageUrl });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update user data:', error);
+    }
+    
   };
 
   if (!user) {
@@ -86,7 +117,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   const radius = Math.min(screenWidth, screenHeight) / 2.7;
 
   const buttonStyles = buttons.map((button, index) => {
-    const angle = (Math.PI) / (buttons.length - 1) * index - Math.PI; // Adjusted angle to start from top
+    const angle = (Math.PI) / (buttons.length - 1) * index - Math.PI;
     const x = radius * Math.cos(angle);
     const y = radius * Math.sin(angle);
     return {
@@ -98,9 +129,8 @@ const UserProfileScreen = ({ route, navigation }) => {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
-      <View style={{flex:1}}>
-        <View >
-          
+      <View style={{ flex: 1 }}>
+        <View>
           {buttons.map((button, index) => (
             <TouchableOpacity
               key={index}
@@ -112,12 +142,34 @@ const UserProfileScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           ))}
           <View style={styles.profileContainer}>
+          {currentUser && currentUser.userName === userName ? (
+            <Image source={{ uri: newImage || user.profileImageUrl }} style={styles.profileImage} />
+          ) : (
             <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
+          )}
             <Text style={styles.header}>{userName}</Text>
+            {currentUser && currentUser.userName === userName && (
+              <View style={styles.editButtonsContainer}>
+                {isEditing ? (
+                  <View>
+                    <TouchableOpacity onPress={pickImage} style={styles.actionButton}>
+                      <Text style={styles.actionButtonText}>Change Image</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={saveChanges} style={styles.actionButton}>
+                      <Text style={styles.actionButtonText}>Save</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.editButton}>
+                    <Text style={styles.editButtonText}>Edit Profile</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
           </View>
         </View>
-        <View style={{flex:1}}/>
-        <BottomBarComponent navigation={navigation} style={{justifyContent: 'flex-end'}}/>
+        <View style={{ flex: 1 }} />
+        <BottomBarComponent navigation={navigation} style={{ justifyContent: 'flex-end' }} />
       </View>
     </PanGestureHandler>
   );
@@ -133,7 +185,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     alignItems: 'center',
     marginBottom: 20,
-    top : 230
+    top: 230,
   },
   profileImage: {
     width: 200,
@@ -145,11 +197,37 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 24,
-  //  fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
     fontFamily: 'Oswald-Medium',
-
+  },
+  editButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  editButton: {
+    marginHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 5,
+  },
+  editButtonText: {
+    fontFamily: 'Oswald-Medium',
+    color: 'black',
+  },
+  actionButton: {
+    marginVertical: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    borderRadius: 5,
+    backgroundColor: 'white',
+  },
+  actionButtonText: {
+    fontFamily: 'Oswald-Medium',
+    color: 'black',
   },
   bottomBar: {
     flexDirection: 'row',
@@ -160,14 +238,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 20,
-    backgroundColor: '#fff', // צבע רקע לפס הרציף
-    elevation: 10, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
-  },
-  bottomBarButton: {
     backgroundColor: '#fff',
-    paddingVertical: 7,
-    paddingHorizontal: 15,
-    borderRadius: 8,
+    elevation: 10,
   },
   circleButton: {
     position: 'absolute',
@@ -189,7 +261,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 13,
     fontFamily: 'Oswald-Medium',
-
   },
 });
 
