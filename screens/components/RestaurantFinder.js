@@ -23,10 +23,9 @@ const haversineDistance = (coords1, coords2) => {
     return d;
 };
 
-const RestaurantFinder = ({textinputstyle,placeholder, Complete}) =>{
+const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset}) =>{
     const [SearchName, setSearch] = useState(null);
     const [location, setLocation] = useState(null);
-    const [placesUnsorted, setPlacesUnsorted] = useState(null);
     const [places, setPlaces] = useState(null);
     const [placeidx, setplaceidx] = useState(null);
 
@@ -88,6 +87,14 @@ const RestaurantFinder = ({textinputstyle,placeholder, Complete}) =>{
                 Complete({name: places[placeidx].displayName.text,id:restaurantId});
             };
             fetchData();
+            if(CompleteReset){
+                setSearch(null);
+                setLocation(null);
+                setPlaces(null);
+                setplaceidx(null);
+                setRestaurantId(null);
+                setLoading(true);
+            }
         }
         else{
             Complete({name: null,id:null});

@@ -1,135 +1,148 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet, Alert } from 'react-native';
 import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
 import { Timestamp } from 'firebase/firestore';
 import { useFonts } from 'expo-font';
+import RestaurantFinder from './components/RestaurantFinder';
+import { ScrollView } from 'react-native-gesture-handler';
+import BottomBarComponent from './components/BottomBar';
 
+const iconData = [
+  require('../assets/icons/sushilist.png'),
+  require('../assets/icons/drinklist.png'),
+  require('../assets/icons/dessertlist.png'),
+  require('../assets/icons/italianlist.png')
 
+  // Add more icons as needed
+];
+images = {
+  tri : require("../assets/icons/Tri1.png"),
+  editimage :require("../assets/icons/edit2.png"),
+  remove :require("../assets/icons/minus.png"),
+};
+const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,valueTextColor, style, fontWeight, fontSize, ...rest }) => {
+  const [value, setValue] = useState('');
+  const [placeholdertext, setPlaceholder] = useState(placeholder);
+  const Complete = (event) =>{
+    const text = event.nativeEvent.text;
+    if(text != ''){
+      setPlaceholder(text);
+      setValue('');
+      EndEdit(text);
+    }
+  };
+  return (
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',}}>
+          {editable ?
+          <Image
+            source={images.editimage}
+            style={{width:11,height:16,marginRight:3,marginLeft:style.marginLeft}}
+            resizeMode='contain'
+          />
+          : null}
+          <TextInput
+              placeholderTextColor={placeholderTextColor}
+              editable={editable}
+              value={value}
+              onChangeText={setValue}
+              placeholder={placeholdertext}
+              onEndEditing={Complete}
+              style={[
+              style,
+              {flex:1},
+              { color: valueTextColor },
+              fontWeight && { fontWeight },
+              fontSize && { fontSize },
+              ]}
+              {...rest}
+          />
+          
+    </View>
+  );
+  
+};
+const col2 = '#f9f9f9';
+const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinderComplete, navigation}) =>{
+  const [isOpen,SetIsOpen] = useState(false);
+  const FinderComplete = ({ id, name })=>{
+    return RestaurantFinderComplete({index,id,name});
+  };
+  const EndEditT = (text) =>{
+    EditTitle({text: text, index:index});
+  };
+  const EndEditD = (text) =>{
+    EditDescription({text: text, index:index});
+  };
+  return (
+    <View style={{backgroundColor: col2,borderRadius: 15,marginBottom:10}}>
+      <View style={{flexDirection: 'row', alignItems: 'center',padding:5,marginLeft:10}}>
+      
+        <Image source={iconData[item.Image]} style={{ width: 50, height: 50, borderRadius: 20, marginRight: 10 }} />
+        <View style={{flexDirection: 'column',justifyContent: 'center', flex:1}}>
+          <TextInputWithImage editable={isYou} EndEdit={EndEditT} style={{fontFamily:'Oswald-Medium',fontSize:20}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listName}/>
+          <TextInputWithImage editable={isYou} EndEdit={EndEditD} style={{fontFamily:'Oswald-Light',fontSize:16}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listDescription}/>
+        </View>
+        <TouchableOpacity onPress={() => SetIsOpen(!isOpen)}>
+          <Image source={images.tri} style={{ width: 20, height: 11,justifyContent: 'center', right:5,transform: [{rotate: isOpen ? '0deg' : '180deg' }]}} />
+        </TouchableOpacity>
+      </View>
+      <ListDetails isE={isOpen} list={item} navigation={navigation} isYou={isYou} RestaurantFinderComplete={FinderComplete}/>
+    </View>
+  );
+};
+const ListDetails = ({list,isE,isYou,RestaurantFinderComplete, navigation})=>{
+  const Delete = useCallback((index) =>{
+    if(index < list.items.length){
+      list.items.splice(index,1);
+      firestoreDB().updateListInFirebase(list.id,list.items);
+    }
+  });
+  const handleDeletePress = (index) => {
+    Delete(index);
+  };
 
-
+  if(!isE){
+    return <View/>
+  }
+  else{
+    return (
+      <View style={{marginLeft:30}}>
+        <FlatList
+          data={list.items}
+          renderItem={({ item, index }) => (
+            <View style={{flexDirection:'row',justifyContent:'center'}}>
+              <TouchableOpacity style={{paddingBottom:5}} onPress={()=>navigation.navigate('Restaurant', { restaurantName:null, restaurantID: item.id })}>
+                <Text style={{fontFamily:'Oswald-Light',fontSize:18}}>{item.name}</Text>
+              </TouchableOpacity>
+              <View style={{flex:1}}/>
+              {isYou ? 
+                <TouchableOpacity onPress={() =>handleDeletePress(index)}>
+                  <Image source={images.remove} style={{tintColor:'grey',width:15,height:4,marginRight:13}}/>
+                </TouchableOpacity>
+              : null}
+            </View>
+          )}
+          keyExtractor={item => item.id}
+        />
+        {isYou ? <RestaurantFinder Complete={RestaurantFinderComplete} CompleteReset={true} placeholder={"Add Restaurant"} textinputstyle={{fontFamily:'Oswald-Light',fontSize:18}} style={{marginBottom:5}}/> : null}
+      </View>
+    );
+  }
+};
 const MyListsScreen = ({ route, navigation }) => {
-
+  
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
     "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
     "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
   })
-  if (!fontsLoaded){
-    return undefined;
-  }
-
+  const [newItemID, setNewItemID] = useState(null);
+  const [newItemName, setNewItemName] = useState(null);
   const { user, profileImageUrl } = route.params;
   const [lists, setLists] = useState([]);
-  const [newListName, setNewListName] = useState('');
-  const [newItemText, setNewItemText] = useState('');
-  const [editItemId, setEditItemId] = useState(null);
-  const [editItemText, setEditItemText] = useState('');
-  const [selectedList, setSelectedList] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [createListModalVisible, setCreateListModalVisible] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState(null); // State for selected icon
-
-  const [listDescription, setNewlistDescription] = useState('');
-  const [rank, setListRank] = useState(0);
-  const [restCount, setRestCount] = useState(0);
-  const [savedCount, setSavedCount] = useState(0);
-  const [listPic, setListPic] = useState([]);
-  const [mediaTypes, setMediaTypes] = useState('');
-
   const [loading, setLoading] = useState(true);
-
   const { currentUser } = useContext(AuthContext);
-
-  const EditableListItem = ({ item, onSave, onCancel, onStartEdit, onDelete, isEditing, editItemText, setEditItemText, navigateToRestaurant }) => {
-    if (isEditing) {
-      return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-          <TextInput
-            style={{ flex: 1, height: 40, borderColor: 'gray', borderWidth: 1, padding: 5 }}
-            value={editItemText}
-            onChangeText={text => setEditItemText(text)}
-          />
-          <TouchableOpacity
-            style={{ backgroundColor: 'green', padding: 5, marginLeft: 10, borderRadius: 5 }}
-            onPress={onSave}
-          >
-            <Text style={{ color: 'white' }}>Save</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ backgroundColor: 'red', padding: 5, marginLeft: 10, borderRadius: 5 }}
-            onPress={onCancel}
-          >
-            <Text style={{ color: 'white' }}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    } else {
-    //  console.log(currentUser.userName);
-   //   console.log(selectedList.userName);
-   if(currentUser){
-       if (currentUser.userName === user.userName){
-      return (
-        <TouchableOpacity
-          style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}
-          onPress={() => navigateToRestaurant(item.name)}
-        >
-          <Text style={{ flex: 1, marginLeft: 10 }}>{item.name}</Text>
-          <TouchableOpacity
-            style={{ backgroundColor: 'blue', padding: 5, marginLeft: 10, borderRadius: 5 }}
-            onPress={onStartEdit}
-          >
-            <Text style={{ color: 'white' }}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ backgroundColor: 'red', padding: 5, marginLeft: 10, borderRadius: 5 }}
-            onPress={onDelete}
-          >
-            <Text style={{ color: 'white' }}>Delete</Text>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      );
-    }
-  }
-    else { //other user viewing elses lists
-      return (
-      <TouchableOpacity
-      style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}
-      onPress={() => navigateToRestaurant(item.name)}
-    >
-      <Text style={{ flex: 1, marginLeft: 10 }}>{item.name}</Text>
-      </TouchableOpacity>
-      );
-    } 
-
-    }
-  };
-
-  const createNewList = async (icon) => { // Create a new List, store it in the DB
-    if (newListName.trim() === '') {
-      alert('Please enter a valid list name');
-      return;
-    }
-    const newList = {
-      id: Math.random().toString(),
-      userName: currentUser.userName,
-      listName: newListName,
-      listDescription: listDescription,
-      rank: rank,
-      restCount: restCount,
-      savedCount: savedCount,
-      listPic: listPic,
-      items: [],
-      Image: icon,
-      profileImageUrl: currentUser.profileImageUrl,
-      createTime: Timestamp.now()
-    };
-
-    await firestoreDB().CreateList(newList);
-    setNewListName('');
-    setCreateListModalVisible(false);
-  };
-
   useEffect(() => { //fetch the list of user from the DB
     const fetchLists = async () => {
     //  if (!currentUser) return;
@@ -152,336 +165,56 @@ const MyListsScreen = ({ route, navigation }) => {
 
     return () => unsubscribe();
   }, [currentUser]);
-
-  const addItemToList = (listId) => {
-    if (newItemText.trim() === '') {
-      alert('Please enter a valid item name');
-      return;
+  const ReceiveRestaurantData= ({ index,id, name }) => {
+    if(id != null && name != null){
+      lists[index].items.push({id:id,name:name});
+      firestoreDB().updateListInFirebase(lists[index].id,lists[index].items);
+      setNewItemID(id);
+      setNewItemName(name);
+      
     }
-    const updatedLists = lists.map(list => {
-      if (list.id === listId) {
-        const updatedItems = [...list.items, { id: Date.now().toString(), name: newItemText }];
-        const updatedList = { ...list, items: updatedItems };
-        if (selectedList && selectedList.id === listId) {
-          setSelectedList(updatedList);
-        }
-        // Update the list in Firebase
-        firestoreDB().updateListInFirebase(listId, updatedItems);
-        return updatedList;
-      }
-      return list;
-    });
-    setNewItemText('');
   };
-
-  const startEditItem = (itemId, itemName) => {
-    setEditItemId(itemId);
-    setEditItemText(itemName);
+  const EditTitle = ({text, index}) => {
+    lists[index].listName = text;
+    firestoreDB().updateList(lists[index]);
   };
-
-  const saveEditItem = () => {
-    const updatedLists = lists.map(list => {
-      const updatedItems = list.items.map(item =>
-        item.id === editItemId ? { ...item, name: editItemText } : item
-      );
-      if (list.id === selectedList.id) {
-        // Update the list in Firebase
-        firestoreDB().updateListInFirebase(list.id, updatedItems);
-      }
-      return { ...list, items: updatedItems };
-    });
-    setLists(updatedLists);
-    setEditItemId(null);
-    setEditItemText('');
+  const EditDescription = ({text, index}) => {
+    lists[index].listDescription = text;
+    firestoreDB().updateList(lists[index]);
   };
-
-  const cancelEditItem = () => {
-    setEditItemId(null);
-    setEditItemText('');
-  };
-
-  const deleteItem = (listId, itemId) => {
-    const updatedLists = lists.map(list => {
-      const updatedItems = list.items.filter(item => item.id !== itemId);
-      if (list.id === listId) {
-        // Update the list in Firebase
-        firestoreDB().updateListInFirebase(listId, updatedItems);
-      }
-      return list.id === listId ? { ...list, items: updatedItems } : list;
-    });
-    setLists(updatedLists);
-  };
-
-  const openList = (list) => {
-    setSelectedList(list);
-    setModalVisible(true);
-  };
-
-  const closeList = () => {
-    setSelectedList(null);
-    setModalVisible(false);
-  };
-
-  const navigateToRestaurant = (restaurantName) => {
-    navigation.navigate('Restaurant', { restaurantName });
-  };
-
-  const renderDefaultButtons = () => (
-    <View style={styles.buttonsContainer}>
-      {lists.map((list, index) => (
-        <TouchableOpacity
-          key={list.id}
-          style={[styles.categoryButtonIcon, {
-            left: 165 + 140 * Math.cos((index * 2 * Math.PI) / lists.length),
-            bottom: 340 + 140 * Math.sin((index * 2 * Math.PI) / lists.length),
-          }]}
-          onPress={() => openList(list)}
-        >
-          <Image source={list.Image} style={{ width: 30, height: 30 }} />
-        </TouchableOpacity>
-      ))}
-      {currentUser && user.userName.toLowerCase() === currentUser.userName.toLowerCase() && ( //only curr user can add lists to his own page
-        <TouchableOpacity
-          style={[styles.categoryButtonIcon, {
-            right: 20,
-            top: -30,
-          }]}
-          onPress={() => setCreateListModalVisible(true)}
-        >
-          <Image source={require('../assets/icons/pluslists.png')} style={styles.categoryButtonIcon} />
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-  
-
-  const renderItemList = () => (
-    <FlatList
-      data={selectedList?.items || []}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <EditableListItem
-          item={item}
-          onSave={saveEditItem}
-          onCancel={cancelEditItem}
-          onStartEdit={() => startEditItem(item.id, item.name)}
-          onDelete={() => deleteItem(selectedList.id, item.id)}
-          isEditing={editItemId === item.id}
-          editItemText={editItemText}
-          setEditItemText={setEditItemText}
-          navigateToRestaurant={navigateToRestaurant}
-        />
-      )}
-    />
-  );
-
-  // const handleSubmit = async () => {
-  //   if (!restaurantName || stars <= 0 || !content || mediaUris.length === 0) {
-  //     Alert.alert('Error', 'Please fill in all fields and select at least one image, video, or GIF');
-  //     return;
-  //   }
-
-  //   const newList = {
-  //     id: Math.random().toString(),
-  //     userName: currentUser.userName,
-  //     ListName: listName,
-  //     listDescription : listDescription,
-	// 		rank: rank,
-	// 		restCount: restCount,
-	// 		savedCount : savedCount,
-  //     stars: stars,
-  //     content: content,
-  //     listPic: listPic,
-  //     mediaType: mediaTypes,
-  //   };
-
-  //   await firestoreDB().CreateList(newList);
-  //   navigation.goBack();
-  // };
-
-
-  // Render the main content
-  if(currentUser){
-    if (currentUser.userName === user.userName){ //current user logged in to his lists page
+  const isYou = currentUser != null && currentUser.userName === user.userName;
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
-      {renderDefaultButtons()}
-
-      <Modal  //List Window
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={closeList}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.listTitle}>{selectedList?.name}</Text>
-            {renderItemList()}
-            <TextInput
-              style={styles.input}
-              placeholder="Enter new item"
-              value={newItemText}
-              onChangeText={text => setNewItemText(text)}
-            />
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => addItemToList(selectedList.id)}
-            >
-              <Text style={styles.addButtonText}>Add Item</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={closeList}
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
+    <View style={{justifyContent: 'flex-end',flex: 1}}>
+      <View style={{flexDirection: 'row', alignItems: 'center',padding:5}}>
+        <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
+        <View style={{ flex: 1, alignItems: 'center' }}>
+          <Text style={styles.titletext}>
+            {isYou ? `Your Lists` : `${user.userName}'s Lists`}
+          </Text>
         </View>
-      </Modal>
-
-      <Modal  //Create New List window
-        animationType="slide" 
-        transparent={true}
-        visible={createListModalVisible}
-        onRequestClose={() => setCreateListModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.listTitle}>Create New List</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter new list name"
-              value={newListName}
-              onChangeText={text => setNewListName(text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Enter description"
-              value={listDescription}
-              onChangeText={text => setNewlistDescription(text)}
-            />
-            {/* Display icons for selection */}
-            <View style={styles.iconSelectionContainer}>
-              {iconData.map((icon, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.iconOption}
-                  onPress={() => setSelectedIcon(icon)}
-                >
-                  <Image source={icon} style={{ width: 30, height: 30 }} />
-                </TouchableOpacity>
-              ))}
-            </View>
-            <TouchableOpacity
-              style={styles.createButton}
-              onPress={() => createNewList(selectedIcon)} // Pass selectedIcon to createNewList function
-            >
-              <Text style={styles.createButtonText}>Create New List</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setCreateListModalVisible(false)}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      </View>
+      <View style={{...styles.separator,marginBottom:10}} />
+      <FlatList
+        data={lists}
+        renderItem={({ item,index }) => <RenderList EditTitle={EditTitle} EditDescription={EditDescription} index={index} item={item} isYou={isYou} RestaurantFinderComplete={ReceiveRestaurantData} navigation={navigation}/>}
+        keyExtractor={item => item.id}
+      />
+      <View style={{flex:1}} />
+      <BottomBarComponent navigation={navigation}/>
     </View>
   );
-}
-  }
-  else{ //someone's viewing other lists
-    return (
-      <View style={styles.container}>
-        <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
-        {renderDefaultButtons()}
   
-        <Modal  //List Window
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={closeList}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.listTitle}>{selectedList?.name}</Text>
-              {renderItemList()}
-
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={closeList}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-  
-        <Modal  //Create New List window
-          animationType="slide" 
-          transparent={true}
-          visible={createListModalVisible}
-          onRequestClose={() => setCreateListModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.listTitle}>Create New List</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter new list name"
-                value={newListName}
-                onChangeText={text => setNewListName(text)}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Enter description"
-                value={listDescription}
-                onChangeText={text => setNewlistDescription(text)}
-              />
-              {/* Display icons for selection */}
-              <View style={styles.iconSelectionContainer}>
-                {iconData.map((icon, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.iconOption}
-                    onPress={() => setSelectedIcon(icon)}
-                  >
-                    <Image source={icon} style={{ width: 30, height: 30 }} />
-                  </TouchableOpacity>
-                ))}
-              </View>
-              <TouchableOpacity
-                style={styles.createButton}
-                onPress={() => createNewList(selectedIcon)} // Pass selectedIcon to createNewList function
-              >
-                <Text style={styles.createButtonText}>Create New List</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setCreateListModalVisible(false)}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-      </View>
-  );
-};
 };
 
-const iconData = [
-  require('../assets/icons/sushilist.png'),
-  require('../assets/icons/drinklist.png'),
-  require('../assets/icons/dessertlist.png'),
-  require('../assets/icons/italianlist.png')
 
-  // Add more icons as needed
-];
+
 
 const styles = StyleSheet.create({
+  titletext :{
+    fontFamily: 'Oswald-Medium',
+    alignSelf: 'center',
+    fontSize: 30,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -489,11 +222,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     
   },
+  separator: {
+    height: 2,
+    backgroundColor: '#C0C0C0',
+  },
   profileImage: {
-    width: 200,
-    height: 200,
+    width: 80,
+    height: 80,
     borderRadius: 100,
-    marginBottom: 20,
   },
   modalContainer: {
     flex: 1,

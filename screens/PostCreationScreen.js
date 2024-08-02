@@ -175,7 +175,7 @@ const PostCreationScreen = ({ navigation }) => {
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.label}>Restaurant</Text>
-        <RestaurantFinder textinputstyle={styles.input} placeholder="Enter restaurant name" Complete={ReceiveRestaurantData}/>
+        <RestaurantFinder textinputstyle={styles.input} placeholder="Enter restaurant name" Complete={ReceiveRestaurantData} CompleteReset={false}/>
 
         
 
