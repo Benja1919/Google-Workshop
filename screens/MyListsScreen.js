@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet, Alert } from 'react-native';
 import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
@@ -7,6 +7,7 @@ import { useFonts } from 'expo-font';
 import RestaurantFinder from './components/RestaurantFinder';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomBarComponent from './components/BottomBar';
+
 const iconData = [
   require('../assets/icons/sushilist.png'),
   require('../assets/icons/drinklist.png'),
@@ -18,6 +19,7 @@ const iconData = [
 images = {
   tri : require("../assets/icons/Tri1.png"),
   editimage :require("../assets/icons/edit2.png"),
+  remove :require("../assets/icons/minus.png"),
 };
 const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,valueTextColor, style, fontWeight, fontSize, ...rest }) => {
   const [value, setValue] = useState('');
@@ -90,6 +92,16 @@ const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinde
   );
 };
 const ListDetails = ({list,isE,isYou,RestaurantFinderComplete, navigation})=>{
+  const Delete = useCallback((index) =>{
+    if(index < list.items.length){
+      list.items.splice(index,1);
+      firestoreDB().updateListInFirebase(list.id,list.items);
+    }
+  });
+  const handleDeletePress = (index) => {
+    Delete(index);
+  };
+
   if(!isE){
     return <View/>
   }
@@ -99,9 +111,17 @@ const ListDetails = ({list,isE,isYou,RestaurantFinderComplete, navigation})=>{
         <FlatList
           data={list.items}
           renderItem={({ item, index }) => (
-            <TouchableOpacity style={{paddingBottom:5}} onPress={()=>navigation.navigate('Restaurant', { restaurantName:null, restaurantID: item.id })}>
-              <Text style={{fontFamily:'Oswald-Light',fontSize:18}}>{item.name}</Text>
-            </TouchableOpacity>
+            <View style={{flexDirection:'row',justifyContent:'center'}}>
+              <TouchableOpacity style={{paddingBottom:5}} onPress={()=>navigation.navigate('Restaurant', { restaurantName:null, restaurantID: item.id })}>
+                <Text style={{fontFamily:'Oswald-Light',fontSize:18}}>{item.name}</Text>
+              </TouchableOpacity>
+              <View style={{flex:1}}/>
+              {isYou ? 
+                <TouchableOpacity onPress={() =>handleDeletePress(index)}>
+                  <Image source={images.remove} style={{tintColor:'grey',width:15,height:4,marginRight:13}}/>
+                </TouchableOpacity>
+              : null}
+            </View>
           )}
           keyExtractor={item => item.id}
         />
