@@ -7,25 +7,79 @@ import { useFonts } from 'expo-font';
 import RestaurantFinder from './components/RestaurantFinder';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomBarComponent from './components/BottomBar';
+const iconData = [
+  require('../assets/icons/sushilist.png'),
+  require('../assets/icons/drinklist.png'),
+  require('../assets/icons/dessertlist.png'),
+  require('../assets/icons/italianlist.png')
+
+  // Add more icons as needed
+];
 images = {
   tri : require("../assets/icons/Tri1.png"),
+  editimage :require("../assets/icons/edit2.png"),
 };
-
-const col2 = '#fbfbfb';
-const RenderList = ({item,index,isYou, RestaurantFinderComplete, navigation}) =>{
+const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,valueTextColor, style, fontWeight, fontSize, ...rest }) => {
+  const [value, setValue] = useState('');
+  const [placeholdertext, setPlaceholder] = useState(placeholder);
+  const Complete = (event) =>{
+    const text = event.nativeEvent.text;
+    if(text != ''){
+      setPlaceholder(text);
+      setValue('');
+      EndEdit(text);
+    }
+  };
+  return (
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',}}>
+          {editable ?
+          <Image
+            source={images.editimage}
+            style={{width:11,height:16,marginRight:3,marginLeft:style.marginLeft}}
+            resizeMode='contain'
+          />
+          : null}
+          <TextInput
+              placeholderTextColor={placeholderTextColor}
+              editable={editable}
+              value={value}
+              onChangeText={setValue}
+              placeholder={placeholdertext}
+              onEndEditing={Complete}
+              style={[
+              style,
+              {flex:1},
+              { color: valueTextColor },
+              fontWeight && { fontWeight },
+              fontSize && { fontSize },
+              ]}
+              {...rest}
+          />
+          
+    </View>
+  );
+  
+};
+const col2 = '#f9f9f9';
+const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinderComplete, navigation}) =>{
   const [isOpen,SetIsOpen] = useState(false);
   const FinderComplete = ({ id, name })=>{
     return RestaurantFinderComplete({index,id,name});
   };
-
+  const EndEditT = (text) =>{
+    EditTitle({text: text, index:index});
+  };
+  const EndEditD = (text) =>{
+    EditDescription({text: text, index:index});
+  };
   return (
     <View style={{backgroundColor: col2,borderRadius: 15,marginBottom:10}}>
       <View style={{flexDirection: 'row', alignItems: 'center',padding:5,marginLeft:10}}>
       
-        <Image source={item.Image} style={{ width: 50, height: 50, borderRadius: 20, marginRight: 10 }} />
+        <Image source={iconData[item.Image]} style={{ width: 50, height: 50, borderRadius: 20, marginRight: 10 }} />
         <View style={{flexDirection: 'column',justifyContent: 'center', flex:1}}>
-          <Text style={{fontFamily:'Oswald-Medium',fontSize:20}}>{item.listName}</Text>
-          <Text style={{fontFamily:'Oswald-Light',fontSize:16}}>{item.listDescription}</Text>
+          <TextInputWithImage editable={isYou} EndEdit={EndEditT} style={{fontFamily:'Oswald-Medium',fontSize:20}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listName}/>
+          <TextInputWithImage editable={isYou} EndEdit={EndEditD} style={{fontFamily:'Oswald-Light',fontSize:16}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listDescription}/>
         </View>
         <TouchableOpacity onPress={() => SetIsOpen(!isOpen)}>
           <Image source={images.tri} style={{ width: 20, height: 11,justifyContent: 'center', right:5,transform: [{rotate: isOpen ? '0deg' : '180deg' }]}} />
@@ -100,7 +154,15 @@ const MyListsScreen = ({ route, navigation }) => {
       
     }
   };
-  const isYou = currentUser && currentUser.userName === user.userName
+  const EditTitle = ({text, index}) => {
+    lists[index].listName = text;
+    firestoreDB().updateList(lists[index]);
+  };
+  const EditDescription = ({text, index}) => {
+    lists[index].listDescription = text;
+    firestoreDB().updateList(lists[index]);
+  };
+  const isYou = currentUser != null && currentUser.userName === user.userName;
   return (
     <View style={{justifyContent: 'flex-end',flex: 1}}>
       <View style={{flexDirection: 'row', alignItems: 'center',padding:5}}>
@@ -114,7 +176,7 @@ const MyListsScreen = ({ route, navigation }) => {
       <View style={{...styles.separator,marginBottom:10}} />
       <FlatList
         data={lists}
-        renderItem={({ item,index }) => <RenderList index={index} item={item} isYou={isYou} RestaurantFinderComplete={ReceiveRestaurantData} navigation={navigation}/>}
+        renderItem={({ item,index }) => <RenderList EditTitle={EditTitle} EditDescription={EditDescription} index={index} item={item} isYou={isYou} RestaurantFinderComplete={ReceiveRestaurantData} navigation={navigation}/>}
         keyExtractor={item => item.id}
       />
       <View style={{flex:1}} />
@@ -125,14 +187,7 @@ const MyListsScreen = ({ route, navigation }) => {
 };
 
 
-const iconData = [
-  require('../assets/icons/sushilist.png'),
-  require('../assets/icons/drinklist.png'),
-  require('../assets/icons/dessertlist.png'),
-  require('../assets/icons/italianlist.png')
 
-  // Add more icons as needed
-];
 
 const styles = StyleSheet.create({
   titletext :{

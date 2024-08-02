@@ -170,16 +170,29 @@ export const firestoreDB = () => {
 		}
 	  };
 
-	  const updateListInFirebase = async (listId, updatedItems) => {
-		try {
-		  const listRef = doc(firestore, 'usersLists', listId);
-		  await updateDoc(listRef, {
-			items: updatedItems,
-		  });
-		} catch (error) {
-		  console.error('Error updating list in Firebase:', error);
-		}
-	  };
+    const updateListInFirebase = async (listId, updatedItems) => {
+        try {
+            const listRef = doc(firestore, 'usersLists', listId);
+            await updateDoc(listRef, {
+            items: updatedItems,
+            });
+        } catch (error) {
+            console.error('Error updating list in Firebase:', error);
+        }
+    };
+    const updateList = async (list) => {
+        try {
+            
+            const listDoc = doc(firestore, 'usersLists', list.id);
+            updateddata = {
+                listDescription : list.listDescription,
+                listName : list.listName,
+            };
+            await setDoc(listDoc, updateddata, { merge: true });
+        } catch (error) {
+            console.error('Error updating list in Firebase:', error);
+        }
+    };
     const CreateUser = async (user) => {
         const userDoc = doc(firestore, 'users', user.userName.toLowerCase())
         await setDoc(userDoc, user);
@@ -353,6 +366,7 @@ export const firestoreDB = () => {
         AddRestaurant,
         FetchRestaurantByGID,
         SubscribeToLists,
+        updateList,
     };
 };
 
