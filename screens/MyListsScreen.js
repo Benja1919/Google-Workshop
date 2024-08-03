@@ -19,6 +19,7 @@ const iconData = [
   require('../assets/icons/meatlist.png'),
   require('../assets/icons/pizzalist.png'),
   require('../assets/icons/veganlist.png'),
+  require('../assets/icons/favoritelist.png'),
 ];
 const images = {
   tri : require("../assets/icons/Tri1.png"),
