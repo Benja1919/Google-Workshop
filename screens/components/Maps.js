@@ -142,7 +142,7 @@ export const GetPlaces = (restaurant) => {
                 const headers = {
                     'Content-Type': 'application/json',
                     'X-Goog-Api-Key': apiKey,
-                    'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location'
+                    'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.addressComponents'
                 };
                 const body = JSON.stringify({
                     textQuery: textQuery,

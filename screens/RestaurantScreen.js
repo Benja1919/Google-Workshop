@@ -166,15 +166,22 @@ const RestaurantScreen = ({ route, navigation }) => {
       </View>
       <Text style={styles.sectionTitle}>Opening Times</Text>
           <OpeningTimes restaurant={restaurant} Globaloh={OpeningTime} isGlobalOpen={OpenNow} isEditable ={false}/>
+      {(Phone || Website) && 
       <Text style={styles.sectionTitle}>Contact</Text>
+      }
       <View style={{...styles.item,padding:5}} >
-        <TouchableOpacity  onPress={()=>{Linking.openURL(`tel:${Phone}`)}} >
-          <Text style={{...styles.details,marginLeft:10,padding:2}}>Phone: {Phone}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity  onPress={()=>{Linking.openURL(Website)}} >
-          <Text style={{...styles.details,marginLeft:10,padding:2}}>Website: {Website}</Text>
-        </TouchableOpacity>
+        {Phone && 
+          <TouchableOpacity  onPress={()=>{Linking.openURL(`tel:${Phone}`)}} >
+            <Text style={{...styles.details,marginLeft:10,padding:2}}>Phone: {Phone}</Text>
+          </TouchableOpacity>
+        }
+        {Website && 
+          <TouchableOpacity  onPress={()=>{Linking.openURL(Website)}} >
+            <Text style={{...styles.details,marginLeft:10,padding:2}}>Website: {Website}</Text>
+          </TouchableOpacity>
+        }
       </View>
+      
       <Text style={styles.sectionTitle}>Rating</Text>
       <View style={{...styles.item,padding:10}}>
         <Text style={{...styles.details,marginLeft:10}}>CommunEATy: {restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>

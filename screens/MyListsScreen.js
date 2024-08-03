@@ -200,7 +200,7 @@ const ListDetails = ({list,isE,isYou,RestaurantFinderComplete, navigation})=>{
           )}
           keyExtractor={item => item.id}
         />
-        {isYou ? <RestaurantFinder Complete={RestaurantFinderComplete} CompleteReset={true} placeholder={"Add Restaurant"} textinputstyle={{fontFamily:'Oswald-Light',fontSize:18}} style={{marginBottom:5}}/> : null}
+        {isYou ? <RestaurantFinder Complete={RestaurantFinderComplete} CompleteReset={true} returnCity={true} placeholder={"Add Restaurant"} textinputstyle={{fontFamily:'Oswald-Light',fontSize:18}} style={{marginBottom:5}}/> : null}
       </View>
     );
   }
@@ -265,8 +265,9 @@ const MyListsScreen = ({ route, navigation }) => {
         ...newLists[index],
         items: [...newLists[index].items, { id: id, name: name }],
       };
+      
       setLists(newLists);
-      firestoreDB().updateListInFirebase(lists[index].id,lists[index].items);
+      firestoreDB().updateListInFirebase(newLists[index].id,newLists[index].items);
       setNewItemID(id);
       setNewItemName(name);
       

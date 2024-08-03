@@ -23,7 +23,7 @@ const haversineDistance = (coords1, coords2) => {
     return d;
 };
 
-const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset}) =>{
+const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset, returnCity}) =>{
     const [SearchName, setSearch] = useState(null);
     const [location, setLocation] = useState(null);
     const [places, setPlaces] = useState(null);
@@ -79,12 +79,31 @@ const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset})
             fetchData();
         }
     }, [restaurantId]);
-    //sending id to parent
+    const GetCity = (place) =>{
+        const cityComponent = place.addressComponents.find(component =>
+            component.types.includes('locality')
+        );
+        if(cityComponent != undefined){
+            return cityComponent.longText;
+        }
+        const sublocality =  place.addressComponents.find(component =>
+            component.types.includes('sublocality_level_1')
+        );
+        if(sublocality != undefined){
+            return sublocality.longText;
+        }
+        return null;
+    };
     useEffect(() => {
         if(restaurantId != null && restaurantId != ''){
-            
             const fetchData = async () => {
-                Complete({name: places[placeidx].displayName.text,id:restaurantId});
+                if(returnCity){
+                    const city = GetCity(places[placeidx]);
+                    Complete({name: `${places[placeidx].displayName.text}${city != null?`(${city})` : ''}`,id:restaurantId});
+                }
+                else{
+                    Complete({name: places[placeidx].displayName.text,id:restaurantId});
+                }
             };
             fetchData();
             if(CompleteReset){
@@ -137,11 +156,11 @@ const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset})
         );
     }
     else if(placeidx != null){
-        
+        const city = GetCity(places[placeidx]);
         return(
             <TextInput
             style={{...textinputstyle}}
-            placeholder={places[placeidx].displayName.text}
+            placeholder={`${places[placeidx].displayName.text}${city != null?`(${city})` : ''}`}
             onEndEditing={EndEdit}
             />
         );
