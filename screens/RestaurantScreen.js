@@ -191,10 +191,12 @@ const RestaurantScreen = ({ route, navigation }) => {
         horizontal
         style={{...styles.item,padding:15}}
       />
+      
       <Text style={styles.sectionTitle}>Posts</Text>
 
       {/* Display posts for the specific restaurant */}
       <PostsScreen navigation={navigation} route={{ params: { filterrestaurantID: restaurantID } }} isScrollEnabled={false}/>
+      <Text style={{fontSize:30}}></Text>
     </ScrollView>
   );
 };
