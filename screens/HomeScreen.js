@@ -14,7 +14,7 @@ const HomeScreen = ({ navigation }) => {
     }
     else if (event.nativeEvent.translationX > 50) {
       if(isLoggedIn){
-        const name = currentUser.userName
+        const name = currentUser.userName.toLowerCase();
         navigation.navigate('UserProfile', { userName: name });
       }
       else{

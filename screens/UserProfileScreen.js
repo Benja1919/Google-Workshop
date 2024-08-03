@@ -10,14 +10,21 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFonts } from 'expo-font';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
+import { doc, updateDoc } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+
+// Initialize Firestore
+const firestore = getFirestore();
 
 const UserProfileScreen = ({ route, navigation }) => {
   const storage = getStorage();
   const { userName } = route.params;
   const [user, setUser] = useState(null);
+  const [users, setUsers] = useState([]);
   const { isLoggedIn, currentUser } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
   const [newImage, setNewImage] = useState(null);
+  const [followedUsers, setFollowedUsers] = useState(new Set());
 
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
@@ -34,6 +41,7 @@ const UserProfileScreen = ({ route, navigation }) => {
       try {
         const userData = await firestoreDB().GetUserName(userName);
         setUser(userData);
+
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       }
@@ -41,6 +49,28 @@ const UserProfileScreen = ({ route, navigation }) => {
 
     fetchUserData();
   }, [userName]);
+
+  useEffect(() => { //fetch the list of user from the DB
+    // Function to fetch friends from DB
+    const fetchFriends = async () => {
+      try {
+        const friendsList = await firestoreDB().GetUserFriends(userName.toLowerCase()); // Fetch friends data
+  
+        setUsers(friendsList);
+        const followedSet = new Set(currentUser?.friends || []);
+        setFollowedUsers(followedSet);
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+      }
+    };
+  
+      fetchFriends();
+      const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
+        setUsers(friendsList);
+      }, userName);
+  
+      return () => unsubscribe();
+    }, [userName, currentUser]);
 
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX > 100) {
@@ -98,6 +128,43 @@ const UserProfileScreen = ({ route, navigation }) => {
     
   };
 
+
+  const handleFollow = async (user) => {
+    try {
+      const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
+      const currentFriends = currentUser?.friends || [];
+      if (!currentFriends.includes(user.userName)) {
+        await updateDoc(userRef, {
+          friends: [...currentFriends, user.userName],
+        });
+        setFollowedUsers(prev => new Set([...prev, user.userName]));
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
+    }
+  };
+  
+  const handleUnfollow = async (user) => {
+    try {
+      const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
+      const updatedFriends = (currentUser?.friends || []).filter(
+        (friend) => friend !== user.userName
+      );
+      await updateDoc(userRef, {
+        friends: updatedFriends,
+      });
+      setFollowedUsers(prev => new Set(updatedFriends));
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+    }
+  };
+
+  const isFollowing = (user) => {
+    //console.log(followedUsers.has(user.userName));
+    //console.log(followedUsers);
+    return followedUsers.has(user.userName);
+  };
+
   if (!user) {
     return (
       <View style={styles.container}>
@@ -142,13 +209,13 @@ const UserProfileScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           ))}
           <View style={styles.profileContainer}>
-          {currentUser && currentUser.userName === userName ? (
-            <Image source={{ uri: newImage || user.profileImageUrl }} style={styles.profileImage} />
-          ) : (
-            <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
-          )}
+            {currentUser && currentUser.userName === userName ? (
+              <Image source={{ uri: newImage || user.profileImageUrl }} style={styles.profileImage} />
+            ) : (
+              <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
+            )}
             <Text style={styles.header}>{userName}</Text>
-            {currentUser && currentUser.userName === userName && (
+            {currentUser && currentUser.userName === userName ? (
               <View style={styles.editButtonsContainer}>
                 {isEditing ? (
                   <View>
@@ -165,6 +232,31 @@ const UserProfileScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 )}
               </View>
+            ) : (
+              currentUser && (
+                <View style={styles.buttonsContainer}>
+                  {isFollowing(user) ? (
+                    <>
+                      <TouchableOpacity style={styles.followingButton}>
+                        <Text style={styles.followingButtonText}>Following</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.unfollowButton}
+                        onPress={() => handleUnfollow(user)}
+                      >
+                        <Text style={styles.unfollowButtonText}>Unfollow</Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.followButton}
+                      onPress={() => handleFollow(user)}
+                    >
+                      <Text style={styles.followButtonText}>Follow</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )
             )}
           </View>
         </View>
@@ -178,28 +270,66 @@ const UserProfileScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    fontFamily: "Oswald-Bold",
+    textAlign: 'center',
+    margin: 10,
+  },
+  icon: {
+    width: 20,
+    height: 20,
   },
   profileContainer: {
     alignItems: 'center',
-    marginBottom: 20,
-    top: 230,
+    marginTop: 225,
   },
   profileImage: {
     width: 200,
     height: 200,
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: '#000000',
+    borderRadius: 200,
     marginBottom: 10,
   },
-  header: {
-    fontSize: 24,
-    marginBottom: 10,
-    textAlign: 'center',
-    fontFamily: 'Oswald-Medium',
+  followButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    margin: 5,
+  },
+  followButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: "Oswald-Medium",
+  },
+  followingButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    margin: 5,
+  },
+  followingButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: "Oswald-Medium",
+  },
+  unfollowButton: {
+    backgroundColor: '#FF0000',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    margin: 5,
+  },
+  unfollowButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: "Oswald-Medium",
   },
   editButtonsContainer: {
     flexDirection: 'row',

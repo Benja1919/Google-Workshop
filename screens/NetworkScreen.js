@@ -39,11 +39,12 @@ const NetworkScreen = ({ navigation, route }) => {
   const navigateToProfile = (userName) => {
     navigation.navigate('UserProfile', { userName });
   };
-
+  useEffect(() => { //fetch the list of user from the DB
   // Function to fetch friends from DB
   const fetchFriends = async () => {
     try {
       const friendsList = await firestoreDB().GetUserFriends(userName.toLowerCase()); // Fetch friends data
+
       setUsers(friendsList);
       const followedSet = new Set(currentUser?.friends || []);
       setFollowedUsers(followedSet);
@@ -52,39 +53,31 @@ const NetworkScreen = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
     fetchFriends();
+    const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
+      setUsers(friendsList);
+      console.log(followedUsers);
+    }, [userName]);
+
+    return () => unsubscribe();
   }, [userName]); // Add userName as a dependency
 
-  // Function to select a user
-  const selectUser = (user) => {
-    setUserSelected(user);
-    setModalVisible(true);
-  };
 
-  // Function to check if the current user is following the displayed user
-  const isFollowing = (user) => {
-    return followedUsers.has(user.userName);
-  };
-
-  // Function to follow a user
   const handleFollow = async (user) => {
     try {
       const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
       const currentFriends = currentUser?.friends || [];
-      // Avoid adding duplicate entries
       if (!currentFriends.includes(user.userName)) {
         await updateDoc(userRef, {
           friends: [...currentFriends, user.userName],
         });
-        setFollowedUsers(new Set([...followedUsers, user.userName]));
+        setFollowedUsers(prev => new Set([...prev, user.userName]));
       }
     } catch (error) {
       console.error('Error following user:', error);
     }
   };
-
-  // Function to unfollow a user
+  
   const handleUnfollow = async (user) => {
     try {
       const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
@@ -94,12 +87,26 @@ const NetworkScreen = ({ navigation, route }) => {
       await updateDoc(userRef, {
         friends: updatedFriends,
       });
-      setFollowedUsers(new Set(updatedFriends));
+      setFollowedUsers(prev => new Set(updatedFriends));
     } catch (error) {
       console.error('Error unfollowing user:', error);
     }
   };
 
+  
+
+  // Function to select a user
+  const selectUser = (user) => {
+    setUserSelected(user);
+    setModalVisible(true);
+  };
+
+  // Function to check if the current user is following the displayed user
+  const isFollowing = (user) => {
+    //console.log(followedUsers);
+    return followedUsers.has(user.userName);
+  };
+  
   return (
     <View style={styles.container}>
       <FlatList
