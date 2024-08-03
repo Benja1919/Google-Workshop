@@ -55,15 +55,14 @@ const UserProfileScreen = ({ route, navigation }) => {
         console.error('Error fetching friends:', error);
       }
     };
-  
-      fetchFriends();
-      const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
-        const followedSet = new Set(friendsList || []);
-        //console.log(followedSet);
-        setFollowedUsers(followedSet);
-      }, currentUser.userName);
-  
-      return () => unsubscribe();
+    fetchFriends();
+    const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
+      const followedSet = new Set(friendsList || []);
+      //console.log(followedSet);
+      setFollowedUsers(followedSet);
+    }, currentUser?.userName);
+
+    return () => unsubscribe();
     }, [userName, currentUser]);
 
   const onGestureEvent = (event) => {

@@ -366,8 +366,10 @@ export const firestoreDB = () => {
     };
 
     const SubscribeToFriends = (callback, userName) => {
+        if (userName == null)
+            return () => {return null;};
         const userDocRef = doc(firestore, 'users', userName.toLowerCase());
-        return onSnapshot(userDocRef, async (snapshot) => {
+        return onSnapshot(userDocRef, (snapshot) => {
             userDoc = snapshot;
             const userData = userDoc.data();
             callback(userData.friends);

@@ -38,7 +38,6 @@ const NetworkScreen = ({ navigation, route }) => {
   const fetchFriends = async () => {
     try {
       const friendsList = await firestoreDB().GetUserFriends(userName.toLowerCase()); // Fetch friends data
-
       setUsers(friendsList);
       const followedSet = new Set(currentUser?.friends || []);
       setFollowedUsers(followedSet);
@@ -47,13 +46,13 @@ const NetworkScreen = ({ navigation, route }) => {
     }
   };
 
-    fetchFriends();
-    const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
-      const followedSet = new Set(friendsList || []);
-      setFollowedUsers(followedSet);
-    }, currentUser.userName);
+  fetchFriends();
+  const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
+    const followedSet = new Set(friendsList || []);
+    setFollowedUsers(followedSet);
+  }, currentUser?.userName);
 
-    return () => unsubscribe();
+  return () => unsubscribe();
   }, [userName]); // Add userName as a dependency
 
 
