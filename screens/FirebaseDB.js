@@ -1,12 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-<<<<<<< HEAD
-import { AuthContext } from './AuthContext';
-import { collection, onSnapshot, getDocs, doc, getDoc, addDoc, updateDoc, setDoc, query, where, orderBy,limit } from 'firebase/firestore';
-=======
 import { collection, onSnapshot, getDocs, doc, getDoc, deleteDoc, addDoc, updateDoc, setDoc, query, where, orderBy,limit } from 'firebase/firestore';
->>>>>>> 4a133aa2326b119e61d0a6a6c1b6cbe9f227ba87
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -21,7 +16,6 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const firestore = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
-
 
 export const firestoreDB = () => {
     const GetPosts = async () => {
@@ -111,13 +105,12 @@ export const firestoreDB = () => {
         });
     };
 
-	
-
     const AddPost = async (post) => {
         const currentUser = await GetUserName(post.userName.toLowerCase());
         const newPost = {
             userName: post.userName,
             restaurantName: post.restaurantName,
+            RestaurantID : post.RestaurantID,
             stars: post.stars,
             likes: 0,
             like_users: [],
@@ -135,13 +128,35 @@ export const firestoreDB = () => {
             await new Promise(resolve => setTimeout(resolve, 100));
             postDoc = await getDoc(postRef);
         }
-        GetRestaurant(post.restaurantName).starcount += post.stars;
-        GetRestaurant(post.restaurantName).reviewcount += 1;
+        const restaurant = await GetRestaurantByID(post.RestaurantID);
+        const restaurantDoc = doc(firestore, 'restaurants', post.RestaurantID);
+        updateddata = {
+            starcount : restaurant.starcount+ post.stars,
+            reviewcount : restaurant.reviewcount+ 1,
+        };
+        await setDoc(restaurantDoc, updateddata, { merge: true });
     };
     const AddRestaurant =async (Restaurant) =>{
         const collectionRef = await collection(firestore, 'restaurants');
         const docRef = await addDoc(collectionRef, Restaurant);
         return docRef.id;
+    };
+    const FetchRestaurantByGID = async (somegid) => {
+
+        try {
+            const q = query(collection(firestore, 'restaurants'), where("GoogleMapsID","==",somegid));
+			const restaurantSnapshot = await getDocs(q);
+        
+            if (!restaurantSnapshot.empty) {
+                const restaurantDoc = restaurantSnapshot.docs[0];
+                return restaurantDoc.id;
+            } else {
+                return '';
+            }
+        } catch (error) {
+            console.error("Error fetching restaurant: ", error);
+            return '';
+        }
     };
 	const CreateList = async (list) => {
 		try {
@@ -159,16 +174,29 @@ export const firestoreDB = () => {
 		}
 	  };
 
-	  const updateListInFirebase = async (listId, updatedItems) => {
-		try {
-		  const listRef = doc(firestore, 'usersLists', listId);
-		  await updateDoc(listRef, {
-			items: updatedItems,
-		  });
-		} catch (error) {
-		  console.error('Error updating list in Firebase:', error);
-		}
-	  };
+    const updateListInFirebase = async (listId, updatedItems) => {
+        try {
+            const listRef = doc(firestore, 'usersLists', listId);
+            await updateDoc(listRef, {
+            items: updatedItems,
+            });
+        } catch (error) {
+            console.error('Error updating list in Firebase:', error);
+        }
+    };
+    const updateList = async (list) => {
+        try {
+            
+            const listDoc = doc(firestore, 'usersLists', list.id);
+            updateddata = {
+                listDescription : list.listDescription,
+                listName : list.listName,
+            };
+            await setDoc(listDoc, updateddata, { merge: true });
+        } catch (error) {
+            console.error('Error updating list in Firebase:', error);
+        }
+    };
     const CreateUser = async (user) => {
         const userDoc = doc(firestore, 'users', user.userName.toLowerCase())
         await setDoc(userDoc, user);
@@ -288,48 +316,11 @@ export const firestoreDB = () => {
 		// const userdoc = await getDoc(userRef);
 		// console.log(userdoc);
 		await updateDoc(userRef, {
+		 // userName: newName,
 		  profileImageUrl: newImageUrl,
 		});
 	  };
 
-	  const handleFollow = async (user, currentUser) => {
-		try {
-			console.log("curruser");
-		console.log(currentUser);
-		  const userRef = doc(firestore, 'users', currentUser.toLowerCase());
-		  const currentFriends = currentUser?.friends || [];
-		  //console.log(userRef);
-		  console.log("current friends");
-		  console.log(currentFriends);
-		  // Avoid adding duplicate entries
-		  if (!currentFriends.includes(user.userName)) {
-			await updateDoc(userRef, {
-			  friends: [...currentFriends, user.userName],
-			});
-			setFollowedUsers(new Set([...followedUsers, user.userName]));
-			console.log(currentFriends);
-		  }
-		} catch (error) {
-		  console.error('Error following user:', error);
-		}
-	  };
-	
-	  // Function to unfollow a user
-	  const handleUnfollow = async (user, currentUser) => {
-		try {
-		  const userRef = doc(firestore, 'users', currentUser.toLowerCase());
-		  const updatedFriends = (currentUser?.friends || []).filter(
-			(friend) => friend !== user.userName
-		  );
-		  await updateDoc(userRef, {
-			friends: updatedFriends,
-		  });
-		  setFollowedUsers(new Set(updatedFriends));
-		} catch (error) {
-		  console.error('Error unfollowing user:', error);
-		}
-	  };
-	
 
 
     const GetUsers = async () => {
@@ -338,8 +329,7 @@ export const firestoreDB = () => {
         const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         return users;
     };
-
-	const SubscribeToLists = (callback, userName) => {
+    const SubscribeToLists = (callback, userName) => {
         const q = query(collection(firestore, 'usersLists'),  where('userName', '==', userName));
 
         return onSnapshot(q, (snapshot) => {
@@ -349,18 +339,6 @@ export const firestoreDB = () => {
             console.error('Error fetching real-time lists:', error);
         });
     };
-
-	const SubscribeToFriends = (callback, userName) => {
-        const q = query(collection(firestore, 'users'),  where('userName', '==', userName));
-
-        return onSnapshot(q, (snapshot) => {
-            const friendsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            callback(friendsList);
-        }, (error) => {
-            console.error('Error fetching real-time lists:', error);
-        });
-    };
-
     const GetUserFriends = async (userName) => {
         try {
             const userDocRef = doc(firestore, 'users', userName);
@@ -396,24 +374,32 @@ export const firestoreDB = () => {
         return firestore.collection('users').doc(userName);
     };
 
+    const SubscribeToFriends = (callback, userName) => {
+        const q = query(collection(firestore, 'users'),  where('userName', '==', userName));
+
+        return onSnapshot(q, (snapshot) => {
+            const friendsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            callback(friendsList);
+        }, (error) => {
+            console.error('Error fetching real-time lists:', error);
+        });
+    };
+
     return {
         GetPosts,
         SubscribeToPosts,
         AddPost,
         getUserRef,
+        SubscribeToFriends,
         CreateList,
 		updateListInFirebase,
         TryLoginUser,
         GetUserFriends,
         GetUserLists,
-		handleFollow,
-		handleUnfollow,
         LikePost,
         UnlikePost,
 		updateUserProfile,
         GetUserName,
-		SubscribeToLists,
-		SubscribeToFriends,
         GetRestaurant,
         UpdateRestaurantContent,
         GetRestaurantbyOwner,
@@ -424,8 +410,6 @@ export const firestoreDB = () => {
 		FetchRestaurants,
         GetRestaurantByID,
         AddRestaurant,
-<<<<<<< HEAD
-=======
         FetchRestaurantByGID,
         SubscribeToLists,
         updateList,
@@ -433,7 +417,6 @@ export const firestoreDB = () => {
         UpdateUserFollowedLists,
         GetUserFollowedListIds,
         DeleteListsbyID,
->>>>>>> 4a133aa2326b119e61d0a6a6c1b6cbe9f227ba87
     };
 };
 

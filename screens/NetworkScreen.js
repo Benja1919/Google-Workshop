@@ -56,7 +56,7 @@ const NetworkScreen = ({ navigation, route }) => {
     fetchFriends();
     const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
       setUsers(friendsList);
-      console.log(followedUsers);
+      //console.log(followedUsers);
     }, [userName]);
 
     return () => unsubscribe();
