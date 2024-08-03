@@ -179,6 +179,7 @@ export const firestoreDB = () => {
             updateddata = {
                 listDescription : list.listDescription,
                 listName : list.listName,
+                Image : list.Image,
             };
             await setDoc(listDoc, updateddata, { merge: true });
         } catch (error) {

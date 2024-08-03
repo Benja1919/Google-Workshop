@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, Modal, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, Pressable ,Button,TouchableWithoutFeedback } from 'react-native';
+import Modal from 'react-native-modal';
 import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
 import { Timestamp } from 'firebase/firestore';
@@ -12,9 +13,12 @@ const iconData = [
   require('../assets/icons/sushilist.png'),
   require('../assets/icons/drinklist.png'),
   require('../assets/icons/dessertlist.png'),
-  require('../assets/icons/italianlist.png')
-
-  // Add more icons as needed
+  require('../assets/icons/italianlist.png'),
+  require('../assets/icons/mexicanlist.png'),
+  require('../assets/icons/coffeelist.png'),
+  require('../assets/icons/meatlist.png'),
+  require('../assets/icons/pizzalist.png'),
+  require('../assets/icons/veganlist.png'),
 ];
 const images = {
   tri : require("../assets/icons/Tri1.png"),
@@ -22,6 +26,7 @@ const images = {
   remove :require("../assets/icons/listminus.png"),
   add :require("../assets/icons/listplus.png"),
 };
+
 /*
 const triUri = Image.resolveAssetSource(images.tri).uri;
 const editimageUri = Image.resolveAssetSource(images.editimage).uri;
@@ -74,8 +79,10 @@ const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,v
   
 };
 const col2 = '#f9f9f9';
-const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinderComplete, navigation,foreign,plusorminus, sidefunction, loggedIn}) =>{
+const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinderComplete, navigation,foreign,plusorminus, sidefunction, loggedIn, ChangeListImage}) =>{
   const [isOpen,SetIsOpen] = useState(false);
+  const [ModalVisible,setModalVisible] = useState(false);
+  const [_,ReRender] = useState(null);
   const FinderComplete = ({ id, name })=>{
     return RestaurantFinderComplete({index,id,name});
   };
@@ -88,11 +95,20 @@ const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinde
   const sideButtonPress = () =>{
     sidefunction({isfromforeign: foreign, index:index});
   };
+  const ChangeImageTo = (idx) =>{
+    setModalVisible(false);
+    ChangeListImage({listindex: index,iconindex: idx});
+  };
+  const ChangeImagePress = () =>{
+    setModalVisible(true);
+  };
   const listowner = item.userName;
   return (
     <View style={{backgroundColor: col2,borderRadius: 15,marginBottom:10}}>
       <View style={{flexDirection: 'row', alignItems: 'center',padding:5,marginLeft:10}}>
-        <Image source={iconData[item.Image]} style={{ width: 50, height: 50, borderRadius: 20, marginRight: 10 }} />
+        <TouchableOpacity disabled={!(isYou && !foreign)} onPress={()=>ChangeImagePress()}>
+          <Image source={iconData[item.Image]} style={{ width: 50, height: 50, borderRadius: 20, marginRight: 10 }} />
+        </TouchableOpacity>
         {foreign && 
         <TouchableOpacity style={{position: 'absolute',top:5}} onPress={() => navigation.navigate('UserProfile', { userName:listowner })}>
           <ImprovedImageComponent ImageURI={item.profileImageUrl} ImageStyle={{ width: 25, height: 25, borderRadius: 20,  }}/>
@@ -114,6 +130,39 @@ const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinde
         <Image source={images.tri} style={{ width: 20, height: 11,justifyContent: 'center',alignSelf:"center",padding:5,transform: [{rotate: isOpen ? '0deg' : '180deg' }]}} />
       </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={ModalVisible}
+        backdropOpacity={0}
+        coverScreen={true}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
+        onBackdropPress={() => {
+          setModalVisible(false);
+        }}
+      >
+        <View style={{backgroundColor: 'rgba(0, 0, 0, 0.5)',flex:1,margin:-100,justifyContent:'center',pointerEvents: 'box-none'}}>
+          <View style={{backgroundColor: '#F0F0F0', padding: 10, borderRadius: 10,margin:100}}>
+            <Text style={{fontFamily: 'Oswald-Medium',fontSize:30,alignSelf:'center'}}>Select List icon</Text>
+            <View style={{ ...styles.separator, marginBottom: 10 }} />
+            <FlatList
+              data={iconData}
+              renderItem={({ item,index }) => (
+                <TouchableOpacity onPress={()=> ChangeImageTo(index)}>
+                  <Image source={item} style={{width: 80, height: 80,borderRadius:30,marginRight:10,resizeMode:'cover'}} />
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={true}
+            />
+          </View>
+        </View>
+
+
+      </Modal>
+
     </View>
   );
 };
@@ -223,6 +272,11 @@ const MyListsScreen = ({ route, navigation }) => {
       
     }
   };
+  const ChangeListImage = ({listindex,iconindex}) =>{
+    lists[listindex].Image = iconindex;
+    firestoreDB().updateList(lists[listindex]);
+    ReRender(Math.random());
+  }; 
   const EditTitle = ({text, index}) => {
     lists[index].listName = text;
     firestoreDB().updateList(lists[index]);
@@ -311,6 +365,7 @@ const MyListsScreen = ({ route, navigation }) => {
               plusorminus={CurrentUserFollow != null && !isYou && !CurrentUserFollow.includes(item.id)}
               sidefunction={sideButtonPress}
               loggedIn={CurrentUserFollow != null && currentUser}
+              ChangeListImage={ChangeListImage}
             />
           )}
           keyExtractor={item => item.id}
@@ -380,21 +435,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 100,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    maxHeight: '80%',
-    
   },
   listTitle: {
     fontSize: 20,
