@@ -10,6 +10,7 @@ import { ScrollView, createNativeWrapper } from 'react-native-gesture-handler';
 import BottomBarComponent from './components/BottomBar';
 import ImprovedImageComponent from './components/ImprovedImage';
 const iconData = [
+  require('../assets/icons/favoritelist.png'),
   require('../assets/icons/sushilist.png'),
   require('../assets/icons/drinklist.png'),
   require('../assets/icons/dessertlist.png'),
@@ -19,7 +20,9 @@ const iconData = [
   require('../assets/icons/meatlist.png'),
   require('../assets/icons/pizzalist.png'),
   require('../assets/icons/veganlist.png'),
-  require('../assets/icons/favoritelist.png'),
+  require('../assets/icons/hummuslist.png'),
+  require('../assets/icons/falafellist.png'),
+  require('../assets/icons/shawarmalist.png'),
 ];
 const images = {
   tri : require("../assets/icons/Tri1.png"),
