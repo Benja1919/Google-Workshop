@@ -220,6 +220,7 @@ const MyListsScreen = ({ route, navigation }) => {
   const [followedlists, setFollowedLists] = useState(null);
   const [CurrentUserFollow, setCurrentUserFollow] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reloadlists, RefetchLists] = useState(null);
   const { currentUser } = useContext(AuthContext);
   useEffect(() => { //fetch the list of user from the DB
     const fetchLists = async () => {
@@ -245,7 +246,7 @@ const MyListsScreen = ({ route, navigation }) => {
     }, user.userName);
 
     return () => unsubscribe();
-  }, []);
+  }, [reloadlists]);
   useEffect(() => {
     if(user && user.FollowedLists.length > 0){
       const fetchfollowedklsits = async () =>{
@@ -319,7 +320,7 @@ const MyListsScreen = ({ route, navigation }) => {
   };
   const AddList = () =>{
     
-    const newList = {
+    var newList = {
       listDescription : "default description",
       listName : "default name",
       profileImageUrl : currentUser.profileImageUrl,
@@ -327,10 +328,16 @@ const MyListsScreen = ({ route, navigation }) => {
       items: [],
       Image : 0,
     };
+    
     firestoreDB().CreateList(newList);
-    lists.push(newList);
-    ReRender();
+    newList = {...newList,id:41};
+    setLists([...lists,newList]);
+    RefetchLists(Math.random());
   };
+  for (let index = 0; index < lists.length; index++) {
+    console.log(index, lists[index].id);
+    
+  }
   return (
     <View style={{ flex: 1}}>
     <ScrollView style={{ flex: 1}}>
