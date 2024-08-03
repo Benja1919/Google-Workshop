@@ -64,6 +64,10 @@ export const firestoreDB = () => {
 			console.error('Error fetching restaurants: ', error);
 		}
 	};
+    const DeleteListsbyID = async (id) => {
+        const docRef = doc(firestore, 'usersLists', id); // Replace 'collectionName' with your Firestore collection name
+        //await deleteDoc(docRef); //cant find it//
+    };
     const UnlikePost = async (postId, currentUserId) => {
         const postRef = doc(firestore, 'posts', postId);
         try {
@@ -228,7 +232,25 @@ export const firestoreDB = () => {
 		const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 		return lists;
     };
+    const GetUserFollowedListIds = async (user) => {
+		const userDoc = doc(firestore, 'users', user);
+		const DocSS = await getDoc(userDoc);
+        if(DocSS.exists()){
+            return DocSS.data().FollowedLists;
+        }
+		return null;
+    };
+    const GetFollowedLists = async (listids) => {
+        const promises = listids.map(id => getDoc(doc(firestore, 'usersLists', id)));
+        
+        // Wait for all promises to resolve
+        const querySnapshots = await Promise.all(promises);
 
+        // Extract the document data from each snapshot
+        const documents = querySnapshots.map(snapshot => snapshot.data());
+        
+        return documents;
+      }
     const GetUserName = async (userName) => {
         const userDocRef = doc(firestore, 'users', userName.toLowerCase());
         const userDoc = await getDoc(userDocRef);
@@ -254,7 +276,19 @@ export const firestoreDB = () => {
         const restaurantSnapshot = await getDoc(restaurantDoc);
         return { id: restaurantSnapshot.id, ...restaurantSnapshot.data() };
     };
+    const UpdateUserFollowedLists = async (followedlists,userid) => {
+        const userRef = doc(firestore, "users", userid);
 
+        // Create the new contents object
+        const updatedData = {
+            FollowedLists: followedlists
+        };
+        try {
+            await setDoc(userRef, updatedData, { merge: true });
+        } catch (error) {
+            console.error('Error updating restaurant content:', error);
+        }
+    };
     const UpdateRestaurantContent = async (Restaurant) => {
         const userRef = doc(firestore, "restaurants", Restaurant.id);
 
@@ -367,6 +401,10 @@ export const firestoreDB = () => {
         FetchRestaurantByGID,
         SubscribeToLists,
         updateList,
+        GetFollowedLists,
+        UpdateUserFollowedLists,
+        GetUserFollowedListIds,
+        DeleteListsbyID,
     };
 };
 

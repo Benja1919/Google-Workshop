@@ -65,7 +65,8 @@ const SignUpScreen = ({ navigation }) => {
       email: email.toLocaleLowerCase(),
       friends: [],
       profileImageUrl: profileImageUrl,
-      isRest: isRestaurant,
+      isRest: false,
+      FollowedLists: [],
       createTime: Timestamp.now(),
     };
 
