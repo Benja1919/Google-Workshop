@@ -374,9 +374,21 @@ export const firestoreDB = () => {
         return firestore.collection('users').doc(userName);
     };
 
+    const SubscribeToFriends = (callback, userName) => {
+        const q = query(collection(firestore, 'users'),  where('userName', '==', userName));
+
+        return onSnapshot(q, (snapshot) => {
+            const friendsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            callback(friendsList);
+        }, (error) => {
+            console.error('Error fetching real-time lists:', error);
+        });
+    };
+
     return {
         GetPosts,
         SubscribeToPosts,
+        SubscribeToFriends,
         AddPost,
         getUserRef,
         CreateList,
