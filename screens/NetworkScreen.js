@@ -11,13 +11,7 @@ import {
 } from 'react-native';
 import { AuthContext } from './AuthContext'; // Import AuthContext
 import { firestoreDB } from './FirebaseDB';
-import { doc, updateDoc } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
 import { useFonts } from 'expo-font';
-
-
-// Initialize Firestore
-const firestore = getFirestore();
 
 const NetworkScreen = ({ navigation, route }) => {
   const { userName } = route.params; // Get userName from parameters
@@ -55,44 +49,21 @@ const NetworkScreen = ({ navigation, route }) => {
 
     fetchFriends();
     const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
-      setUsers(friendsList);
-      console.log(followedUsers);
-    }, [userName]);
+      const followedSet = new Set(friendsList || []);
+      setFollowedUsers(followedSet);
+    }, currentUser.userName);
 
     return () => unsubscribe();
   }, [userName]); // Add userName as a dependency
 
 
   const handleFollow = async (user) => {
-    try {
-      const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
-      const currentFriends = currentUser?.friends || [];
-      if (!currentFriends.includes(user.userName)) {
-        await updateDoc(userRef, {
-          friends: [...currentFriends, user.userName],
-        });
-        setFollowedUsers(prev => new Set([...prev, user.userName]));
-      }
-    } catch (error) {
-      console.error('Error following user:', error);
-    }
+    await firestoreDB().AddFriend(currentUser, user.userName);
   };
   
   const handleUnfollow = async (user) => {
-    try {
-      const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
-      const updatedFriends = (currentUser?.friends || []).filter(
-        (friend) => friend !== user.userName
-      );
-      await updateDoc(userRef, {
-        friends: updatedFriends,
-      });
-      setFollowedUsers(prev => new Set(updatedFriends));
-    } catch (error) {
-      console.error('Error unfollowing user:', error);
-    }
+    await firestoreDB().RemoveFriend(currentUser, user.userName);
   };
-
   
 
   // Function to select a user

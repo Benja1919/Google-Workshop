@@ -329,7 +329,7 @@ export const firestoreDB = () => {
     };
     const GetUserFriends = async (userName) => {
         try {
-            const userDocRef = doc(firestore, 'users', userName);
+            const userDocRef = doc(firestore, 'users', userName.toLowerCase());
             const userDoc = await getDoc(userDocRef);
 
             if (userDoc.exists()) {
@@ -363,14 +363,40 @@ export const firestoreDB = () => {
     };
 
     const SubscribeToFriends = (callback, userName) => {
-        const q = query(collection(firestore, 'users'),  where('userName', '==', userName));
-
-        return onSnapshot(q, (snapshot) => {
-            const friendsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            callback(friendsList);
+        const userDocRef = doc(firestore, 'users', userName.toLowerCase());
+        return onSnapshot(userDocRef, async (snapshot) => {
+            userDoc = snapshot;
+            const userData = userDoc.data();
+            callback(userData.friends);
         }, (error) => {
             console.error('Error fetching real-time lists:', error);
         });
+    };
+
+    const AddFriend = async (user, friendUserName) => {
+        try {
+            const userDocRef = doc(firestore, 'users', user.userName.toLowerCase());
+            if(user && !user.friends.includes(friendUserName))
+            {
+                user.friends = [...user.friends, friendUserName];
+                await updateDoc(userDocRef, user);
+            }
+        } catch (error) {
+            console.error('Error following user:', error);
+        }
+    };
+
+    const RemoveFriend = async (user, friendUserName) => {
+        try {
+            const userDocRef = doc(firestore, 'users', user.userName.toLowerCase());
+            if(user && user.friends.includes(friendUserName))
+            {
+                user.friends = user.friends.filter(user => user !== friendUserName);
+                await updateDoc(userDocRef, user);
+            }
+        } catch (error) {
+            console.error('Error following user:', error);
+        }
     };
 
     return {
@@ -405,6 +431,8 @@ export const firestoreDB = () => {
         UpdateUserFollowedLists,
         GetUserFollowedListIds,
         DeleteListsbyID,
+        AddFriend,
+        RemoveFriend
     };
 };
 

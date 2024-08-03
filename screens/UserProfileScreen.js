@@ -10,17 +10,12 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFonts } from 'expo-font';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
-import { doc, updateDoc } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
 
-// Initialize Firestore
-const firestore = getFirestore();
 
 const UserProfileScreen = ({ route, navigation }) => {
   const storage = getStorage();
   const { userName } = route.params;
   const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([]);
   const { isLoggedIn, currentUser } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
   const [newImage, setNewImage] = useState(null);
@@ -54,9 +49,6 @@ const UserProfileScreen = ({ route, navigation }) => {
     // Function to fetch friends from DB
     const fetchFriends = async () => {
       try {
-        const friendsList = await firestoreDB().GetUserFriends(userName.toLowerCase()); // Fetch friends data
-  
-        setUsers(friendsList);
         const followedSet = new Set(currentUser?.friends || []);
         setFollowedUsers(followedSet);
       } catch (error) {
@@ -66,8 +58,10 @@ const UserProfileScreen = ({ route, navigation }) => {
   
       fetchFriends();
       const unsubscribe = firestoreDB().SubscribeToFriends((friendsList) => {
-        setUsers(friendsList);
-      }, userName);
+        const followedSet = new Set(friendsList || []);
+        //console.log(followedSet);
+        setFollowedUsers(followedSet);
+      }, currentUser.userName);
   
       return () => unsubscribe();
     }, [userName, currentUser]);
@@ -130,38 +124,14 @@ const UserProfileScreen = ({ route, navigation }) => {
 
 
   const handleFollow = async (user) => {
-    try {
-      const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
-      const currentFriends = currentUser?.friends || [];
-      if (!currentFriends.includes(user.userName)) {
-        await updateDoc(userRef, {
-          friends: [...currentFriends, user.userName],
-        });
-        setFollowedUsers(prev => new Set([...prev, user.userName]));
-      }
-    } catch (error) {
-      console.error('Error following user:', error);
-    }
+    await firestoreDB().AddFriend(currentUser, user.userName);
   };
   
   const handleUnfollow = async (user) => {
-    try {
-      const userRef = doc(firestore, 'users', currentUser.userName.toLowerCase());
-      const updatedFriends = (currentUser?.friends || []).filter(
-        (friend) => friend !== user.userName
-      );
-      await updateDoc(userRef, {
-        friends: updatedFriends,
-      });
-      setFollowedUsers(prev => new Set(updatedFriends));
-    } catch (error) {
-      console.error('Error unfollowing user:', error);
-    }
+    await firestoreDB().RemoveFriend(currentUser, user.userName);
   };
 
   const isFollowing = (user) => {
-    //console.log(followedUsers.has(user.userName));
-    //console.log(followedUsers);
     return followedUsers.has(user.userName);
   };
 
