@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { collection, onSnapshot, getDocs, doc, getDoc, addDoc, updateDoc, setDoc, query, where, orderBy,limit } from 'firebase/firestore';
+import { collection, onSnapshot, getDocs, doc, getDoc, deleteDoc, addDoc, updateDoc, setDoc, query, where, orderBy,limit } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -66,7 +66,7 @@ export const firestoreDB = () => {
 	};
     const DeleteListsbyID = async (id) => {
         const docRef = doc(firestore, 'usersLists', id); // Replace 'collectionName' with your Firestore collection name
-        //await deleteDoc(docRef); //cant find it//
+        await deleteDoc(docRef); //cant find it//
     };
     const UnlikePost = async (postId, currentUserId) => {
         const postRef = doc(firestore, 'posts', postId);

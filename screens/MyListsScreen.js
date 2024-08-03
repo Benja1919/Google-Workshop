@@ -244,8 +244,9 @@ const MyListsScreen = ({ route, navigation }) => {
       firestoreDB().UpdateUserFollowedLists(followedlistsids, currentUser.id)
     }
     else if(!isYou && isfollowed){
-      CurrentUserFollow = CurrentUserFollow.filter(x => x !== item.id);
-      firestoreDB().UpdateUserFollowedLists(CurrentUserFollow, currentUser.id)
+      const tempUserFollow = CurrentUserFollow.filter(x => x !== item.id);
+      setCurrentUserFollow(tempUserFollow);
+      firestoreDB().UpdateUserFollowedLists(tempUserFollow, currentUser.id)
     }
     else if(!isYou && !isfollowed){
       CurrentUserFollow.push(isfromforeign ? followedlists[index].id : lists[index].id);
@@ -289,7 +290,7 @@ const MyListsScreen = ({ route, navigation }) => {
         />
       </View>
       </View>
-      {user.FollowedLists.length > 0 && followedlists != null && (
+      {user.FollowedLists.length > 0 && followedlists != null && followedlists.length > 0 && (
         <View style={{flex:1}}>
           <Text style={{ ...styles.titletext }}>Followed Lists</Text>
           <View style={{ ...styles.separator, marginBottom: 10 }} />
