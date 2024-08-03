@@ -217,7 +217,9 @@ export const firestoreDB = () => {
     const GetUserLists = async (userName) => {
 		const q = query(collection(firestore, 'usersLists'),  where('userName', '==', userName));
 		const querySnapshot = await getDocs(q);
+        
 		const lists = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
 		return lists;
     };
     const GetUserFollowedListIds = async (user) => {
@@ -235,8 +237,9 @@ export const firestoreDB = () => {
         const querySnapshots = await Promise.all(promises);
 
         // Extract the document data from each snapshot
-        const documents = querySnapshots.map(snapshot => snapshot.data());
-        
+        const documents = querySnapshots.map(snapshot => ({
+            id: snapshot.id, ...snapshot.data()
+        }));
         return documents;
       }
     const GetUserName = async (userName) => {

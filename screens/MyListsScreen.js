@@ -5,7 +5,7 @@ import { firestoreDB } from './FirebaseDB';
 import { Timestamp } from 'firebase/firestore';
 import { useFonts } from 'expo-font';
 import RestaurantFinder from './components/RestaurantFinder';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView, createNativeWrapper } from 'react-native-gesture-handler';
 import BottomBarComponent from './components/BottomBar';
 import ImprovedImageComponent from './components/ImprovedImage';
 const iconData = [
@@ -22,6 +22,7 @@ const images = {
   remove :require("../assets/icons/listminus.png"),
   add :require("../assets/icons/listplus.png"),
 };
+/*
 const triUri = Image.resolveAssetSource(images.tri).uri;
 const editimageUri = Image.resolveAssetSource(images.editimage).uri;
 const removeUri = Image.resolveAssetSource(images.remove).uri;
@@ -30,6 +31,7 @@ Image.prefetch(triUri);
 Image.prefetch(editimageUri);
 Image.prefetch(removeUri);
 Image.prefetch(addUri);
+*/
 const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,valueTextColor, style, fontWeight, fontSize, ...rest }) => {
   const [value, setValue] = useState('');
   const [placeholdertext, setPlaceholder] = useState(placeholder);
@@ -199,9 +201,9 @@ const MyListsScreen = ({ route, navigation }) => {
     if(user && user.FollowedLists.length > 0){
       const fetchfollowedklsits = async () =>{
         const listsids = await firestoreDB().GetUserFollowedListIds(user.userName.toLowerCase());
-        const lists = await firestoreDB().GetFollowedLists(listsids);
+        const flists = await firestoreDB().GetFollowedLists(listsids);
         if(lists != null){
-          setFollowedLists(lists);
+          setFollowedLists(flists);
         }
       };
       fetchfollowedklsits();
@@ -209,7 +211,12 @@ const MyListsScreen = ({ route, navigation }) => {
   },[user]);
   const ReceiveRestaurantData= ({ index,id, name }) => {
     if(id != null && name != null){
-      lists[index].items.push({id:id,name:name});
+      const newLists = [...lists];
+      newLists[index] = {
+        ...newLists[index],
+        items: [...newLists[index].items, { id: id, name: name }],
+      };
+      setLists(newLists);
       firestoreDB().updateListInFirebase(lists[index].id,lists[index].items);
       setNewItemID(id);
       setNewItemName(name);
@@ -249,8 +256,9 @@ const MyListsScreen = ({ route, navigation }) => {
       firestoreDB().UpdateUserFollowedLists(tempUserFollow, currentUser.id)
     }
     else if(!isYou && !isfollowed){
-      CurrentUserFollow.push(isfromforeign ? followedlists[index].id : lists[index].id);
-      firestoreDB().UpdateUserFollowedLists(CurrentUserFollow, currentUser.id)
+      const tempCurrentUserFollow = [...CurrentUserFollow,isfromforeign ? followedlists[index].id : lists[index].id];
+      setCurrentUserFollow(tempCurrentUserFollow);
+      firestoreDB().UpdateUserFollowedLists(tempCurrentUserFollow, currentUser.id)
     }
     ReRender(Math.random());
   };
@@ -328,7 +336,7 @@ const MyListsScreen = ({ route, navigation }) => {
               foreign={true}
               plusorminus={CurrentUserFollow != null && !CurrentUserFollow.includes(item.id) && !isYou}
               sidefunction={sideButtonPress}
-              loggedIn={CurrentUserFollow != null && currentUser}
+              loggedIn={CurrentUserFollow != null && currentUser && item.userName != currentUser.userName}
             />
           )}
           keyExtractor={item => item.id}
