@@ -159,20 +159,8 @@ export const firestoreDB = () => {
         }
     };
 	const CreateList = async (list) => {
-		try {
-		  const currentUser = await GetUserName(list.userName.toLowerCase());
-		  if (!currentUser) {
-			throw new Error('User not found');
-		  }
-		  const listsCollectionRef = collection(firestore, 'usersLists');
-		  // בדוק את הנתונים שנשלחים למסמך	  
-		  const listDoc = doc(firestore, 'usersLists', list.id)
-		  await setDoc(listDoc, list);
-		  console.log(list.userName);
-		} catch (error) {
-		  console.error('Error creating list:', error);
-		}
-	  };
+		await addDoc(collection(firestore, 'usersLists'),list);
+	};
 
     const updateListInFirebase = async (listId, updatedItems) => {
         try {

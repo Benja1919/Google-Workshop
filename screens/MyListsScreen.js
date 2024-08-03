@@ -16,11 +16,11 @@ const iconData = [
 
   // Add more icons as needed
 ];
-images = {
+const images = {
   tri : require("../assets/icons/Tri1.png"),
   editimage :require("../assets/icons/edit2.png"),
-  remove :require("../assets/icons/minus4.png"),
-  add :require("../assets/icons/pplus4.png"),
+  remove :require("../assets/icons/listminus.png"),
+  add :require("../assets/icons/listplus.png"),
 };
 const triUri = Image.resolveAssetSource(images.tri).uri;
 const editimageUri = Image.resolveAssetSource(images.editimage).uri;
@@ -102,7 +102,7 @@ const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinde
         </View>
         { loggedIn &&
           <TouchableOpacity style={{padding:5,right:0}} onPress={()=>sideButtonPress()}>
-            <Image source={plusorminus ? images.add : images.remove} style={{ width: 20, height: plusorminus ? 20 : 6,tintColor:'grey',justifyContent: 'center',alignSelf:"center"}} />
+            <Image source={plusorminus ? images.add : images.remove} style={{ width: 20, height: plusorminus ? 20 : 5.42,tintColor:'grey',justifyContent: 'center',alignSelf:"center"}} />
           </TouchableOpacity>
         }
       </View>
@@ -254,6 +254,20 @@ const MyListsScreen = ({ route, navigation }) => {
     }
     ReRender(Math.random());
   };
+  const AddList = () =>{
+    
+    const newList = {
+      listDescription : "default description",
+      listName : "default name",
+      profileImageUrl : currentUser.profileImageUrl,
+      userName : currentUser.userName,
+      items: [],
+      Image : 0,
+    };
+    firestoreDB().CreateList(newList);
+    lists.push(newList);
+    ReRender();
+  };
   return (
     <View style={{ flex: 1}}>
     <ScrollView style={{ flex: 1}}>
@@ -261,10 +275,15 @@ const MyListsScreen = ({ route, navigation }) => {
       <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
         <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
         <View style={{ flex: 1, alignItems: 'center' }}>
-          <Text style={{...styles.titletext,marginLeft:-80}}>
+          <Text style={{...styles.titletext,marginLeft:-40}}>
             {isYou ? `Your Lists` : `${user.userName}'s Lists`}
           </Text>
         </View>
+        {isYou &&
+        <TouchableOpacity style={{padding:5,right:0,right:10}} onPress={()=>AddList()}>
+          <Image source={images.add} style={{ width: 31, height: 31,tintColor:'grey',justifyContent: 'center',alignSelf:"center"}} />
+        </TouchableOpacity>
+        }
       </View>
       <View style={{ ...styles.separator, marginBottom: 10 }} />
       <View >

@@ -18,13 +18,19 @@
       "splash": {
         "foregroundImage": "./assets/pic.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.guylevy3.CommunEaty"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0c2952e4-cad8-418b-ad47-aaaf4c92737f"
+      }
+    }
   }
 }
