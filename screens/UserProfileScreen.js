@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions,BackHandler } from 'react-native';
 import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
 import myNetworkIcon from '../assets/icons/network.png';
@@ -26,7 +26,17 @@ const UserProfileScreen = ({ route, navigation }) => {
     "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
     "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
   });
+  useEffect(() => {
+    const handleBackPress = () => {
+      // Prevent the back button from doing anything
+      return true;
+    };
 
+    BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+    // Clean up the event listener on component unmount
+    return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+  }, []);
   if (!fontsLoaded) {
     return null;
   }
