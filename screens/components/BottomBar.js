@@ -3,7 +3,26 @@ import { View, Text, TextInput, Button, Image, StyleSheet, Alert, TouchableOpaci
 import StarRating from 'react-native-star-rating-widget';
 import { useNavigationState } from '@react-navigation/native';
 import { AuthContext } from '../AuthContext';
+import { useFonts } from 'expo-font';
+const buttonimagesinverted = {
+  home: require('../../assets/icons/homeinv2.png'),
+  post: require('../../assets/icons/plusinv.png'),
+  login: require('../../assets/icons/logininv.png'),
+  profile: require('../../assets/icons/profileinv.png'),
+};
+const buttonimages = {
+  home: require('../../assets/icons/home.png'),
+  post: require('../../assets/icons/plus4.png'),
+  login: require('../../assets/icons/login2.png'),
+  profile: require('../../assets/icons/profile.png'),
+};
+
 const BottomBarComponent = ({ navigation }) => {
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../../assets/fonts/Oswald-Medium.ttf")
+  });
     const route = useNavigationState(state => state.routes[state.index]);
     const {isLoggedIn, currentUser} = useContext(AuthContext);
     const navigateToPostCreation = () => {
@@ -43,62 +62,65 @@ const BottomBarComponent = ({ navigation }) => {
       isinownprofile = currentUser.userName == userName;
     }
     return (
-    <View style={styles.container}>
+    <View>
       {/* Bottom bar */}
-      <View style={styles.bottomBar}>
+      <View style={{...styles.bottomBar,bottom: route.name != "HomeScreen" && route.name != "PostCreation" ? 0 : -10}}>
         
         {/* Button for home */}
-        <TouchableOpacity style={route.name != "HomeScreen" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToHome}>
-          <Image source={require('../../assets/icons/home.png')} style={styles.icon} />
-        </TouchableOpacity>
-
+        <View style={{flexDirection:'column'}}>
+          <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToHome}>
+            <Image source={route.name != "HomeScreen" ? buttonimages.home : buttonimagesinverted.home} style={styles.icon} />
+            <Text style={{alignSelf:'center',fontFamily:'Oswald-Light'}}>Home</Text>
+          </TouchableOpacity>
+        </View>
         
-
-        {/* Button to navigate to post creation */}
-        <TouchableOpacity style={(isLoggedIn && route.name != "PostCreation") ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToPostCreation}>
-        <Image source={require('../../assets/icons/plus4.png')} style={styles.icon} />
-        </TouchableOpacity>
+        {isLoggedIn && 
+          <View style={{flexDirection:'column'}}>
+            <TouchableOpacity style={(isLoggedIn ) ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToPostCreation}>
+              <Image source={route.name != "PostCreation" ? buttonimages.post : buttonimagesinverted.post} style={styles.icon} />
+              <Text style={{alignSelf:'center',fontFamily:'Oswald-Light'}}>Post</Text>
+            </TouchableOpacity>
+          </View>
+        }
 
         {/* Button for profile */}
-        <TouchableOpacity style={route.name != "LoginScreen" && !(route.name == 'UserProfile' && isinownprofile) ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToProfile}>
-          <Image source={isLoggedIn ? require('../../assets/icons/profile.png') : require('../../assets/icons/login2.png')} style={styles.icon} />
-        </TouchableOpacity>
+        <View style={{flexDirection:'column'}}>
+          <TouchableOpacity style={styles.bottomBarButton} onPress={navigateToProfile}>
+            <Image source={isLoggedIn ? (isinownprofile ? buttonimagesinverted.profile : buttonimages.profile) : (route.name != "LoginScreen" ?buttonimages.login : buttonimagesinverted.login)} style={styles.icon} />
+            <Text style={{alignSelf:'center',fontFamily:'Oswald-Light'}}>{isLoggedIn ? `Profile`:`Login`}</Text>
+          </TouchableOpacity>
+        </View>
+
       </View>
     </View>
     );
 };
 const styles = StyleSheet.create({
-    container: {
-      backgroundColor: '#f0f0f0',
-        padding: 10,
-    },
     bottomBar: {
 
       flexDirection: 'row',
       justifyContent: 'space-around',
       alignItems: 'center',
       position: 'absolute',
-      left: -10,
-      right: -10,
+      left: -20,
+      right: -20,
       paddingHorizontal: 20,
-      bottom: 10,
       backgroundColor: '#fff', // צבע רקע לפס הרציף
-      elevation: 10, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
+      elevation: 15, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
     },
     bottomBarButton: {
       backgroundColor: '#fff',
-      paddingVertical: 7,
-      paddingHorizontal: 15,
+      
+      paddingTop:5,
       borderRadius: 8,
     },
     bottomBarButtondisabled: {
-        backgroundColor: '#ccc',
-        paddingVertical: 7,
-        paddingHorizontal: 15,
-        borderRadius: 0,
-      },
+      backgroundColor: '#ccc',
+      paddingHorizontal: 15,
+      borderRadius: 0,
+    },
     icon: {
-      width: 26,
+      width: 27,
       height: 25,
     },
     buttonText: {

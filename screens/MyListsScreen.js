@@ -338,10 +338,6 @@ const MyListsScreen = ({ route, navigation }) => {
     setLists([...lists,newList]);
     RefetchLists(Math.random());
   };
-  for (let index = 0; index < lists.length; index++) {
-    console.log(index, lists[index].id);
-    
-  }
   return (
     <View style={{ flex: 1}}>
     <ScrollView style={{ flex: 1}}>

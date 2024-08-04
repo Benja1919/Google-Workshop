@@ -34,7 +34,7 @@ const HomeScreen = ({ navigation }) => {
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={styles.container}>
         <PostsScreen navigation={navigation} />
-        <BottomBarComponent navigation={navigation} />
+        <BottomBarComponent navigation={navigation}/>
         
 
       </View>

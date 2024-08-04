@@ -75,6 +75,7 @@ const App = () => {
               },
               headerTitle: () => <AppHeaderTitle />,
               headerTitleAlign: 'center',
+              headerLeft: () => null,
               headerRight: () => (
                 <TouchableOpacity
                   onPress={() => {

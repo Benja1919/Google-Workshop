@@ -12,6 +12,7 @@ import {
 import { AuthContext } from './AuthContext'; // Import AuthContext
 import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
+import BottomBarComponent from './components/BottomBar';
 
 const NetworkScreen = ({ navigation, route }) => {
   const { userName } = route.params; // Get userName from parameters
@@ -141,6 +142,7 @@ const NetworkScreen = ({ navigation, route }) => {
           </View>
         </View>
       </Modal>
+      <BottomBarComponent navigation={navigation}/>
     </View>
   );
 };
