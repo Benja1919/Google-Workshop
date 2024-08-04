@@ -231,7 +231,6 @@ const MyListsScreen = ({ route, navigation }) => {
   const isYou = currentUser != null && currentUser.userName === user.userName;
   useEffect(() => { //fetch the list of user from the DB
     const fetchLists = async () => {
-    //  if (!currentUser) return;
       try {
         const fetchedLists = await firestoreDB().GetUserLists(user.userName);
         if(currentUser){
@@ -246,13 +245,16 @@ const MyListsScreen = ({ route, navigation }) => {
       }
     };
 
-    // Fetch lists immediately
+    
     fetchLists();
+    /*
     const unsubscribe = firestoreDB().SubscribeToLists((fetchedLists) => {
       setLists(fetchedLists);
     }, user.userName);
 
     return () => unsubscribe();
+
+    */
   }, [reloadlists]);
   useEffect(() => {
     if(user && user.FollowedLists.length > 0){
@@ -359,6 +361,7 @@ const MyListsScreen = ({ route, navigation }) => {
     setLists([...lists,newList]);
     RefetchLists(Math.random());
   };
+  
   return (
     <View style={{ flex: 1}}>
     <ScrollView style={{ flex: 1}}>
