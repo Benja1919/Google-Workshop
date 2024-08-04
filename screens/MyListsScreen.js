@@ -11,6 +11,8 @@ import BottomBarComponent from './components/BottomBar';
 import ImprovedImageComponent from './components/ImprovedImage';
 const iconData = [
   require('../assets/icons/favoritelist.png'),
+  require('../assets/icons/wishlist.png'),
+  require('../assets/icons/burgerlist.png'),
   require('../assets/icons/sushilist.png'),
   require('../assets/icons/drinklist.png'),
   require('../assets/icons/dessertlist.png'),
