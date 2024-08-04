@@ -427,7 +427,7 @@ const MyListsScreen = ({ route, navigation }) => {
       )}
       
       
-    
+      <Text style={{fontSize:50}}/>
     </ScrollView>
     
       <BottomBarComponent navigation={navigation}/>
