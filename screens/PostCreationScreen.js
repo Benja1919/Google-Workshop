@@ -42,7 +42,7 @@ const PostCreationScreen = ({ navigation }) => {
       }
     }
     else if (event.nativeEvent.translationX > 100) {
-      navigation.navigate('MapView');
+      navigation.navigate('HomeScreen');
     }
   };
   

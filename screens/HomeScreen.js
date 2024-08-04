@@ -10,11 +10,16 @@ const HomeScreen = ({ navigation }) => {
   const { isLoggedIn, currentUser} = useContext(AuthContext);
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -50) {
-      navigation.navigate('MapView');
+      if(isLoggedIn){
+        navigation.navigate('PostCreation');
+      }
+      else{
+        navigation.navigate('LoginScreen');
+      }
     }
     else if (event.nativeEvent.translationX > 50) {
       if(isLoggedIn){
-        const name = currentUser.userName.toLowerCase();
+        const name = currentUser.userName;
         navigation.navigate('UserProfile', { userName: name });
       }
       else{

@@ -17,7 +17,7 @@ const LoginScreen = ({ navigation }) => {
       navigation.navigate('HomeScreen');
     }
     else if (event.nativeEvent.translationX > 50) {
-      navigation.navigate('MapView');
+      navigation.navigate('HomeScreen');
     }
   };
   // State variables to store user input for username and password

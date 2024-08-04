@@ -70,7 +70,7 @@ const UserProfileScreen = ({ route, navigation }) => {
       if (isLoggedIn) {
         navigation.navigate('PostCreation');
       } else {
-        navigation.navigate('MapView');
+        navigation.navigate('HomeScreen');
       }
     } else if (event.nativeEvent.translationX < -100) {
       navigation.navigate('HomeScreen');

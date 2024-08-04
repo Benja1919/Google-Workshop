@@ -32,6 +32,16 @@ const BottomBarComponent = ({ navigation }) => {
       const navigateToHome = () => {
         navigation.navigate('HomeScreen');
       };
+    /*
+    <TouchableOpacity style={route.name != "MapView" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={() => navigation.navigate("MapView")}>
+      <Image source={require('../../assets/icons/mapview6.png')} style={styles.icon} />
+    </TouchableOpacity>
+    */
+    var isinownprofile = false;
+    if(route.name == 'UserProfile' && isLoggedIn){
+      const { userName } = route.params;
+      isinownprofile = currentUser.userName == userName;
+    }
     return (
     <View style={styles.container}>
       {/* Bottom bar */}
@@ -42,10 +52,7 @@ const BottomBarComponent = ({ navigation }) => {
           <Image source={require('../../assets/icons/home.png')} style={styles.icon} />
         </TouchableOpacity>
 
-        {/* Button for search */}
-        <TouchableOpacity style={route.name != "MapView" ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={() => navigation.navigate("MapView")}>
-          <Image source={require('../../assets/icons/mapview6.png')} style={styles.icon} />
-        </TouchableOpacity>
+        
 
         {/* Button to navigate to post creation */}
         <TouchableOpacity style={(isLoggedIn && route.name != "PostCreation") ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToPostCreation}>
@@ -53,7 +60,7 @@ const BottomBarComponent = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Button for profile */}
-        <TouchableOpacity style={route.name != "LoginScreen" && route.name != "ProfileScreen" && route.name != 'UserProfile' ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToProfile}>
+        <TouchableOpacity style={route.name != "LoginScreen" && !(route.name == 'UserProfile' && isinownprofile) ? styles.bottomBarButton : styles.bottomBarButtondisabled} onPress={navigateToProfile}>
           <Image source={isLoggedIn ? require('../../assets/icons/profile.png') : require('../../assets/icons/login2.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
