@@ -174,79 +174,81 @@ const PostCreationScreen = ({ navigation }) => {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.label}>Restaurant</Text>
-        <RestaurantFinder textinputstyle={styles.input} placeholder="Enter restaurant name" Complete={ReceiveRestaurantData} CompleteReset={false}/>
+      <View style={{flex:1}}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.label}>Restaurant</Text>
+          <RestaurantFinder textinputstyle={styles.input} placeholder="Enter restaurant name" Complete={ReceiveRestaurantData} CompleteReset={false}/>
 
-        
+          
 
-        <Text style={styles.label}>Rating</Text>
-        <StarRating
-          rating={stars}
-          onChange={setStars}
-        />
-
-        <Text style={styles.label}>Content</Text>
-        <TextInput
-          style={[styles.input, { height: 100 }]}
-          value={content}
-          onChangeText={text => setContent(text)}
-          placeholder="Enter your review"
-          multiline
-        />
-
-        {/* Media Picker Bar */}
-        <View style={styles.mediaBar}>
-          <TouchableOpacity style={styles.mediaButton} onPress={pickImage}>
-            <Image source={require('../assets/icons/image.png')} style={styles.mediaicon} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.mediaButton} onPress={pickVideo}>
-            <Image source={require('../assets/icons/video.png')} style={styles.mediaicon} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.mediaButton} onPress={pickGif}>
-            <Image source={require('../assets/icons/gif.png')} style={styles.mediaicon} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.mediaButton} onPress={pickLocation}>
-            <Image source={require('../assets/icons/location.png')} style={styles.mediaicon} />
-          </TouchableOpacity>
-        </View>
-
-        
-
-        <View style={styles.mediaContainer}>
-          {mediaUris.map((uri, index) => (
-            <View key={index} style={styles.mediaPreviewContainer}>
-              <Image source={{ uri }} style={styles.previewImage} />
-              <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveMedia(uri)}>
-                <Text style={styles.removeButtonText}>X</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-
-        {location && (
-          <Text>Location: {location.coords.latitude}, {location.coords.longitude}</Text>
-        )}
-
-        {places.length > 0 && (
-          <FlatList
-            data={places}
-            keyExtractor={(item) => item.place_id}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => handlePlaceSelect(item)}>
-                <Text style={styles.placeItem}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
+          <Text style={styles.label}>Rating</Text>
+          <StarRating
+            rating={stars}
+            onChange={setStars}
           />
-        )}
 
-        <TouchableOpacity style={RestaurantID== null ? styles.submitButtondisabled : styles.submitButton} onPress={handleSubmit} disabled={RestaurantID== null}>
-          <Text style={styles.submitButtonText}>Post</Text>
-        </TouchableOpacity>
-        <Text style={{fontSize:30}}></Text>
-        <View Push style={styles.Pusher}/>
+          <Text style={styles.label}>Content</Text>
+          <TextInput
+            style={[styles.input, { height: 100 }]}
+            value={content}
+            onChangeText={text => setContent(text)}
+            placeholder="Enter your review"
+            multiline
+          />
+
+          {/* Media Picker Bar */}
+          <View style={styles.mediaBar}>
+            <TouchableOpacity style={styles.mediaButton} onPress={pickImage}>
+              <Image source={require('../assets/icons/image.png')} style={styles.mediaicon} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.mediaButton} onPress={pickVideo}>
+              <Image source={require('../assets/icons/video.png')} style={styles.mediaicon} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.mediaButton} onPress={pickGif}>
+              <Image source={require('../assets/icons/gif.png')} style={styles.mediaicon} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.mediaButton} onPress={pickLocation}>
+              <Image source={require('../assets/icons/location.png')} style={styles.mediaicon} />
+            </TouchableOpacity>
+          </View>
+
+          
+
+          <View style={styles.mediaContainer}>
+            {mediaUris.map((uri, index) => (
+              <View key={index} style={styles.mediaPreviewContainer}>
+                <Image source={{ uri }} style={styles.previewImage} />
+                <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveMedia(uri)}>
+                  <Text style={styles.removeButtonText}>X</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+
+          {location && (
+            <Text>Location: {location.coords.latitude}, {location.coords.longitude}</Text>
+          )}
+
+          {places.length > 0 && (
+            <FlatList
+              data={places}
+              keyExtractor={(item) => item.place_id}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => handlePlaceSelect(item)}>
+                  <Text style={styles.placeItem}>{item.name}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+
+          <TouchableOpacity style={RestaurantID== null ? styles.submitButtondisabled : styles.submitButton} onPress={handleSubmit} disabled={RestaurantID== null}>
+            <Text style={styles.submitButtonText}>Post</Text>
+          </TouchableOpacity>
+          <Text style={{fontSize:30}}></Text>
+          <View Push style={styles.Pusher}/>
+        </ScrollView>
         <BottomBarComponent navigation={navigation}/>
-      </ScrollView>
+      </View>
     </PanGestureHandler>
   );
 };

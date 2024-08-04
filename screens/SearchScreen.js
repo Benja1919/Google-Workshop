@@ -30,9 +30,8 @@ const SearchScreen = () => {
   const handleSearch = async (query) => {
     const users = await db.GetUsers();
     const posts = await db.GetPosts();
-
     const filteredUsers = users.filter(user =>
-      user.userName && user.userName.toLowerCase().includes(query.toLowerCase())
+      user.profilename && user.profilename.toLowerCase().includes(query.toLowerCase())
     );
 
     if (filteredUsers.length > 0) {
@@ -90,7 +89,7 @@ const SearchScreen = () => {
         <TouchableOpacity onPress={() => handleUserPress(item.userName)}>
           <View style={styles.userItem}>
             <Image source={{ uri: item.profileImageUrl }} style={styles.profileImage} />
-            <Text>{item.userName}</Text>
+            <Text>{item.profilename}</Text>
           </View>
         </TouchableOpacity>
       );
@@ -102,7 +101,7 @@ const SearchScreen = () => {
             <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
             <Text>{item.restaurantName}</Text>
             <Image source={{ uri: item.profileImageUrl }} style={styles.profileImage} />
-            <Text>{item.userName}</Text>
+            <Text>{item.profilename}</Text>
             <Text>{item.content}</Text>
           </View>
         </TouchableOpacity>
@@ -165,6 +164,7 @@ const SearchScreen = () => {
             placeholder="Enter search query"
             value={searchQuery}
             onChangeText={text => setSearchQuery(text)}
+            onEndEditing={() => handleSearch(searchQuery)}
           />
           <TouchableOpacity style={styles.searchButton} onPress={() => handleSearch(searchQuery)}>
             <Image source={require('../assets/icons/search.png')} style={styles.searchbarIcon} />
@@ -174,14 +174,14 @@ const SearchScreen = () => {
         {searchResults.length === 0 && recentSearches.length > 0 && renderRecentSearches()}
 
         {searchResults.length === 0 && recentSearches.length === 0 && renderNoResults()}
-
+        <View>
         <FlatList
           style={{ marginTop: 20 }}
           data={searchResults}
           keyExtractor={(item) => item.id ? item.id.toString() : item.userName}
           renderItem={renderResultItem}
         />
-        
+        </View>
       </View>
       <View style={styles.Pusher} />
       <BottomBarComponent navigation={navigation} />

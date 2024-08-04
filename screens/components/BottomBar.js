@@ -64,7 +64,7 @@ const BottomBarComponent = ({ navigation }) => {
     return (
     <View>
       {/* Bottom bar */}
-      <View style={{...styles.bottomBar,bottom: route.name != "HomeScreen" && route.name != "PostCreation" ? 0 : -10}}>
+      <View style={{...styles.bottomBar,bottom: route.name != "HomeScreen"  ? 0 : -10}}>
         
         {/* Button for home */}
         <View style={{flexDirection:'column'}}>
