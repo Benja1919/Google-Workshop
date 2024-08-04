@@ -50,7 +50,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
             <View style={styles.textContainer}>
                 <TouchableOpacity style={styles.userContainer} onPress={() => navigateToProfile(post.userName)}>
                     <Image source={{ uri: profileImageUrl }} style={styles.userImage} />
-                    <Text style={styles.userName}>{post.userName}</Text>
+                    <Text style={styles.userName}>{post.userprofile}</Text>
                 </TouchableOpacity>
                 <StarRating rating={post.stars} onChange={() => {}} starSize={25} starStyle={{ marginHorizontal: 0 }}/>
             </View>

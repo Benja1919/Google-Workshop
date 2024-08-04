@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, Pressable ,Button,TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet, Pressable ,Button,TouchableWithoutFeedback, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
@@ -226,6 +226,7 @@ const MyListsScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [reloadlists, RefetchLists] = useState(null);
   const { currentUser } = useContext(AuthContext);
+  const isYou = currentUser != null && currentUser.userName === user.userName;
   useEffect(() => { //fetch the list of user from the DB
     const fetchLists = async () => {
     //  if (!currentUser) return;
@@ -256,7 +257,25 @@ const MyListsScreen = ({ route, navigation }) => {
       const fetchfollowedklsits = async () =>{
         const listsids = await firestoreDB().GetUserFollowedListIds(user.userName.toLowerCase());
         const flists = await firestoreDB().GetFollowedLists(listsids);
-        if(lists != null){
+        if(flists != null){
+          //logic to remove followed lists that the owner has deleted//
+          not_exists = [];
+          let index = 0;
+          while (index < flists.length) {
+            if (!flists[index].Image) {
+                not_exists.push(flists[index].id);
+                flists.splice(index, 1); // Remove the item
+            } else {
+                index++; // Only increment if no item was removed
+            }
+          }
+          if(not_exists.length > 0 && currentUser && user.userName == currentUser.userName){
+            
+            Alert.alert(`Removed ${not_exists.length} deleted list${not_exists.length > 1 ? "s" : ''}`);
+            
+            const newListIds = listsids.filter(item => !not_exists.includes(item));
+            firestoreDB().UpdateUserFollowedLists(newListIds, currentUser.id)
+          }
           setFollowedLists(flists);
         }
       };
@@ -291,7 +310,7 @@ const MyListsScreen = ({ route, navigation }) => {
     lists[index].listDescription = text;
     firestoreDB().updateList(lists[index]);
   };
-  const isYou = currentUser != null && currentUser.userName === user.userName;
+  
   const sideButtonPress = ({isfromforeign, index}) =>{
     item = isfromforeign ? followedlists[index] : lists[index];
     const isfollowed = CurrentUserFollow.includes(item.id);
@@ -346,7 +365,7 @@ const MyListsScreen = ({ route, navigation }) => {
         <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
         <View style={{ flex: 1, alignItems: 'center' }}>
           <Text style={{...styles.titletext,marginLeft:-40}}>
-            {isYou ? `Your Lists` : `${user.userName}'s Lists`}
+            {isYou ? `Your Lists` : `${user.profilename}'s Lists`}
           </Text>
         </View>
         {isYou &&
@@ -380,7 +399,7 @@ const MyListsScreen = ({ route, navigation }) => {
         />
       </View>
       </View>
-      {user.FollowedLists.length > 0 && followedlists != null && followedlists.length > 0 && (
+      {followedlists != null && followedlists.length > 0 && (
         <View style={{flex:1}}>
           <Text style={{ ...styles.titletext }}>Followed Lists</Text>
           <View style={{ ...styles.separator, marginBottom: 10 }} />

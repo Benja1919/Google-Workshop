@@ -158,6 +158,7 @@ const PostCreationScreen = ({ navigation }) => {
     const newPost = {
       id: Math.random().toString(),
       userName: currentUser.userName,
+      userprofile: currentUser.userprofile,
       restaurantName: restaurantName,
       RestaurantID: RestaurantID,
       stars: stars,

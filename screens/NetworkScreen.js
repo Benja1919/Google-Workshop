@@ -88,7 +88,7 @@ const NetworkScreen = ({ navigation, route }) => {
           <TouchableOpacity style={styles.card} onPress={() => navigateToProfile(item.userName)}>
             <Image style={styles.image} source={{ uri: item.profileImageUrl }} />
             <View style={styles.cardContent}>
-              <Text style={styles.name}>{item.userName}</Text>
+              <Text style={styles.name}>{item.profilename}</Text>
               {currentUser?.userName !== item.userName && currentUser && (
                 <View style={styles.buttonsContainer}>
                   {isFollowing(item) ? (

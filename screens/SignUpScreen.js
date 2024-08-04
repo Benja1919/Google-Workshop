@@ -5,15 +5,21 @@ import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { firestoreDB } from './FirebaseDB'; // Adjust your imports based on your file structure
 import { Timestamp } from 'firebase/firestore';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { useFonts } from 'expo-font';
 
 const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
+  const [profilename, setprofilename] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
   const [isRestaurant, setisRestaurant] = useState(false); 
-
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
@@ -61,6 +67,7 @@ const SignUpScreen = ({ navigation }) => {
   const createNewUser = async () => {
     const newUser = {
       userName: username,
+      profilename : profilename,
       password: password,
       email: email.toLocaleLowerCase(),
       friends: [],
@@ -74,7 +81,7 @@ const SignUpScreen = ({ navigation }) => {
   };
 
   const handleSignUp = async () => {
-    if (!email || !username || !password || !confirmPassword || !profileImageUrl) {
+    if (!email || !username || !password || !confirmPassword || !profileImageUrl || !profilename) {
       Alert.alert('Error', 'All fields must be filled!');
       return;
     }
@@ -117,11 +124,19 @@ const SignUpScreen = ({ navigation }) => {
         autoCapitalize="none"
         keyboardType="email-address"
       />
+      
       <TextInput
         style={styles.input}
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Profile Name"
+        value={profilename}
+        onChangeText={setprofilename}
         autoCapitalize="none"
       />
       <TextInput
@@ -138,18 +153,7 @@ const SignUpScreen = ({ navigation }) => {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
-      <View style={styles.checkboxContainer}>
-        <BouncyCheckbox
-          size={25}
-          fillColor="#0B99E8"
-          unfillColor="#FFFFFF"
-          disabled={true}
-          text="This is a Restaurant profile"
-          innerIconStyle={{ borderWidth: 2 }}
-          textStyle={{ textDecorationLine: "none" }}
-          onPress={(isChecked) => setisRestaurant(isChecked)}
-        />
-      </View>
+      
       <TouchableOpacity onPress={pickProfileImage} style={styles.imagePicker}>
         {profileImageUrl ? (
           <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
@@ -161,7 +165,20 @@ const SignUpScreen = ({ navigation }) => {
     </View>
   );
 };
-
+/* the restaurnat checkbox
+<View style={styles.checkboxContainer}>
+        <BouncyCheckbox
+          size={25}
+          fillColor="#0B99E8"
+          unfillColor="#FFFFFF"
+          disabled={true}
+          text="This is a Restaurant profile"
+          innerIconStyle={{ borderWidth: 2 }}
+          textStyle={{ textDecorationLine: "none" }}
+          onPress={(isChecked) => setisRestaurant(isChecked)}
+        />
+      </View>
+*/
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -172,7 +189,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Oswald-Bold',
     marginBottom: 20,
   },
   input: {
@@ -183,6 +200,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
+    fontFamily: 'Oswald-Light',
   },
   imagePicker: {
     alignItems: 'center',
@@ -197,6 +215,7 @@ const styles = StyleSheet.create({
   imagePickerText: {
     textAlign: 'center',
     color: 'gray',
+    fontFamily: 'Oswald-Medium',
   },
   profileImage: {
     width: '100%',

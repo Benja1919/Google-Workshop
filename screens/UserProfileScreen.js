@@ -44,7 +44,7 @@ const UserProfileScreen = ({ route, navigation }) => {
 
     fetchUserData();
   }, [userName]);
-
+  
   useEffect(() => { //fetch the list of user from the DB
     // Function to fetch friends from DB
     const fetchFriends = async () => {
@@ -183,7 +183,7 @@ const UserProfileScreen = ({ route, navigation }) => {
             ) : (
               <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
             )}
-            <Text style={styles.header}>{userName}</Text>
+            <Text style={styles.header}>{user.profilename}</Text>
             {currentUser && currentUser.userName === userName ? (
               <View style={styles.editButtonsContainer}>
                 {isEditing ? (
