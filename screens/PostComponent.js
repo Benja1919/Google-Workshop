@@ -24,15 +24,13 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
     useEffect(() => {
         const fetchProfileImage = async () => {
             try {
-                if (!post.userName)
-                    return;  // Early return if userName is not defined
+                if (!post.userName) return;  // Early return if userName is not defined
                 const user = await firestoreDB().GetUserName(post.userName.toLowerCase()) || {};
                 setProfileImageUrl(user.profileImageUrl || 'defaultProfileImageUri');
             } catch (error) {
                 console.error('Error fetching profile image:', error);
                 setProfileImageUrl('defaultProfileImageUri'); // Set default image URI on error
-            }
-            finally {
+            } finally {
                 setUserProfileLoaded(true);
             }
         };
@@ -80,19 +78,27 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
                 </TouchableOpacity>
                 <StarRating rating={post.stars} onChange={() => {}} starSize={25} starStyle={{ marginHorizontal: 0 }}/>
             </View>
-            <View style={styles.likeContainer}>
-                <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
-                    <Image
-                        source={post.like_users.includes(currentUser?.userName) ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
-                        style={styles.icon}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.likesCountText}>{likesCount} {'likes'}</Text>
-            </View> 
-            <TouchableOpacity style={styles.bottomTextContainer} onPress={() => navigateToRestaurant(post.RestaurantID)}>
+
+            <View style={styles.bottomTextContainer}>
+            <TouchableOpacity onPress={() => navigateToRestaurant(post.RestaurantID)}>
                 <Text style={styles.contentBig}>{post.restaurantName}</Text>
-                <Text style={styles.content}>{post.content}</Text>
             </TouchableOpacity>
+            <Text style={styles.content}>{post.content}</Text>
+            <View style={styles.dateAndLikeContainer}>
+                <Text style={styles.date}>{postDate}</Text>
+                <View style={styles.likeContainer}>
+                    <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
+                        <Image
+                            source={post.like_users.includes(currentUser?.userName) ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
+                            style={styles.icon}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.likesCountText}>{likesCount} {'likes'}</Text>
+                </View>
+            </View>
+        </View>
+
+
         </View>
     );
 };
@@ -103,7 +109,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginVertical: 12,
         overflow: 'hidden',
-        height: Dimensions.get('window').width * 0.75, // Height set to maintain aspect ratio
+        height: Dimensions.get('window').width * 0.93, // Height set to maintain aspect ratio
     },
     backgroundImage: {
         position: 'absolute',
@@ -120,10 +126,39 @@ const styles = StyleSheet.create({
     },
     bottomTextContainer: {
         flex: 0,
-        marginTop: 130,
-        justifyContent: 'flex-end',
+        marginTop: 150,
         padding: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)' // Semi-transparent overlay for better text readability
+        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent overlay for better text readability
+    },
+    dateAndLikeContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: -10, 
+    },
+    date: {
+        color: '#FFF',
+        fontFamily: 'Oswald-Light',
+        fontSize: 14,
+    },
+    likeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    likeButton: {
+        backgroundColor: 'transparent',
+        padding: 10,  // Adjust padding to change button size
+        width: 40,  // Adjust width to make the button larger or smaller
+        height: 40,  // Adjust height to make the button larger or smaller
+    },
+    icon: {
+        width: '100%',  // Ensure the icon takes up the full size of the button
+        height: '100%',  // Ensure the icon takes up the full size of the button
+        resizeMode: 'contain',  // Ensure the icon maintains its aspect ratio
+    },
+    likesCountText: {
+        fontSize: 16,
+        fontFamily: 'Oswald-Medium',
     },
     userContainer: {
         flexDirection: 'row',
@@ -143,6 +178,7 @@ const styles = StyleSheet.create({
     date: {
         color: '#FFF',
         fontFamily: 'Oswald-Light',
+        alignItems: 'center',
         fontSize: 14,
     },
     content: {
@@ -159,17 +195,18 @@ const styles = StyleSheet.create({
     },
     likeContainer: {
         flexDirection: 'row',
-        alignItems: 'top',
+        alignItems: 'center',
         marginTop: 10,
     },
     likesCountText: {
+        color: '#FFF',
         fontSize: 16,
         fontFamily: 'Oswald-Medium',
     },
     likeButton: {
         backgroundColor: 'transparent',
         padding: 10,  // Adjust padding to change button size
-        marginRight: 10,
+        marginRight: 0,
         width: 40,  // Adjust width to make the button larger or smaller
         height: 40,  // Adjust height to make the button larger or smaller
     },
