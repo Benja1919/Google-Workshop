@@ -38,9 +38,6 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
         fetchProfileImage();
     }, [post.userName]);
 
-    if (!fontsLoaded || !userProfileLoaded) {
-        return <Text>Loading...</Text>; // Display a loading text while fonts are loading
-    }
 
     const postDate = new Date(post.creationTime.seconds * 1000).toLocaleDateString();
 
@@ -134,7 +131,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '35%',
         overflow: 'hidden',
-        // backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent overlay for better text readability
     },
     dateAndLikeContainer: {
         flexDirection: 'row',
