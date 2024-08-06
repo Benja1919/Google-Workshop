@@ -9,7 +9,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
     const [profileImageUrl, setProfileImageUrl] = useState('defaultProfileImageUri');
     const { currentUser } = useContext(AuthContext);
     const [userProfileLoaded, setUserProfileLoaded] = useState(false);
-    const [likesCount, setLikesCount] = useState(post.likes ? post.likes.length : 0);
+    const [likesCount, setLikesCount] = useState(post.likes ? post.likes : 0);
     const [fontsLoaded] = useFonts({
         "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
         "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
@@ -69,47 +69,49 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
     };
 
     return (
-        <View style={styles.postCard}> 
-            <Image source={{ uri: post.mediaUrls[0] }} style={styles.backgroundImage} />
-            <View style={styles.textContainer}>
-                <TouchableOpacity style={styles.userContainer} onPress={() => navigateToProfile(post.userName)}>
-                    <Image source={{ uri: profileImageUrl }} style={styles.userImage} />
-                    <Text style={styles.userName}>{post.userprofile}</Text>
-                </TouchableOpacity>
-                <StarRating rating={post.stars} onChange={() => {}} starSize={25} starStyle={{ marginHorizontal: 0 }}/>
+        <View style={styles.post}>
+            <View style={styles.postCard}> 
+                <Image source={{ uri: post.mediaUrls[0] }} style={styles.backgroundImage} />
+                <View style={styles.textContainer}>
+                    <TouchableOpacity style={styles.userContainer} onPress={() => navigateToProfile(post.userName)}>
+                        <Image source={{ uri: profileImageUrl }} style={styles.userImage} />
+                        <Text style={styles.userName}>{post.userprofile}</Text>
+                    </TouchableOpacity>
+                    <StarRating rating={post.stars} onChange={() => {}} starSize={22} color={'#FFF'} starStyle={{ marginHorizontal: 0 }}/>
+                </View>
             </View>
 
             <View style={styles.bottomTextContainer}>
-            <TouchableOpacity onPress={() => navigateToRestaurant(post.RestaurantID)}>
-                <Text style={styles.contentBig}>{post.restaurantName}</Text>
-            </TouchableOpacity>
-            <Text style={styles.content}>{post.content}</Text>
-            <View style={styles.dateAndLikeContainer}>
-                <Text style={styles.date}>{postDate}</Text>
-                <View style={styles.likeContainer}>
-                    <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
-                        <Image
-                            source={post.like_users.includes(currentUser?.userName) ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
-                            style={styles.icon}
-                        />
-                    </TouchableOpacity>
-                    <Text style={styles.likesCountText}>{likesCount} {'likes'}</Text>
+                <TouchableOpacity onPress={() => navigateToRestaurant(post.RestaurantID)}>
+                    <Text style={styles.contentBig}>{post.restaurantName}</Text>
+                </TouchableOpacity>
+                <Text style={styles.content}>{post.content}</Text>
+                <View style={styles.dateAndLikeContainer}>
+                    <Text style={styles.date}>{postDate}</Text>
+                    <View style={styles.likeContainer}>
+                        <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
+                            <Image
+                                source={post.like_users.includes(currentUser?.userName) ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
+                                style={styles.icon}
+                            />
+                        </TouchableOpacity>
+                        <Text style={styles.likesCountText}>{likesCount} {'likes'}</Text>
+                    </View>
                 </View>
             </View>
         </View>
-
-
-        </View>
     );
 };
-
 const styles = StyleSheet.create({
+    post: {
+        flex: 1
+    },
     postCard: {
         flex: 1,
-        borderRadius: 8,
-        marginVertical: 12,
+        borderRadius: 0,
+        marginBottom: -10,
         overflow: 'hidden',
-        height: Dimensions.get('window').width * 0.93, // Height set to maintain aspect ratio
+        height: Dimensions.get('window').width , // Height set to maintain aspect ratio
     },
     backgroundImage: {
         position: 'absolute',
@@ -122,13 +124,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)' // Semi-transparent overlay for better text readability
+        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent overlay for better text readability
     },
     bottomTextContainer: {
         flex: 0,
-        marginTop: 150,
+        marginTop: 0,
+        marginBottom : 50,
         padding: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent overlay for better text readability
+        width: '100%',
+        height: '35%',
+        overflow: 'hidden',
+        // backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent overlay for better text readability
     },
     dateAndLikeContainer: {
         flexDirection: 'row',
@@ -137,9 +143,10 @@ const styles = StyleSheet.create({
         marginTop: -10, 
     },
     date: {
-        color: '#FFF',
+        color: '#000',
         fontFamily: 'Oswald-Light',
         fontSize: 14,
+        alignItems: 'center',
     },
     likeContainer: {
         flexDirection: 'row',
@@ -159,6 +166,7 @@ const styles = StyleSheet.create({
     likesCountText: {
         fontSize: 16,
         fontFamily: 'Oswald-Medium',
+        color: '#000',
     },
     userContainer: {
         flexDirection: 'row',
@@ -172,52 +180,22 @@ const styles = StyleSheet.create({
     },
     userName: {
         color: '#FFF',
-        fontFamily: 'Oswald-Medium',
+        fontFamily: 'Oswald-Light',
         fontSize: 18,
     },
-    date: {
-        color: '#FFF',
-        fontFamily: 'Oswald-Light',
-        alignItems: 'center',
-        fontSize: 14,
-    },
     content: {
-        color: '#FFF',
+        color: '#000',
         fontFamily: 'Oswald-Medium',
         fontSize: 16,
         marginBottom: 0, // Adds some spacing at the bottom
     },
     contentBig: {
-        color: '#FFF',
+        color: '#000',
         fontFamily: 'Oswald-Medium',
         fontSize: 22,
         marginBottom: 0, // Adds some spacing at the bottom
     },
-    likeContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    likesCountText: {
-        color: '#FFF',
-        fontSize: 16,
-        fontFamily: 'Oswald-Medium',
-    },
-    likeButton: {
-        backgroundColor: 'transparent',
-        padding: 10,  // Adjust padding to change button size
-        marginRight: 0,
-        width: 40,  // Adjust width to make the button larger or smaller
-        height: 40,  // Adjust height to make the button larger or smaller
-    },
-    icon: {
-        width: '100%',  // Ensure the icon takes up the full size of the button
-        height: '100%',  // Ensure the icon takes up the full size of the button
-        resizeMode: 'contain',  // Ensure the icon maintains its aspect ratio
-    },
-    likeText: {
-        fontFamily: 'Oswald-Medium',
-    },
 });
+
 
 export default PostComponent;
