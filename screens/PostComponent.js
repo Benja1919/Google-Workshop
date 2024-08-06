@@ -5,10 +5,11 @@ import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
 import StarRating from 'react-native-star-rating-widget';
 
-const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
+const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigateToLogin }) => {
     const [profileImageUrl, setProfileImageUrl] = useState('defaultProfileImageUri');
     const { currentUser } = useContext(AuthContext);
     const [userProfileLoaded, setUserProfileLoaded] = useState(false);
+    const [likesCount, setLikesCount] = useState(post.likes ? post.likes.length : 0);
     const [fontsLoaded] = useFonts({
         "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
         "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
@@ -44,6 +45,31 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
     }
 
     const postDate = new Date(post.creationTime.seconds * 1000).toLocaleDateString();
+
+    const toggleLike = async () => {
+        if (!currentUser || !currentUser.userName) {
+            navigateToLogin(); // Redirect to login if not logged in
+            return;
+        }
+
+        const alreadyLiked = post.like_users.includes(currentUser.userName);
+
+        // Optimistic update
+        setLikesCount(prevCount => alreadyLiked ? prevCount - 1 : prevCount + 1);
+
+        try {
+            const updatedPostDoc = alreadyLiked 
+                ? await firestoreDB().UnlikePost(post.id, currentUser.userName)
+                : await firestoreDB().LikePost(post.id, currentUser.userName);
+            const updatedPost = updatedPostDoc.data();
+            setLikesCount(updatedPost.likes);
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            // Revert the optimistic update if an error occurred
+            setLikesCount(prevCount => alreadyLiked ? prevCount + 1 : prevCount - 1);
+        }
+    };
+
     return (
         <View style={styles.postCard}> 
             <Image source={{ uri: post.mediaUrls[0] }} style={styles.backgroundImage} />
@@ -54,11 +80,19 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant }) => {
                 </TouchableOpacity>
                 <StarRating rating={post.stars} onChange={() => {}} starSize={25} starStyle={{ marginHorizontal: 0 }}/>
             </View>
+            <View style={styles.likeContainer}>
+                <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
+                    <Image
+                        source={post.like_users.includes(currentUser?.userName) ? require('../assets/icons/unlike.png') : require('../assets/icons/like.png')}
+                        style={styles.icon}
+                    />
+                </TouchableOpacity>
+                <Text style={styles.likesCountText}>{likesCount} {'likes'}</Text>
+            </View> 
             <TouchableOpacity style={styles.bottomTextContainer} onPress={() => navigateToRestaurant(post.RestaurantID)}>
-                <Text style={styles.contentBig} > {post.restaurantName} </Text>
-                {/* <Text style={styles.date}>{postDate}</Text> */}
+                <Text style={styles.contentBig}>{post.restaurantName}</Text>
                 <Text style={styles.content}>{post.content}</Text>
-            </TouchableOpacity>          
+            </TouchableOpacity>
         </View>
     );
 };
@@ -78,7 +112,6 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
     },
     textContainer: {
-        // flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -87,7 +120,7 @@ const styles = StyleSheet.create({
     },
     bottomTextContainer: {
         flex: 0,
-        marginTop : 130,
+        marginTop: 130,
         justifyContent: 'flex-end',
         padding: 10,
         backgroundColor: 'rgba(0, 0, 0, 0.3)' // Semi-transparent overlay for better text readability
@@ -111,21 +144,42 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: 'Oswald-Light',
         fontSize: 14,
-        // marginVertical: 5,
     },
     content: {
         color: '#FFF',
         fontFamily: 'Oswald-Medium',
         fontSize: 16,
-        // marginTop : ,
         marginBottom: 0, // Adds some spacing at the bottom
     },
     contentBig: {
         color: '#FFF',
         fontFamily: 'Oswald-Medium',
         fontSize: 22,
-        // marginTop : ,
         marginBottom: 0, // Adds some spacing at the bottom
+    },
+    likeContainer: {
+        flexDirection: 'row',
+        alignItems: 'top',
+        marginTop: 10,
+    },
+    likesCountText: {
+        fontSize: 16,
+        fontFamily: 'Oswald-Medium',
+    },
+    likeButton: {
+        backgroundColor: 'transparent',
+        padding: 10,  // Adjust padding to change button size
+        marginRight: 10,
+        width: 40,  // Adjust width to make the button larger or smaller
+        height: 40,  // Adjust height to make the button larger or smaller
+    },
+    icon: {
+        width: '100%',  // Ensure the icon takes up the full size of the button
+        height: '100%',  // Ensure the icon takes up the full size of the button
+        resizeMode: 'contain',  // Ensure the icon maintains its aspect ratio
+    },
+    likeText: {
+        fontFamily: 'Oswald-Medium',
     },
 });
 

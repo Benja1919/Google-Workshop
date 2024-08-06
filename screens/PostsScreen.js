@@ -84,6 +84,11 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
     navigation.navigate('Restaurant', { restaurantName:null, restaurantID: restaurantID });
   };
 
+  const navigateToLogin = () => {
+    navigation.navigate('LoginScreen', {});
+  };
+  
+
   /**
    * renderPost
    *
@@ -97,6 +102,9 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
       post={item}
       navigateToProfile={navigateToProfile}
       navigateToRestaurant={navigateToRestaurant}
+      navigateToLogin={navigateToLogin}
+      
+
     />
   );
 
