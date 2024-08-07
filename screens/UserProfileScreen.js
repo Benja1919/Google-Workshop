@@ -171,20 +171,6 @@ const UserProfileScreen = ({ route, navigation }) => {
           <Text style={styles.header}>{user.profilename}</Text>
         </View>
 
-        
-        <View style={styles.buttonContainer}>
-          {buttons.map((button, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.button}
-              onPress={() => navigateToScreen(button.screen)}
-            >
-              <Image source={buttons[index].icon} style={styles.icon} />
-              <Text style={styles.buttonText}>{button.label}</Text>
-            </TouchableOpacity>
-          ))}
-        <View/>
-
         <View style={styles.profileContainer}>
             {currentUser && currentUser.userName === userName ? (
               <View style={styles.editButtonsContainer}>
@@ -230,6 +216,19 @@ const UserProfileScreen = ({ route, navigation }) => {
               )
             )}
           </View>
+        <View style={styles.buttonContainer}>
+          {buttons.map((button, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.button}
+              onPress={() => navigateToScreen(button.screen)}
+            >
+              <Image source={buttons[index].icon} style={styles.icon} />
+              <Text style={styles.buttonText}>{button.label}</Text>
+            </TouchableOpacity>
+          ))}
+        <View/>
+
         </View>
         <View style={{ flex: 1 }} />
         <BottomBarComponent navigation={navigation} style={{ justifyContent: 'flex-end' }} />
@@ -242,6 +241,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    // backgroundColor: "green"
+
     // backgroundColor: 'white'
   },
 
@@ -257,6 +258,7 @@ const styles = StyleSheet.create({
     height: 183,
     width: 183,
     top: -6.5,
+
     // zIndex: 1
 
   },
@@ -282,6 +284,7 @@ const styles = StyleSheet.create({
     fontFamily: "Oswald-Bold",
     textAlign: 'center',
     margin: 10,
+    
   },
   icon: {
     width: 20,
@@ -290,6 +293,8 @@ const styles = StyleSheet.create({
   profileContainer: {
     alignItems: 'center',
     marginTop: 0,
+    // backgroundColor: "red"
+
   },
   profileImage: {
     position: 'center',
@@ -297,10 +302,11 @@ const styles = StyleSheet.create({
     height: 170,
     borderRadius: 170,
     zIndex: 2,
+    
     // marginBottom: 10,
   },
   followButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#D36B00',
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 20,
