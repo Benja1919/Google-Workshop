@@ -2,7 +2,7 @@ import React, {useState, useContext} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
-import { Image, LogBox, View, TouchableOpacity,Text } from 'react-native';
+import { Image,StyleSheet, LogBox, View, TouchableOpacity,Text } from 'react-native';
 import UserProfileScreen from './screens/UserProfileScreen';
 import RestaurantScreen from './screens/RestaurantScreen';
 import PostsScreen from './screens/PostsScreen';
@@ -19,6 +19,7 @@ import MapMenu from './screens/MapMenu';
 import Landingpage from './screens/Landing';
 import { useFonts } from 'expo-font';
 import LogoutButton from './screens/components/logoutbutton';
+
 //caused by a library component DateTimePickerModal
 LogBox.ignoreLogs([ //suppresses in expo go
   /defaultProps will be removed/
@@ -55,6 +56,8 @@ const App = () => {
   }
   return (
     <AuthProvider>
+        <View style={styles.appBackground}>
+
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Landingpage">
         <Stack.Screen 
@@ -243,9 +246,18 @@ const App = () => {
         </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
+      </View>
     </AuthProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  appBackground: {
+    flex: 1,
+    backgroundColor: 'blue', // Set your desired background color here
+  },
+});
+
 
 export default App;
 

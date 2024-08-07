@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions,BackHandler } from 'react-native';
 import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
+import line from '../assets/line.png'
+import circle from '../assets/circle.png'
 import myNetworkIcon from '../assets/icons/network.png';
 import { firestoreDB } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
@@ -10,6 +12,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFonts } from 'expo-font';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
+
 
 
 const UserProfileScreen = ({ route, navigation }) => {
@@ -158,42 +161,31 @@ const UserProfileScreen = ({ route, navigation }) => {
     { label: 'My Network', screen: 'Network', icon: myNetworkIcon },
   ];
 
-  const screenWidth = Dimensions.get('window').width;
-  const screenHeight = Dimensions.get('window').height;
-  const radius = Math.min(screenWidth, screenHeight) / 2.7;
-
-  const buttonStyles = buttons.map((button, index) => {
-    const angle = (Math.PI) / (buttons.length - 1) * index - Math.PI;
-    const x = radius * Math.cos(angle);
-    const y = radius * Math.sin(angle);
-    return {
-      ...styles.circleButton,
-      left: screenWidth / 2 + x - 40,
-      top: screenHeight / 2 + y - 110,
-    };
-  });
-
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
-      <View style={{ flex: 1 }}>
-        <View>
+      <View style={{flex: 1 }}>
+        <View style={styles.container}>
+          <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
+          <Image source={line } style={styles.line} />
+          <Image source={circle } style={styles.circle} />
+          <Text style={styles.header}>{user.profilename}</Text>
+        </View>
+
+        
+        <View style={styles.buttonContainer}>
           {buttons.map((button, index) => (
             <TouchableOpacity
               key={index}
-              style={buttonStyles[index]}
+              style={styles.button}
               onPress={() => navigateToScreen(button.screen)}
             >
               <Image source={buttons[index].icon} style={styles.icon} />
               <Text style={styles.buttonText}>{button.label}</Text>
             </TouchableOpacity>
           ))}
-          <View style={styles.profileContainer}>
-            {currentUser && currentUser.userName === userName ? (
-              <Image source={{ uri: newImage || user.profileImageUrl }} style={styles.profileImage} />
-            ) : (
-              <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
-            )}
-            <Text style={styles.header}>{user.profilename}</Text>
+        <View/>
+
+        <View style={styles.profileContainer}>
             {currentUser && currentUser.userName === userName ? (
               <View style={styles.editButtonsContainer}>
                 {isEditing ? (
@@ -248,11 +240,42 @@ const UserProfileScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F5FCFF',
+    // backgroundColor: 'white'
   },
+
+  line:{
+    height:300,
+    width: "100%",
+    position: 'absolute',
+    zIndex: 1,
+    },
+
+  circle:{
+    position: 'absolute',
+    height: 171,
+    width: 171,
+    top: 0,
+    // zIndex: 1
+
+  },
+
+  buttonContainer: {
+    flex: 1,
+    top: 40,
+    width: 200,
+    alignSelf:'center',
+    marginVertical: 5,
+    // backgroundColor: "green"
+
+  },
+
+  button:{
+    backgroundColor:"#E6D2AA",
+    marginTop: 10,
+  },
+
   header: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -266,13 +289,15 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: 'center',
-    marginTop: 225,
+    marginTop: 0,
   },
   profileImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 200,
-    marginBottom: 10,
+    position: 'center',
+    width: 170,
+    height: 170,
+    borderRadius: 170,
+    zIndex: 2,
+    // marginBottom: 10,
   },
   followButton: {
     backgroundColor: '#2196F3',
@@ -313,7 +338,7 @@ const styles = StyleSheet.create({
   editButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 10,
+    marginTop: 20,
   },
   editButton: {
     marginHorizontal: 10,
@@ -338,29 +363,17 @@ const styles = StyleSheet.create({
     fontFamily: 'Oswald-Medium',
     color: 'black',
   },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-    elevation: 10,
-  },
-  circleButton: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#282512',
-  },
+  // circleButton: {
+  //   position: 'absolute',
+  //   width: 80,
+  //   height: 80,
+  //   borderRadius: 40,
+  //   backgroundColor: 'white',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   borderWidth: 1,
+  //   borderColor: '#282512',
+  // },
   icon: {
     width: 25,
     height: 25,
