@@ -85,7 +85,7 @@ const App = () => {
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image
                       source={require("./assets/icons/search.png")}
-                      style={{ tintColor: 'black', width: 50, height: 30, marginLeft: 5, resizeMode: 'contain' }}
+                      style={{ tintColor: '#434343',width: 27, height: 27, marginRight: 20, resizeMode: 'contain' }}
                     />
                     <Text style={{ color: 'black', marginLeft: 8 }}></Text>
                   </View>
