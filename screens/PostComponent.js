@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         borderRadius: 0,
         // marginBottom: -10,
         overflow: 'hidden',
-        height: Dimensions.get('window').width , // Height set to maintain aspect ratio
+        height: Dimensions.get('window').height * 0.35 , // Height set to maintain aspect ratio
     },
     backgroundImage: {
         position: 'absolute',
