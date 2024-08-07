@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     position: 'absolute',
-    height: 65,
+    height: 70,
     left: -20,
     right: -20,
     paddingHorizontal: 30,
@@ -115,16 +115,16 @@ const styles = StyleSheet.create({
   },
   postButton: {
     position: 'center',
-    bottom: 23,  // Adjust as needed to overlay properly
+    bottom: 30,  
     alignSelf: 'center',
     backgroundColor: '#fff',
     borderRadius: 50,
-    padding: 7,
+    padding: 3,
     elevation: 10,
   },
   postIcon: {
-    width: 60,
-    height: 60,
+    width: 65,
+    height: 65,
   },
 });
 

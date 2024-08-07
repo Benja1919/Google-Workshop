@@ -20,8 +20,8 @@ const LogoutButton = ({navigation}) =>{
           onPress={handlePress}
         >
           <Image 
-            style={{ width: 40, height: 31, tintColor: "black" }}
-            source={require("../../assets/icons/logout3.png")}        
+            style={{ width: 25, height: 25, tintColor: "black" ,marginLeft: 25 }}
+            source={require("../../assets/icons/logout.png")}        
           />
         </TouchableOpacity> 
         );
