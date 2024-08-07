@@ -7,14 +7,14 @@ import { useFonts } from 'expo-font';
 const buttonimagesinverted = {
   home: require('../../assets/icons/home2.png'),
   post: require('../../assets/icons/add2.png'),
-  login: require('../../assets/icons/logininv.png'),
-  profile: require('../../assets/icons/profileinv.png'),
+  login: require('../../assets/icons/log-in2.png'),
+  profile: require('../../assets/icons/avatar2.png'),
 };
 const buttonimages = {
   home: require('../../assets/icons/home.png'),
   post: require('../../assets/icons/add.png'),
-  login: require('../../assets/icons/login2.png'),
-  profile: require('../../assets/icons/profile.png'),
+  login: require('../../assets/icons/log-in.png'),
+  profile: require('../../assets/icons/avatar.png'),
 };
 
 const BottomBarComponent = ({ navigation }) => {
@@ -110,6 +110,8 @@ const styles = StyleSheet.create({
   icon: {
     width: 25,
     height: 25,
+    backgroundColor: '#fff',
+    alignItems: 'stretch'
   },
   postButton: {
     position: 'center',
