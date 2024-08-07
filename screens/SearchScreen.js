@@ -197,12 +197,12 @@ const SearchScreen = () => {
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={{ flex: 1}}>
       <View style={{padding:20,flex:1}}>
-        <View style={styles.buttonContainer}>
-          {/* <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
+        {/*<View style={styles.buttonContainer}>
+           <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
             <View>
               <Image source={require('../assets/icons/fire.png')} style={styles.searchicon} />
             </View>
-          </TouchableOpacity> */}
+          </TouchableOpacity> 
           <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('burger')}>
             <View>
               <Image source={require('../assets/icons/burger.png')} style={styles.searchicon} />
@@ -224,7 +224,7 @@ const SearchScreen = () => {
             </View>
           </TouchableOpacity>
         </View>
-
+        */}
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
@@ -270,7 +270,7 @@ const SearchScreen = () => {
             />
           </View>
         }
-        {!searchResults?.posts?.length > 0 && !searchResults?.restaurants?.length > 0 && !searchResults?.users?.length > 0 && 
+        {searchResults?.posts && !searchResults?.posts?.length > 0 && searchResults?.restaurants && !searchResults?.restaurants?.length > 0 && searchResults?.users && !searchResults?.users?.length > 0 && 
           <Text style={{fontFamily :'Oswald-Medium',fontSize:30}}>No results</Text>
         }
         </ScrollView>
