@@ -1,12 +1,22 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from './AuthContext';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet,ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { firestoreDB } from './FirebaseDB';
 import PostComponent from './PostComponent';
+import { GetPlaces, getPhotoUri } from './components/Maps';
+import * as Location from 'expo-location';
+import {haversineDistance} from './components/RestaurantFinder';
+import { useFonts } from 'expo-font';
+const col2 = '#f9f9f9';
 const SearchScreen = () => {
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
   const { isLoggedIn } = useContext(AuthContext);
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -100) {
@@ -23,50 +33,89 @@ const SearchScreen = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isUserSearch, setIsUserSearch] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
+  const [location, setLocation] = useState(null);
   const navigation = useNavigation();
   const db = firestoreDB();
 
   // Handle the search logic for users and posts
-  const handleSearch = async (query) => {
-    const users = await db.GetUsers();
-    const posts = await db.GetPosts();
-    const filteredUsers = users.filter(user =>
-      user.profilename && user.profilename.toLowerCase().includes(query.toLowerCase())
-    );
 
-    if (filteredUsers.length > 0) {
-      setSearchResults(filteredUsers);
-      setIsUserSearch(true);
-    } else {
-      const filteredPosts = posts.filter(post =>
-        (post.restaurantName && post.restaurantName.toLowerCase().includes(query.toLowerCase())) ||
-        (post.content && post.content.toLowerCase().includes(query.toLowerCase()))
-      );
-      setSearchResults(filteredPosts);
-      setIsUserSearch(false);
-    }
-
-    updateRecentSearches(query);
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocation('');
+        return;
+        }
+        })();
+  }, []);
+  const pickLocation = async () => {
+      try {
+          let locationResult = await Location.getCurrentPositionAsync({});
+          setLocation(locationResult);
+      } catch (error) {
+          setLocation('');
+      }
   };
+  
+  const rawplaces = GetPlaces(searchQuery);
+  useEffect(() => {
+    if(rawplaces){
+      if(location != null){
+        const referenceLocation = location.coords;
+        const sortedLocations = rawplaces.sort((a, b) => {
+            const distanceA = haversineDistance(referenceLocation, a.location);
+            const distanceB = haversineDistance(referenceLocation, b.location);
+            return distanceA - distanceB;
+        });
+        
+        setSearchResults({...searchResults,restaurants:sortedLocations});
+      }
+      else{
+        setSearchResults({...searchResults,restaurants:rawplaces});
+      }
+    }
+    else if(searchResults?.restaurants){
+      setSearchResults({...searchResults,restaurants:[]});
+    }
+  },[rawplaces]);
+  
+  useEffect(() => {
+    if(searchQuery != ''){
+      const Search = async () =>{
+        const users = await db.GetUsers();
+        const posts = await db.GetPosts();
 
+        const filteredUsers = users.filter(user =>
+          user.profilename && user.profilename.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        const filteredPosts = posts.filter(post =>
+          (post.restaurantName && post.restaurantName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+        if (filteredUsers.length > 0 && filteredPosts.length > 0) {
+          setSearchResults({...searchResults,users:filteredUsers,posts:filteredPosts});
+        }
+        else if(filteredUsers.length > 0){
+          setSearchResults({...searchResults,users:filteredUsers,posts:[]});
+        }
+        else if (filteredPosts.length > 0) {
+          setSearchResults({...searchResults,users:[],posts:filteredPosts});
+        }
+        else{
+          setSearchResults({...searchResults,users:[],posts:[]});
+        }
+      };
+      Search();
+    }
+  }, [searchQuery]);
   // Update recent searches with the new query
   const updateRecentSearches = (query) => {
     if (query && !recentSearches.includes(query)) {
       const updatedSearches = [query, ...recentSearches.slice(0, 4)];
       setRecentSearches(updatedSearches);
+      
     }
   };
-
-  useEffect(() => {
-    // Load recent searches from storage or initialize if empty
-    // Example using AsyncStorage:
-    // const loadRecentSearches = async () => {
-    //   const searches = await AsyncStorage.getItem('recentSearches');
-    //   setRecentSearches(searches ? JSON.parse(searches) : []);
-    // };
-    // loadRecentSearches();
-  }, []);
-
   // Function to handle click on recent search item
   const handleRecentSearchPress = (query) => {
     setSearchQuery(query);
@@ -82,29 +131,40 @@ const SearchScreen = () => {
     handleSearch(category);
   };
 
-  const renderResultItem = ({ item }) => {
-    if (isUserSearch) {
-      // User item
-      return (
-        <TouchableOpacity onPress={() => handleUserPress(item.userName)}>
-          <View style={styles.userItem}>
+  const renderUser = ({ item }) => {
+    return (
+      <View style={{marginBottom:5}}>
+        <TouchableOpacity onPress={() => handleUserPress(item.userName)} style={{flexDirection:'row',backgroundColor:col2,padding:10,borderRadius:10,alignItems:'center'}}>
+          
             <Image source={{ uri: item.profileImageUrl }} style={styles.profileImage} />
-            <Text>{item.profilename}</Text>
+            <Text style={{fontFamily :'Oswald-Medium',fontSize:18}}>{item.profilename}</Text>
+          
+        </TouchableOpacity>
+      </View>
+    );
+  };
+  const renderPost = ({item}) =>{
+    const userName = item.userName;
+    return (
+      <PostComponent
+        post={item}
+        navigateToProfile={() => navigation.navigate('UserProfile', { userName })}
+        navigateToRestaurant={() => navigation.navigate('Restaurant', { restaurantName:null, restaurantID: restaurantID })}
+        navigateToLogin={() => navigation.navigate('LoginScreen', {})}
+      />
+    );
+  };
+  const renderRestaurant = ({item}) => {
+    return (
+      <View style={{marginBottom:5}}>
+        <TouchableOpacity style={{flexDirection:'row',backgroundColor:col2,padding:5,borderRadius:10}} onPress={() => navigation.navigate('Restaurant', { restaurantGID: item.id })}>
+          <View style={{flexDirection:'column'}}>
+            <Text style={{fontFamily :'Oswald-Medium',fontSize:18}}>{item.displayName.text}</Text>
+            <Text style={{fontFamily :'Oswald-Light'}}>{item.formattedAddress}</Text>
           </View>
         </TouchableOpacity>
-      );
-    } else {
-      // Post item
-      const userName = item.userName;
-      return (
-        <PostComponent
-          post={item}
-          navigateToProfile={() => navigation.navigate('UserProfile', { userName })}
-          navigateToRestaurant={() => navigation.navigate('Restaurant', { restaurantName:null, restaurantID: restaurantID })}
-          navigateToLogin={() => navigation.navigate('LoginScreen', {})}
-        />
-      );
-    }
+      </View>
+    );
   };
 
   const renderNoResults = () => (
@@ -123,17 +183,26 @@ const SearchScreen = () => {
       ))}
     </View>
   );
-
+  if(location == null){
+    pickLocation();
+    return (
+        <View/>
+    );
+  } 
+        /*          <TouchableOpacity style={styles.searchButton} onPress={() => handleSearch(searchQuery)}>
+            <Image source={require('../assets/icons/search.png')} style={styles.searchbarIcon} />
+          </TouchableOpacity>
+        */
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={{ flex: 1}}>
       <View style={{padding:20,flex:1}}>
-        <View style={styles.buttonContainer}>
-          {/* <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
+        {/*<View style={styles.buttonContainer}>
+           <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
             <View>
               <Image source={require('../assets/icons/fire.png')} style={styles.searchicon} />
             </View>
-          </TouchableOpacity> */}
+          </TouchableOpacity> 
           <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('burger')}>
             <View>
               <Image source={require('../assets/icons/burger.png')} style={styles.searchicon} />
@@ -155,31 +224,57 @@ const SearchScreen = () => {
             </View>
           </TouchableOpacity>
         </View>
-
+        */}
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
             placeholder="Enter search query"
-            value={searchQuery}
-            onChangeText={text => setSearchQuery(text)}
-            onEndEditing={() => handleSearch(searchQuery)}
+            onEndEditing={event => {
+              event.persist();
+              setSearchQuery(event.nativeEvent.text);
+            }}
           />
-          <TouchableOpacity style={styles.searchButton} onPress={() => handleSearch(searchQuery)}>
-            <Image source={require('../assets/icons/search.png')} style={styles.searchbarIcon} />
-          </TouchableOpacity>
+
         </View>
-
-        {searchResults.length === 0 && recentSearches.length > 0 && renderRecentSearches()}
-
-        {searchResults.length === 0 && recentSearches.length === 0 && renderNoResults()}
-
-        <FlatList
-          style={{ marginTop: 20 }}
-          data={searchResults}
-          keyExtractor={(item) => item.id}
-          renderItem={renderResultItem}
-        />
-        <Text style={{fontSize:30}}></Text>
+        <ScrollView>
+        { searchResults?.users?.length > 0 &&
+        <View>
+          <Text style={{fontFamily :'Oswald-Medium',fontSize:20}}>People</Text>
+          <FlatList
+            scrollEnabled={false} 
+            data={searchResults.users}
+            keyExtractor={(item) => item.id}
+            renderItem={renderUser}
+          />
+        </View>
+        }
+        { searchResults?.restaurants?.length > 0 &&
+        <View>
+          <Text style={{fontFamily :'Oswald-Medium',fontSize:20}}>Places</Text>
+            <FlatList
+              scrollEnabled={false} 
+              data={searchResults.restaurants}
+              keyExtractor={(item) => item.id}
+              renderItem={renderRestaurant}
+            />
+          </View>
+        }
+        { searchResults?.posts?.length > 0 &&
+        <View>
+          <Text style={{fontFamily :'Oswald-Medium',fontSize:20}}>Posts</Text>
+            <FlatList
+              scrollEnabled={false} 
+              data={searchResults.posts}
+              keyExtractor={(item) => item.id}
+              renderItem={renderPost}
+            />
+          </View>
+        }
+        {searchResults?.posts && !searchResults?.posts?.length > 0 && searchResults?.restaurants && !searchResults?.restaurants?.length > 0 && searchResults?.users && !searchResults?.users?.length > 0 && 
+          <Text style={{fontFamily :'Oswald-Medium',fontSize:30}}>No results</Text>
+        }
+        </ScrollView>
+        <Text style={{fontSize:50}}></Text>
       </View>
       <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
         <BottomBarComponent navigation={navigation} />
@@ -214,6 +309,8 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     padding: 5,
+    fontFamily :'Oswald-Light',
+    
   },
   searchButton: {
     marginLeft: 10,

@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, FlatList } 
 import { GetPlaces } from './Maps';
 import * as Location from 'expo-location';
 import { firestoreDB } from '../FirebaseDB';
-const haversineDistance = (coords1, coords2) => {
+export const haversineDistance = (coords1, coords2) => {
     const toRad = (x) => (x * Math.PI) / 180;
   
     const lat1 = coords1.latitude;
@@ -53,7 +53,7 @@ const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset, 
     useEffect(() => {
         if(placeidx != null && places != null && Query){
             const fetchData = async () => {
-                const id = await firestoreDB().FetchRestaurantByGID(places[placeidx].id);
+                const id = await firestoreDB().FetchRestaurantByGID(places[placeidx].id).id;
                 setRestaurantId(id);
                 setLoading(false);
             };

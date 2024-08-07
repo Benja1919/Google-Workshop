@@ -47,27 +47,60 @@ const RestaurantScreen = ({ route, navigation }) => {
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLocationMapEnbaled, setLocationMap] = useState(false);
-  const { restaurantName, restaurantID } = route.params;
+  const { restaurantName, restaurantID, restaurantGID } = route.params;
+  const [RestaurantID, setRestaurantID] = useState(restaurantID);
+  const [Exists, setExist] = useState(true);
   useEffect(() => {
     const fetchRestaurant = async () => {
       if(restaurantName != null){
         setRestaurant(await firestoreDB().GetRestaurant(restaurantName));
         setLoading(false);
       }
+      else if(restaurantGID && restaurantGID != null){
+        const restaurant = await firestoreDB().FetchRestaurantByGID(restaurantGID);
+        
+        if(restaurant != ''){
+          setRestaurant(restaurant);
+          setRestaurantID(restaurant.id);
+        }
+        else{
+          setRestaurant({GoogleMapsID:restaurantGID})
+          setExist(false);
+          setLoading(false);
+        }
+      }
       else if(restaurantID != null){
         setRestaurant(await firestoreDB().GetRestaurantByID(restaurantID));
         setLoading(false);
-        
+        setRestaurantID(restaurantID);
       }
     };
 
     fetchRestaurant();
     
-  }, [restaurantName, restaurantID]);
+  }, [restaurantName, restaurantID, restaurantGID]);
   const Details = GetPlaceDetails(restaurant);
+  useEffect(() =>{
+    if(!Exists && Details){
+      console.log(Details.location);
+      const AddR = async () => {
+        const Restaurant ={
+          name: Details.displayName.text,
+          GoogleMapsID: restaurantGID,
+          Coordinates:Details.location,
+          reviewcount:0,
+          starcount:0,
+        }
+        const id = await firestoreDB().AddRestaurant(Restaurant);
+        setRestaurantID(id);
+        setExist(true);
+      };
+      AddR();
+    }
+  });
 
   
-  if (loading || Details == null) {
+  if (loading || Details == null || !Exists) {
     return (
       <View style={styles.container}>
         <Text style={styles.header}>LOADING</Text>
@@ -120,7 +153,7 @@ const RestaurantScreen = ({ route, navigation }) => {
   Details.servesVegetarianFood ? TagArray.push("Vegetarian food") : '';
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>{restaurant.name}</Text>
+      <Text style={styles.header}>{Details.displayName.text}</Text>
       <Image source={{ uri: ProfileURI}} style={styles.profileImage} />
       <Text style={styles.sectionTitle}>Photos</Text>
       <View style={{...styles.item,padding: 10}}>
@@ -156,13 +189,13 @@ const RestaurantScreen = ({ route, navigation }) => {
                 style={{...styles.icon,marginRight:3,marginLeft:1}}
                 resizeMode="center"
             />
-            <Text style={{...styles.details}}>N {restaurant.Coordinates.latitude}, W {restaurant.Coordinates.longitude}</Text>
+            <Text style={{...styles.details}}>N {Details.location.latitude}, W {Details.location.longitude}</Text>
           </View>
             <Image source={images.tri}
               style={{...styles.icon,alignSelf: 'flex-end',transform: [{rotate: isLocationMapEnbaled ? '0deg' : '180deg' }]}}
               resizeMode="center"/>
         </TouchableOpacity>
-        <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={restaurant.Coordinates}/>
+        <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={Details.location}/>
       </View>
       <Text style={styles.sectionTitle}>Opening Times</Text>
           <OpeningTimes restaurant={restaurant} Globaloh={OpeningTime} isGlobalOpen={OpenNow} isEditable ={false}/>
@@ -202,7 +235,7 @@ const RestaurantScreen = ({ route, navigation }) => {
       <Text style={styles.sectionTitle}>Posts</Text>
 
       {/* Display posts for the specific restaurant */}
-      <PostsScreen navigation={navigation} route={{ params: { filterrestaurantID: restaurantID } }} isScrollEnabled={false}/>
+      <PostsScreen navigation={navigation} route={{ params: { filterrestaurantID: RestaurantID } }} isScrollEnabled={false}/>
       <Text style={{fontSize:30}}></Text>
     </ScrollView>
   );
