@@ -6,13 +6,13 @@ import { useFonts } from 'expo-font';
 
 const buttonimagesinverted = {
   home: require('../../assets/icons/home2.png'),
-  post: require('../../assets/icons/plusinv.png'),
+  post: require('../../assets/icons/add2.png'),
   login: require('../../assets/icons/logininv.png'),
   profile: require('../../assets/icons/profileinv.png'),
 };
 const buttonimages = {
   home: require('../../assets/icons/home.png'),
-  post: require('../../assets/icons/plus4.png'),
+  post: require('../../assets/icons/add.png'),
   login: require('../../assets/icons/login2.png'),
   profile: require('../../assets/icons/profile.png'),
 };
@@ -68,7 +68,7 @@ const BottomBarComponent = ({ navigation }) => {
         </View>
 
         {/* Overlay Button for Post */}
-        {isLoggedIn &&
+        {isLoggedIn && route.name !== "PostCreation" &&
           <TouchableOpacity style={styles.postButton} onPress={navigateToPostCreation}>
             <Image source={route.name !== "PostCreation" ? buttonimages.post: buttonimagesinverted.post } style={styles.postIcon} />
           </TouchableOpacity>
