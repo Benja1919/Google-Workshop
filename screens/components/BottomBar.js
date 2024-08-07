@@ -68,7 +68,7 @@ const BottomBarComponent = ({ navigation }) => {
         </View>
 
         {/* Overlay Button for Post */}
-        {isLoggedIn && route.name !== "PostCreation" &&
+        {isLoggedIn && (route.name == "HomeScreen" || route.name == "UserProfile") &&
           <TouchableOpacity style={styles.postButton} onPress={navigateToPostCreation}>
             <Image source={route.name !== "PostCreation" ? buttonimages.post: buttonimagesinverted.post } style={styles.postIcon} />
           </TouchableOpacity>

@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
 
   postScreenContainer: {
     // flex: 0,
-    paddingBottom: 25,
+    paddingBottom: 30,
   },
   bottomBar: {
     flexDirection: 'row',
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 20,
-    backgroundColor: '#fff', // צבע רקע לפס הרציף
+    // backgroundColor: '#fff', // צבע רקע לפס הרציף
     elevation: 10, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
   },
   bottomBarButton: {
