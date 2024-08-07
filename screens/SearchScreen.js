@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { firestoreDB } from './FirebaseDB';
-
+import PostComponent from './PostComponent';
 const SearchScreen = () => {
   const { isLoggedIn } = useContext(AuthContext);
   const onGestureEvent = (event) => {
@@ -95,16 +95,14 @@ const SearchScreen = () => {
       );
     } else {
       // Post item
+      const userName = item.userName;
       return (
-        <TouchableOpacity onPress={() => handlePostPress(item.id)}>
-          <View style={styles.postItem}>
-            <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
-            <Text>{item.restaurantName}</Text>
-            <Image source={{ uri: item.profileImageUrl }} style={styles.profileImage} />
-            <Text>{item.profilename}</Text>
-            <Text>{item.content}</Text>
-          </View>
-        </TouchableOpacity>
+        <PostComponent
+          post={item}
+          navigateToProfile={() => navigation.navigate('UserProfile', { userName })}
+          navigateToRestaurant={() => navigation.navigate('Restaurant', { restaurantName:null, restaurantID: restaurantID })}
+          navigateToLogin={() => navigation.navigate('LoginScreen', {})}
+        />
       );
     }
   };
@@ -129,7 +127,7 @@ const SearchScreen = () => {
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={{ flex: 1}}>
-      <View style={{ flex: 1, padding: 20 }}>
+      <View style={{padding:20,flex:1}}>
         <View style={styles.buttonContainer}>
           {/* <TouchableOpacity style={styles.categoryButton} onPress={() => handleCategoryPress('fire')}>
             <View>
@@ -174,17 +172,18 @@ const SearchScreen = () => {
         {searchResults.length === 0 && recentSearches.length > 0 && renderRecentSearches()}
 
         {searchResults.length === 0 && recentSearches.length === 0 && renderNoResults()}
-        <View>
+
         <FlatList
           style={{ marginTop: 20 }}
           data={searchResults}
-          keyExtractor={(item) => item.id ? item.id.toString() : item.userName}
+          keyExtractor={(item) => item.id}
           renderItem={renderResultItem}
         />
-        </View>
+        <Text style={{fontSize:30}}></Text>
       </View>
-      <View style={styles.Pusher} />
-      <BottomBarComponent navigation={navigation} />
+      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+        <BottomBarComponent navigation={navigation} />
+      </View>
       </View>
     </PanGestureHandler>
   );
