@@ -33,7 +33,9 @@ const HomeScreen = ({ navigation }) => {
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={styles.container}>
-        <PostsScreen navigation={navigation} />
+        <View style={styles.postScreenContainer}>
+            <PostsScreen navigation={navigation} />
+        </View>
         <BottomBarComponent navigation={navigation}/>
         
 
@@ -47,6 +49,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f0',
     padding: 10,
+  },
+
+  postScreenContainer: {
+    // flex: 0,
+    paddingBottom: 25,
   },
   bottomBar: {
     flexDirection: 'row',
