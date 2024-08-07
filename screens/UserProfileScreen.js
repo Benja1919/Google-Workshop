@@ -147,7 +147,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   if (!user) {
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>User not found</Text>
+        {/* <Text style={styles.header}>User not found</Text> */}
       </View>
     );
   }

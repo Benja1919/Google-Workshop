@@ -2,6 +2,8 @@ import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import PostComponent from './PostComponent'; // Ensure the import path is correct
 import { firestoreDB } from './FirebaseDB';
+import BottomBarComponent from './components/BottomBar';
+
 
 /**
  * PostsScreen
