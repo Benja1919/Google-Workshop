@@ -154,7 +154,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#eeeeee',
   },
   userList: {
-    flex: 1,
+    flex: 0,
+    marginBottom: 90
   },
   cardContent: {
     marginLeft: 20,

@@ -364,77 +364,74 @@ const MyListsScreen = ({ route, navigation }) => {
   
   return (
     <View style={{ flex: 1}}>
-    <ScrollView style={{ flex: 1}}>
-    <View style={{ justifyContent: 'flex-end' }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
-        <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
-        <View style={{ flex: 1, alignItems: 'center' }}>
-          <Text style={{...styles.titletext,marginLeft:-40}}>
-            {isYou ? `Your Lists` : `${user.profilename}'s Lists`}
-          </Text>
-        </View>
-        {isYou &&
-        <TouchableOpacity style={{padding:5,right:0,right:10}} onPress={()=>AddList()}>
-          <Image source={images.add} style={{ width: 31, height: 31,tintColor:'grey',justifyContent: 'center',alignSelf:"center"}} />
-        </TouchableOpacity>
-        }
-      </View>
-      <View style={{ ...styles.separator, marginBottom: 10 }} />
-      <View >
-        <FlatList
-          data={lists}
-          scrollEnabled={false}
-          renderItem={({ item, index }) => (
-            <RenderList
-              EditTitle={EditTitle}
-              EditDescription={EditDescription}
-              index={index}
-              item={item}
-              isYou={isYou}
-              RestaurantFinderComplete={ReceiveRestaurantData}
-              navigation={navigation}
-              foreign={false}
-              plusorminus={CurrentUserFollow != null && !isYou && !CurrentUserFollow.includes(item.id)}
-              sidefunction={sideButtonPress}
-              loggedIn={CurrentUserFollow != null && currentUser}
-              ChangeListImage={ChangeListImage}
-            />
-          )}
-          keyExtractor={item => item.id}
-        />
-      </View>
-      </View>
-      {followedlists != null && followedlists.length > 0 && (
-        <View style={{flex:1}}>
-          <Text style={{ ...styles.titletext }}>Followed Lists</Text>
-          <View style={{ ...styles.separator, marginBottom: 10 }} />
-          <FlatList
-          data={followedlists}
-          scrollEnabled={false}
-          renderItem={({ item, index }) => (
-            <RenderList
-              EditTitle={EditTitle}
-              EditDescription={EditDescription}
-              index={index}
-              item={item}
-              isYou={false}
-              RestaurantFinderComplete={ReceiveRestaurantData}
-              navigation={navigation}
-              foreign={true}
-              plusorminus={CurrentUserFollow != null && !CurrentUserFollow.includes(item.id) && !isYou}
-              sidefunction={sideButtonPress}
-              loggedIn={CurrentUserFollow != null && currentUser && item.userName != currentUser.userName}
-            />
-          )}
-          keyExtractor={item => item.id}
-        />
-        </View>
-      )}
-      
-      
-      <Text style={{fontSize:50}}/>
-    </ScrollView>
-    
+      <ScrollView style={{ flex: 0,}}>
+        <View style={{ justifyContent: 'flex-end' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
+            <Image source={{ uri: profileImageUrl }} style={styles.profileImage} />
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <Text style={{...styles.titletext,marginLeft:-40}}>
+                {isYou ? `Your Lists` : `${user.profilename}'s Lists`}
+              </Text>
+            </View>
+            {isYou &&
+            <TouchableOpacity style={{padding:5,right:0,right:10}} onPress={()=>AddList()}>
+              <Image source={images.add} style={{ width: 31, height: 31,tintColor:'grey',justifyContent: 'center',alignSelf:"center"}} />
+            </TouchableOpacity>
+            }
+          </View>
+            <View style={{ ...styles.separator, marginBottom: 10 }} />
+              <View >
+                <FlatList
+                  data={lists}
+                  scrollEnabled={false}
+                  renderItem={({ item, index }) => (
+                    <RenderList
+                      EditTitle={EditTitle}
+                      EditDescription={EditDescription}
+                      index={index}
+                      item={item}
+                      isYou={isYou}
+                      RestaurantFinderComplete={ReceiveRestaurantData}
+                      navigation={navigation}
+                      foreign={false}
+                      plusorminus={CurrentUserFollow != null && !isYou && !CurrentUserFollow.includes(item.id)}
+                      sidefunction={sideButtonPress}
+                      loggedIn={CurrentUserFollow != null && currentUser}
+                      ChangeListImage={ChangeListImage}
+                    />
+                  )}
+                  keyExtractor={item => item.id}
+                />
+              </View>
+          </View>
+          {followedlists != null && followedlists.length > 0 && (
+            <View style={{flex:1}}>
+              <Text style={{ ...styles.titletext }}>Followed Lists</Text>
+              <View style={{ ...styles.separator, marginBottom: 10 }} />
+              <FlatList
+                data={followedlists}
+                scrollEnabled={false}
+                renderItem={({ item, index }) => (
+                  <RenderList
+                    EditTitle={EditTitle}
+                    EditDescription={EditDescription}
+                    index={index}
+                    item={item}
+                    isYou={false}
+                    RestaurantFinderComplete={ReceiveRestaurantData}
+                    navigation={navigation}
+                    foreign={true}
+                    plusorminus={CurrentUserFollow != null && !CurrentUserFollow.includes(item.id) && !isYou}
+                    sidefunction={sideButtonPress}
+                    loggedIn={CurrentUserFollow != null && currentUser && item.userName != currentUser.userName}
+                  />
+                )}
+                keyExtractor={item => item.id}
+              />
+            </View>
+            )} 
+          <Text style={{fontSize:50}}/>
+        </ScrollView>
       <BottomBarComponent navigation={navigation}/>
     </View>
   );
