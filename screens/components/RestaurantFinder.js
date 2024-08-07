@@ -53,7 +53,8 @@ const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset, 
     useEffect(() => {
         if(placeidx != null && places != null && Query){
             const fetchData = async () => {
-                const id = await firestoreDB().FetchRestaurantByGID(places[placeidx].id).id;
+                const deets = await firestoreDB().FetchRestaurantByGID(places[placeidx].id);
+                const id = deets == '' ? deets : deets.id;
                 setRestaurantId(id);
                 setLoading(false);
             };
@@ -61,7 +62,6 @@ const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset, 
             fetchData();
         }
     }, [placeidx]);
-    
     useEffect(() => {
         if(restaurantId == '' && placeidx != null){
             const Restaurant ={
@@ -97,6 +97,7 @@ const RestaurantFinder = ({textinputstyle,placeholder, Complete, CompleteReset, 
     useEffect(() => {
         if(restaurantId != null && restaurantId != ''){
             const fetchData = async () => {
+                
                 if(returnCity){
                     const city = GetCity(places[placeidx]);
                     Complete({name: `${places[placeidx].displayName.text}${city != null?`(${city})` : ''}`,id:restaurantId});

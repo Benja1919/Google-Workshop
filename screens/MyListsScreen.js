@@ -56,29 +56,29 @@ const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,v
   };
   return (
       <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left',}}>
-          {editable ?
-          <Image
-            source={images.editimage}
-            style={{width:11,height:16,marginRight:3,marginLeft:style.marginLeft}}
-            resizeMode='contain'
-          />
-          : null}
-          <TextInput
-              placeholderTextColor={placeholderTextColor}
-              editable={editable}
-              value={value}
-              onChangeText={setValue}
-              placeholder={placeholdertext}
-              onEndEditing={Complete}
-              style={[
-              style,
-              {flex:1},
-              { color: valueTextColor },
-              fontWeight && { fontWeight },
-              fontSize && { fontSize },
-              ]}
-              {...rest}
-          />
+        {editable ?
+        <Image
+          source={images.editimage}
+          style={{width:11,height:16,marginRight:3,marginLeft:style.marginLeft}}
+          resizeMode='contain'
+        />
+        : null}
+        <TextInput
+            placeholderTextColor={placeholderTextColor}
+            editable={editable}
+            value={value}
+            onChangeText={setValue}
+            placeholder={placeholdertext}
+            onEndEditing={Complete}
+            style={[
+            style,
+            {flex:1},
+            { color: valueTextColor },
+            fontWeight && { fontWeight },
+            fontSize && { fontSize },
+            ]}
+            {...rest}
+        />
           
     </View>
   );
@@ -130,7 +130,7 @@ const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinde
           </TouchableOpacity>
         }
       </View>
-      <ListDetails isE={isOpen} list={item} navigation={navigation} isYou={isYou} RestaurantFinderComplete={FinderComplete}/>
+      <ListDetails isE={isOpen} list={item} navigation={navigation} isYou={isYou} RestaurantFinderComplete={FinderComplete} ReRender={()=>ReRender(Math.random())}/>
       <View  >
       <TouchableOpacity onPress={() => SetIsOpen(!isOpen)} style={{padding:5}}>
         <Image source={images.tri} style={{ width: 20, height: 11,justifyContent: 'center',alignSelf:"center",padding:5,transform: [{rotate: isOpen ? '0deg' : '180deg' }]}} />
@@ -172,11 +172,12 @@ const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinde
     </View>
   );
 };
-const ListDetails = ({list,isE,isYou,RestaurantFinderComplete, navigation})=>{
+const ListDetails = ({list,isE,isYou,RestaurantFinderComplete, navigation,ReRender})=>{
   const Delete = useCallback((index) =>{
     if(index < list.items.length){
       list.items.splice(index,1);
       firestoreDB().updateListInFirebase(list.id,list.items);
+      ReRender();
     }
   });
   const handleDeletePress = (index) => {
@@ -318,7 +319,7 @@ const MyListsScreen = ({ route, navigation }) => {
   const sideButtonPress = ({isfromforeign, index}) =>{
     item = isfromforeign ? followedlists[index] : lists[index];
     const isfollowed = CurrentUserFollow.includes(item.id);
-    if(!isfromforeign && isYou){
+    if(!isfromforeign && isYou){ //delete list
 
       firestoreDB().DeleteListsbyID(lists[index].id);
       lists.splice(index,1);
