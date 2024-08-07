@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     height: 65,
     left: -20,
     right: -20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 30,
     backgroundColor: '#fff',
     elevation: 15,
   },
@@ -113,11 +113,11 @@ const styles = StyleSheet.create({
   },
   postButton: {
     position: 'center',
-    bottom: 20,  // Adjust as needed to overlay properly
+    bottom: 23,  // Adjust as needed to overlay properly
     alignSelf: 'center',
     backgroundColor: '#fff',
     borderRadius: 50,
-    padding: 10,
+    padding: 7,
     elevation: 10,
   },
   postIcon: {
