@@ -112,6 +112,7 @@ export const firestoreDB = () => {
             restaurantName: post.restaurantName,
             RestaurantID : post.RestaurantID,
             stars: post.stars,
+            userprofile: post.userprofile,
             likes: 0,
             like_users: [],
             content: post.content,
@@ -149,7 +150,7 @@ export const firestoreDB = () => {
         
             if (!restaurantSnapshot.empty) {
                 const restaurantDoc = restaurantSnapshot.docs[0];
-                return restaurantDoc.id;
+                return {id:restaurantDoc.id,...restaurantDoc.data()};
             } else {
                 return '';
             }

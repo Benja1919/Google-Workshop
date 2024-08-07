@@ -105,7 +105,7 @@ export const GetPlaceDetails = (restaurant) => {
             const place_id = restaurant.GoogleMapsID;
             const get = async (place_id) => {
                 
-                const url = `https://places.googleapis.com/v1/places/${place_id}?fields=id,displayName,servesBeer,servesBreakfast,servesBrunch,servesCocktails,servesCoffee,servesDessert,servesDinner,servesLunch,servesVegetarianFood,servesWine,takeout,allowsDogs,delivery,dineIn,reservable,delivery,types,nationalPhoneNumber,regularOpeningHours,websiteUri,formattedAddress,photos,rating,userRatingCount&key=${apiKey}`;
+                const url = `https://places.googleapis.com/v1/places/${place_id}?fields=id,displayName,servesBeer,servesBreakfast,servesBrunch,location,servesCocktails,servesCoffee,servesDessert,servesDinner,servesLunch,servesVegetarianFood,servesWine,takeout,allowsDogs,delivery,dineIn,reservable,delivery,types,nationalPhoneNumber,regularOpeningHours,websiteUri,formattedAddress,photos,rating,userRatingCount&key=${apiKey}`;
                 const headers = {
                 'Content-Type': 'application/json',
                 'X-Goog-Api-Key': apiKey,
