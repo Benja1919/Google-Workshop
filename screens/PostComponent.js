@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     postCard: {
         flex: 1,
         borderRadius: 0,
-        marginBottom: -10,
+        // marginBottom: -10,
         overflow: 'hidden',
         height: Dimensions.get('window').width , // Height set to maintain aspect ratio
     },
@@ -121,16 +121,18 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent overlay for better text readability
+        backgroundColor: 'rgba(90, 45, 10, 0.3)', // Semi-transparent overlay for better text readability
     },
     bottomTextContainer: {
-        flex: 0,
+        flex: 1,
         marginTop: 0,
-        marginBottom : 50,
+        marginBottom : 35,
         padding: 10,
         width: '100%',
         height: '35%',
         overflow: 'hidden',
+        backgroundColor: 'rgba(246, 225, 188, 0.3)', // Semi-transparent overlay for better text readability
+
     },
     dateAndLikeContainer: {
         flexDirection: 'row',
