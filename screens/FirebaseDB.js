@@ -179,6 +179,30 @@ export const firestoreDB = () => {
         }
         return []
     };
+    const FetchUsersbyName = async (name) => {
+        const q = query(
+            collection(firestore, 'users'),
+            where("profilename", ">=", name),
+            where("profilename", "<=", name + '\uf8ff') // Unicode character to match the end of the range
+          );
+        const ss = await getDocs(q);
+        
+        if (!ss.empty) {
+            const results = ss.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            return results;
+        }
+        return []
+    };
+    const FetchPostsLimited = async () =>{
+        const postsCollection = collection(firestore, 'posts');
+        const q = query(postsCollection, orderBy("creationTime", "desc"), limit(20));
+        const postsSnapshot = await getDocs(q);
+        const postsList = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return postsList;
+    };
     const updateListInFirebase = async (listId, updatedItems) => {
         try {
             const listRef = doc(firestore, 'usersLists', listId);
@@ -456,7 +480,9 @@ export const firestoreDB = () => {
         DeleteListsbyID,
         AddFriend,
         RemoveFriend,
-        FetchListsbyName
+        FetchListsbyName,
+        FetchUsersbyName,
+        FetchPostsLimited,
     };
 };
 

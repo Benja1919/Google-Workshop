@@ -190,7 +190,7 @@ export const GetPlacesAsync = async (restaurant) => {
     const headers = {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.addressComponents'
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating'
     };
     const body = JSON.stringify({
         textQuery: textQuery,

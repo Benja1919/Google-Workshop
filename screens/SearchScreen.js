@@ -11,6 +11,7 @@ import * as Location from 'expo-location';
 import {haversineDistance} from './components/RestaurantFinder';
 import { useFonts } from 'expo-font';
 import {RenderList} from './MyListsScreen';
+import StarRatingDisplay  from 'react-native-star-rating-widget';
 const col2 = 'rgba(246, 225, 188, 0.3)';
 const secondaryColor = 'rgba(230, 180, 85, 0.8)';
 const col3 = '#f9f9f9';
@@ -89,8 +90,8 @@ const SearchScreen = () => {
   useEffect(() => {
     if(searchQuery != ''){
       const Search = async () =>{
-        const users = await db.GetUsers();
-        const posts = await db.GetPosts();
+        const filteredUsers = await db.FetchUsersbyName(searchQuery);
+        const posts = await db.FetchPostsLimited();
         const lists = await db.FetchListsbyName(searchQuery);
         const rawplaces = await GetPlacesAsync(searchQuery);
         var places;
@@ -108,9 +109,6 @@ const SearchScreen = () => {
             places = rawplaces;
           }
         }
-        const filteredUsers = users.filter(user =>
-          user.profilename && user.profilename.toLowerCase().includes(searchQuery.toLowerCase())
-        );
         const filteredPosts = posts.filter(post =>
           (post.restaurantName && post.restaurantName.toLowerCase().includes(searchQuery.toLowerCase())) ||
           (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -162,7 +160,10 @@ const SearchScreen = () => {
       <View style={{marginBottom:5}}>
         <TouchableOpacity style={{flexDirection:'row',backgroundColor:col2,padding:5,borderRadius:10}} onPress={() => navigation.navigate('Restaurant', { restaurantGID: item.id })}>
           <View style={{flexDirection:'column'}}>
-            <Text style={{fontFamily :'Oswald-Medium',fontSize:18}}>{item.displayName.text}</Text>
+            <View style={{flexDirection:'row'}}>
+              <Text style={{fontFamily :'Oswald-Medium',fontSize:18}}>{item.displayName.text}</Text>
+              <StarRatingDisplay style={{marginLeft:10}} rating={item.rating} onChange={() => {}} starSize={22} color={secondaryColor} starStyle={{ marginHorizontal: 0 }}/>
+            </View>
             <Text style={{fontFamily :'Oswald-Light'}}>{item.formattedAddress}</Text>
           </View>
           <Image source={images.tri} style={{...styles.sidetri,position:'absolute',right:10,top:"50%"}}/>
