@@ -94,7 +94,7 @@ const UserProfileScreen = ({ route, navigation }) => {
     if (screen === 'Posts') {
       navigation.navigate(screen, { filterUserName: userName });
     } else if (screen === 'MyLists') {
-      navigation.navigate('MyLists', { user, profileImageUrl: user.profileImageUrl });
+      navigation.navigate('MyLists', { _user:user, _profileImageUrl: user.profileImageUrl });
     } else {
       navigation.navigate(screen, { userName });
     }

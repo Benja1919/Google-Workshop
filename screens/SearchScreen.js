@@ -6,11 +6,13 @@ import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { firestoreDB } from './FirebaseDB';
 import PostComponent from './PostComponent';
-import { GetPlaces, getPhotoUri } from './components/Maps';
+import { GetPlaces, GetPlacesAsync, getPhotoUri } from './components/Maps';
 import * as Location from 'expo-location';
 import {haversineDistance} from './components/RestaurantFinder';
 import { useFonts } from 'expo-font';
-const col2 = '#f9f9f9';
+import {RenderList} from './MyListsScreen';
+const col2 = 'rgba(246, 225, 188, 0.3)';
+const col3 = '#f9f9f9';
 const SearchScreen = () => {
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
@@ -29,6 +31,7 @@ const SearchScreen = () => {
       navigation.navigate('HomeScreen');
     }
   };
+  const [Opens, OpenClose] = useState({places:false,people:false,posts:false,lists:false});
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isUserSearch, setIsUserSearch] = useState(false);
@@ -56,7 +59,7 @@ const SearchScreen = () => {
           setLocation('');
       }
   };
-  
+  /*
   const rawplaces = GetPlaces(searchQuery);
   useEffect(() => {
     if(rawplaces){
@@ -78,13 +81,29 @@ const SearchScreen = () => {
       setSearchResults({...searchResults,restaurants:[]});
     }
   },[rawplaces]);
-  
+  */
   useEffect(() => {
     if(searchQuery != ''){
       const Search = async () =>{
         const users = await db.GetUsers();
         const posts = await db.GetPosts();
-
+        const lists = await db.FetchListsbyName(searchQuery);
+        const rawplaces = await GetPlacesAsync(searchQuery);
+        var places;
+        if(rawplaces){
+          if(location != null){
+            const referenceLocation = location.coords;
+            const sortedLocations = rawplaces.sort((a, b) => {
+                const distanceA = haversineDistance(referenceLocation, a.location);
+                const distanceB = haversineDistance(referenceLocation, b.location);
+                return distanceA - distanceB;
+            });
+            places = sortedLocations;
+          }
+          else{
+            places = rawplaces;
+          }
+        }
         const filteredUsers = users.filter(user =>
           user.profilename && user.profilename.toLowerCase().includes(searchQuery.toLowerCase())
         );
@@ -92,18 +111,8 @@ const SearchScreen = () => {
           (post.restaurantName && post.restaurantName.toLowerCase().includes(searchQuery.toLowerCase())) ||
           (post.content && post.content.toLowerCase().includes(searchQuery.toLowerCase()))
         );
-        if (filteredUsers.length > 0 && filteredPosts.length > 0) {
-          setSearchResults({...searchResults,users:filteredUsers,posts:filteredPosts});
-        }
-        else if(filteredUsers.length > 0){
-          setSearchResults({...searchResults,users:filteredUsers,posts:[]});
-        }
-        else if (filteredPosts.length > 0) {
-          setSearchResults({...searchResults,users:[],posts:filteredPosts});
-        }
-        else{
-          setSearchResults({...searchResults,users:[],posts:[]});
-        }
+        OpenClose({places:false,people:false,posts:false,lists:false});
+        setSearchResults({restaurants: (places?.length > 0 ? places : []), users:(filteredUsers.length > 0 ? filteredUsers : []), posts:(filteredPosts.length > 0 ? filteredPosts : []), lists:(lists.length > 0 ? lists : [])});
       };
       Search();
     }
@@ -166,7 +175,6 @@ const SearchScreen = () => {
       </View>
     );
   };
-
   const renderNoResults = () => (
     <View style={styles.noResultsContainer}>
       <Text style={styles.noResultsText}>No Results Found</Text>
@@ -239,38 +247,93 @@ const SearchScreen = () => {
         <ScrollView>
         { searchResults?.users?.length > 0 &&
         <View>
-          <Text style={{fontFamily :'Oswald-Medium',fontSize:20}}>People</Text>
-          <FlatList
-            scrollEnabled={false} 
-            data={searchResults.users}
-            keyExtractor={(item) => item.id}
-            renderItem={renderUser}
-          />
+          <TouchableOpacity onPress={()=>OpenClose({...Opens, people:!Opens.people})}>
+            <Text style={styles.sectionHeader}>People</Text>
+          </TouchableOpacity>
+          {Opens.people && 
+            <FlatList
+              scrollEnabled={false} 
+              data={searchResults.users}
+              keyExtractor={(item) => item.id}
+              renderItem={renderUser}
+            />
+          }
         </View>
         }
         { searchResults?.restaurants?.length > 0 &&
         <View>
-          <Text style={{fontFamily :'Oswald-Medium',fontSize:20}}>Places</Text>
-            <FlatList
-              scrollEnabled={false} 
-              data={searchResults.restaurants}
-              keyExtractor={(item) => item.id}
-              renderItem={renderRestaurant}
-            />
+          <TouchableOpacity onPress={()=>OpenClose({...Opens, places:!Opens.places})}>
+            <Text style={styles.sectionHeader}>Places</Text>
+          </TouchableOpacity>
+            {Opens.places && 
+              <FlatList
+                scrollEnabled={false} 
+                data={searchResults.restaurants}
+                keyExtractor={(item) => item.id}
+                renderItem={renderRestaurant}
+              />
+            }
           </View>
         }
         { searchResults?.posts?.length > 0 &&
-        <View>
-          <Text style={{fontFamily :'Oswald-Medium',fontSize:20}}>Posts</Text>
+          <View>
+            <TouchableOpacity onPress={()=>OpenClose({...Opens, posts:!Opens.posts})}>
+              <Text style={styles.sectionHeader}>Posts</Text>
+            </TouchableOpacity>
+          {Opens.posts && 
             <FlatList
               scrollEnabled={false} 
               data={searchResults.posts}
               keyExtractor={(item) => item.id}
-              renderItem={renderPost}
+              renderItem={({item})=>{
+                const userName = item.userName;
+                return (
+                  <PostComponent
+                    post={item}
+                    navigateToProfile={() => navigation.navigate('UserProfile', { userName })}
+                    navigateToRestaurant={() => navigation.navigate('Restaurant', { restaurantName:null, restaurantID: restaurantID })}
+                    navigateToLogin={() => navigation.navigate('LoginScreen', {})}
+                  />
+                );
+              }}
+              style={{marginBottom:-30}}
             />
+          }
           </View>
         }
-        {searchResults?.posts && !searchResults?.posts?.length > 0 && searchResults?.restaurants && !searchResults?.restaurants?.length > 0 && searchResults?.users && !searchResults?.users?.length > 0 && 
+        { searchResults?.lists?.length > 0 &&
+        <View>
+          <TouchableOpacity onPress={()=>OpenClose({...Opens, lists:!Opens.lists})}>
+            <Text style={styles.sectionHeader}>Lists</Text>
+          </TouchableOpacity>
+          {Opens.lists && 
+            <FlatList
+              scrollEnabled={false} 
+              data={searchResults.lists}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item, index }) => (
+                <TouchableOpacity onPress={() => navigation.navigate('MyLists', { _user:null, _profileImageUrl: null, _userName: item.userName })}>
+                  <RenderList
+                    EditTitle={() => null}
+                    EditDescription={() => null}
+                    index={index}
+                    item={item}
+                    isYou={false}
+                    RestaurantFinderComplete={() => null}
+                    navigation={navigation}
+                    foreign={true}
+                    plusorminus={false}
+                    sidefunction={() => null}
+                    loggedIn={false}
+                    
+                  />
+                </TouchableOpacity>
+              )}
+            />
+          }
+          </View>
+        }
+        {searchResults?.posts && !searchResults?.posts?.length > 0 && searchResults?.restaurants && !searchResults?.restaurants?.length > 0 && searchResults?.users && !searchResults?.users?.length > 0 && searchResults?.lists && !searchResults?.lists?.length > 0 &&
           <Text style={{fontFamily :'Oswald-Medium',fontSize:30}}>No results</Text>
         }
         </ScrollView>
@@ -359,6 +422,11 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 10,
+  },
+  sectionHeader :{
+    fontFamily :'Oswald-Medium',
+    fontSize:25,
+    paddingVertical:5
   },
   postItem: {
     paddingVertical: 10,

@@ -180,6 +180,42 @@ export const GetPlaces = (restaurant) => {
     }
     return Details;
 };
+export const GetPlacesAsync = async (restaurant) => {
+    if (restaurant === null || restaurant === '') {
+        return null;
+    }
+
+    const textQuery = restaurant;
+    const url = `https://places.googleapis.com/v1/places:searchText`;
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.addressComponents'
+    };
+    const body = JSON.stringify({
+        textQuery: textQuery,
+        includedType: 'restaurant'
+    });
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: body
+        });
+
+        if (!response.ok) {
+            console.log(`HTTP error! Status: ${response.status}`);
+            return null;
+        }
+
+        const data = await response.json();
+        return data.places;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return null;
+    }
+};
 const BasicMap = ({isEnabled, initialMarkerCoords, mapclickfunction}) =>{
     const initialRegion = {
         latitude: initialMarkerCoords.latitude,

@@ -162,7 +162,23 @@ export const firestoreDB = () => {
 	const CreateList = async (list) => {
 		await addDoc(collection(firestore, 'usersLists'),list);
 	};
-
+    const FetchListsbyName = async (name) => {
+        const q = query(
+            collection(firestore, 'usersLists'),
+            where("listName", ">=", name),
+            where("listName", "<=", name + '\uf8ff') // Unicode character to match the end of the range
+          );
+        const ss = await getDocs(q);
+        
+        if (!ss.empty) {
+            const results = ss.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            return results;
+        }
+        return []
+    };
     const updateListInFirebase = async (listId, updatedItems) => {
         try {
             const listRef = doc(firestore, 'usersLists', listId);
@@ -439,7 +455,8 @@ export const firestoreDB = () => {
         GetUserFollowedListIds,
         DeleteListsbyID,
         AddFriend,
-        RemoveFriend
+        RemoveFriend,
+        FetchListsbyName
     };
 };
 

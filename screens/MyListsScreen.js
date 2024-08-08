@@ -84,8 +84,8 @@ const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,v
   );
   
 };
-const col2 = '#f9f9f9';
-const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinderComplete, navigation,foreign,plusorminus, sidefunction, loggedIn, ChangeListImage}) =>{
+const col2 = 'rgba(246, 225, 188, 0.3)'; //'rgba(246, 225, 188, 0.5)'
+export const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinderComplete, navigation,foreign,plusorminus, sidefunction, loggedIn, ChangeListImage}) =>{
   const [isOpen,SetIsOpen] = useState(false);
   const [ModalVisible,setModalVisible] = useState(false);
   const [_,ReRender] = useState(null);
@@ -222,31 +222,41 @@ const MyListsScreen = ({ route, navigation }) => {
   const [_, ReRender] = useState(null);
   const [newItemID, setNewItemID] = useState(null);
   const [newItemName, setNewItemName] = useState(null);
-  const { user, profileImageUrl } = route.params;
-  const [lists, setLists] = useState([]);
+  const { _user, _profileImageUrl, _userName } = route.params;
+  const [user, setUser] = useState(null);
+  const [profileImageUrl, setPI] = useState(null);
+  if(_user && !user){
+    setUser(_user);
+  }
+  if(_profileImageUrl && !profileImageUrl){
+    setPI(_profileImageUrl)
+  }
+  console.log("name:", _userName);
+ 
+  const [lists, setLists] = useState(null);
   const [followedlists, setFollowedLists] = useState(null);
   const [CurrentUserFollow, setCurrentUserFollow] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reloadlists, RefetchLists] = useState(null);
   const { currentUser } = useContext(AuthContext);
-  const isYou = currentUser != null && currentUser.userName === user.userName;
+  const isYou = currentUser != null && currentUser.userName === user?.userName;
   useEffect(() => { //fetch the list of user from the DB
     const fetchLists = async () => {
-      try {
-        const fetchedLists = await firestoreDB().GetUserLists(user.userName);
-        if(currentUser){
-          const currentUserFollowedLists = await firestoreDB().GetUserFollowedListIds(currentUser.id);
-          setCurrentUserFollow(currentUserFollowedLists);
+      if(user){
+        try {
+          const fetchedLists = await firestoreDB().GetUserLists(user.userName);
+          if(currentUser){
+            const currentUserFollowedLists = await firestoreDB().GetUserFollowedListIds(currentUser.id);
+            setCurrentUserFollow(currentUserFollowedLists);
+          }
+          setLists(fetchedLists);
+        } catch (error) {
+          console.error("Error fetching lists: ", error);
+        } finally {
+          setLoading(false);
         }
-        setLists(fetchedLists);
-      } catch (error) {
-        console.error("Error fetching lists: ", error);
-      } finally {
-        setLoading(false);
       }
     };
-
-    
     fetchLists();
     /*
     const unsubscribe = firestoreDB().SubscribeToLists((fetchedLists) => {
@@ -287,6 +297,26 @@ const MyListsScreen = ({ route, navigation }) => {
       fetchfollowedklsits();
     }
   },[user]);
+  useEffect(() =>{
+    if(!user && _userName && !_user){
+      const fetchUser = async () =>{
+        const u = await firestoreDB().GetUserName(_userName);
+        if(u){
+          setPI(u.profileImageUrl);
+          setUser(u);
+          RefetchLists(Math.random());
+        }
+      }
+      fetchUser();
+      
+    }
+
+  });
+  if(!user || !lists){
+    return (
+      <View></View>
+    )
+  }
   const ReceiveRestaurantData= ({ index,id, name }) => {
     if(id != null && name != null){
       const newLists = [...lists];
@@ -402,6 +432,7 @@ const MyListsScreen = ({ route, navigation }) => {
                     />
                   )}
                   keyExtractor={item => item.id}
+                  style={{paddingHorizontal:10}}
                 />
               </View>
           </View>
@@ -425,9 +456,11 @@ const MyListsScreen = ({ route, navigation }) => {
                     plusorminus={CurrentUserFollow != null && !CurrentUserFollow.includes(item.id) && !isYou}
                     sidefunction={sideButtonPress}
                     loggedIn={CurrentUserFollow != null && currentUser && item.userName != currentUser.userName}
+                    
                   />
                 )}
                 keyExtractor={item => item.id}
+                style={{paddingHorizontal:10}}
               />
             </View>
             )} 
