@@ -15,7 +15,7 @@ const { width } = Dimensions.get('window');
 
 const SIDEMENU_WIDTH = 200;
 images = {
-    tri : require("../assets/icons/Tri1.png"),
+    tri : require("../assets/icons/triwhite.png"),
 };
 const MapMenu = ({navigation, onHeaderLeftPress}) =>{
     now = GetNow();

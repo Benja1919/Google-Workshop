@@ -11,10 +11,10 @@ import Autocomplete from './AutoComplete';
 export const AllTags = ["Fast Food","Hamburger","Shawarma","Asian","Bakery","Coffee","Luxury","Pizza","Cheap","Kebab","Italian","Sushi","Noodles","Kosher","Not Kosher","Meat","Vegan","Gluten Free","Pasta","Steak","Spicy","Bread","Breakfast","Hummus"]
 const col2 = '#fbfbfb';
 images = {
-    editimage :require("../../assets/icons/edittransparent.png"),
+    editimage :require("../../assets/icons/editwhite.png"),
     mapimage : require("../../assets/icons/mapicon2.png"),
     locationimage : require("../../assets/icons/LocationIcon.png"),
-    tri : require("../../assets/icons/Tri1.png"),
+    tri : require("../../assets/icons/triwhite.png"),
 };
 const CustomTextInput = ({hasdelete, deleteButtonFunction,idx, placeholderTextColor,imageicon, valueTextColor, style, fontWeight, fontSize, ...rest }) => {
     const DeleteButton = () =>{

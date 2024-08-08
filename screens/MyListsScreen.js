@@ -9,6 +9,9 @@ import RestaurantFinder from './components/RestaurantFinder';
 import { ScrollView, createNativeWrapper } from 'react-native-gesture-handler';
 import BottomBarComponent from './components/BottomBar';
 import ImprovedImageComponent from './components/ImprovedImage';
+
+const col2 = 'rgba(246, 225, 188, 0.3)'; //'rgba(246, 225, 188, 0.5)'
+const secondaryColor = 'rgba(230, 180, 85, 0.8)';
 const iconData = [
   require('../assets/icons/favoritelist.png'),
   require('../assets/icons/wishlist.png'),
@@ -27,10 +30,10 @@ const iconData = [
   require('../assets/icons/shawarmalist.png'),
 ];
 const images = {
-  tri : require("../assets/icons/Tri1.png"),
-  editimage :require("../assets/icons/edit2.png"),
-  remove :require("../assets/icons/listminus.png"),
-  add :require("../assets/icons/listplus.png"),
+  tri : require("../assets/icons/triwhite.png"),
+  editimage :require("../assets/icons/editwhite.png"),
+  remove :require("../assets/icons/minuswhite.png"),
+  add :require("../assets/icons/pluswhite.png"),
 };
 
 /*
@@ -59,7 +62,7 @@ const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,v
         {editable ?
         <Image
           source={images.editimage}
-          style={{width:11,height:16,marginRight:3,marginLeft:style.marginLeft}}
+          style={{width:11,height:16,marginRight:3,marginLeft:style.marginLeft,tintColor:secondaryColor}}
           resizeMode='contain'
         />
         : null}
@@ -84,7 +87,7 @@ const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,v
   );
   
 };
-const col2 = 'rgba(246, 225, 188, 0.3)'; //'rgba(246, 225, 188, 0.5)'
+
 export const RenderList = ({item,EditTitle,EditDescription,index,isYou, RestaurantFinderComplete, navigation,foreign,plusorminus, sidefunction, loggedIn, ChangeListImage}) =>{
   const [isOpen,SetIsOpen] = useState(false);
   const [ModalVisible,setModalVisible] = useState(false);
@@ -126,14 +129,14 @@ export const RenderList = ({item,EditTitle,EditDescription,index,isYou, Restaura
         </View>
         { loggedIn &&
           <TouchableOpacity style={{padding:5,right:0}} onPress={()=>sideButtonPress()}>
-            <Image source={plusorminus ? images.add : images.remove} style={{ width: 20, height: plusorminus ? 20 : 5.42,tintColor:'grey',justifyContent: 'center',alignSelf:"center"}} />
+            <Image source={plusorminus ? images.add : images.remove} style={{ width: 20, height: plusorminus ? 20 : 5.42,tintColor:secondaryColor,justifyContent: 'center',alignSelf:"center"}} />
           </TouchableOpacity>
         }
       </View>
       <ListDetails isE={isOpen} list={item} navigation={navigation} isYou={isYou} RestaurantFinderComplete={FinderComplete} ReRender={()=>ReRender(Math.random())}/>
       <View  >
       <TouchableOpacity onPress={() => SetIsOpen(!isOpen)} style={{padding:5}}>
-        <Image source={images.tri} style={{ width: 20, height: 11,justifyContent: 'center',alignSelf:"center",padding:5,transform: [{rotate: isOpen ? '0deg' : '180deg' }]}} />
+        <Image source={images.tri} style={{ width: 20, height: 11,tintColor:secondaryColor,justifyContent: 'center',alignSelf:"center",padding:5,transform: [{rotate: isOpen ? '0deg' : '180deg' }]}} />
       </TouchableOpacity>
       </View>
 
@@ -200,7 +203,7 @@ const ListDetails = ({list,isE,isYou,RestaurantFinderComplete, navigation,ReRend
               <View style={{flex:1}}/>
               {isYou ? 
                 <TouchableOpacity onPress={() =>handleDeletePress(index)}>
-                  <Image source={images.remove} style={{tintColor:'grey',width:15,height:4.3,marginRight:13,resizeMode:'cover'}}/>
+                  <Image source={images.remove} style={{tintColor:secondaryColor,width:15,height:4.3,marginRight:13,resizeMode:'cover'}}/>
                 </TouchableOpacity>
               : null}
             </View>
@@ -231,7 +234,6 @@ const MyListsScreen = ({ route, navigation }) => {
   if(_profileImageUrl && !profileImageUrl){
     setPI(_profileImageUrl)
   }
-  console.log("name:", _userName);
  
   const [lists, setLists] = useState(null);
   const [followedlists, setFollowedLists] = useState(null);
@@ -406,7 +408,7 @@ const MyListsScreen = ({ route, navigation }) => {
             </View>
             {isYou &&
             <TouchableOpacity style={{padding:5,right:0,right:10}} onPress={()=>AddList()}>
-              <Image source={images.add} style={{ width: 31, height: 31,tintColor:'grey',justifyContent: 'center',alignSelf:"center"}} />
+              <Image source={images.add} style={{ width: 31, height: 31,tintColor:secondaryColor,justifyContent: 'center',alignSelf:"center"}} />
             </TouchableOpacity>
             }
           </View>

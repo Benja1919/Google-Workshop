@@ -121,7 +121,7 @@ const App = () => {
       >
         <Image 
           style={{width: 40, height: 30, tintColor:"black"}}
-          source={require("./assets/icons/logout3.png")}        
+          source={require("./assets/icons/logout.png")}        
         />
       </TouchableOpacity> 
     ),

@@ -12,7 +12,11 @@ import {haversineDistance} from './components/RestaurantFinder';
 import { useFonts } from 'expo-font';
 import {RenderList} from './MyListsScreen';
 const col2 = 'rgba(246, 225, 188, 0.3)';
+const secondaryColor = 'rgba(230, 180, 85, 0.8)';
 const col3 = '#f9f9f9';
+const images = {
+  tri : require("../assets/icons/triwhite.png"),
+}
 const SearchScreen = () => {
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
@@ -146,23 +150,13 @@ const SearchScreen = () => {
         <TouchableOpacity onPress={() => handleUserPress(item.userName)} style={{flexDirection:'row',backgroundColor:col2,padding:10,borderRadius:10,alignItems:'center'}}>
           
             <Image source={{ uri: item.profileImageUrl }} style={styles.profileImage} />
-            <Text style={{fontFamily :'Oswald-Medium',fontSize:18}}>{item.profilename}</Text>
-          
+            <Text style={{fontFamily :'Oswald-Medium',fontSize:18,flex:1}}>{item.profilename}</Text>
+            <Image source={images.tri} style={{...styles.sidetri}}/>
         </TouchableOpacity>
       </View>
     );
   };
-  const renderPost = ({item}) =>{
-    const userName = item.userName;
-    return (
-      <PostComponent
-        post={item}
-        navigateToProfile={() => navigation.navigate('UserProfile', { userName })}
-        navigateToRestaurant={() => navigation.navigate('Restaurant', { restaurantName:null, restaurantID: restaurantID })}
-        navigateToLogin={() => navigation.navigate('LoginScreen', {})}
-      />
-    );
-  };
+  
   const renderRestaurant = ({item}) => {
     return (
       <View style={{marginBottom:5}}>
@@ -171,6 +165,7 @@ const SearchScreen = () => {
             <Text style={{fontFamily :'Oswald-Medium',fontSize:18}}>{item.displayName.text}</Text>
             <Text style={{fontFamily :'Oswald-Light'}}>{item.formattedAddress}</Text>
           </View>
+          <Image source={images.tri} style={{...styles.sidetri,position:'absolute',right:10,top:"50%"}}/>
         </TouchableOpacity>
       </View>
     );
@@ -247,8 +242,9 @@ const SearchScreen = () => {
         <ScrollView>
         { searchResults?.users?.length > 0 &&
         <View>
-          <TouchableOpacity onPress={()=>OpenClose({...Opens, people:!Opens.people})}>
+          <TouchableOpacity onPress={()=>OpenClose({...Opens, people:!Opens.people})} style={{flexDirection:'row',alignItems:'center'}}>
             <Text style={styles.sectionHeader}>People</Text>
+            <Image source={images.tri} style={{...styles.sectionTri,transform: [{rotate: Opens.users ? '0deg' : '180deg' }]}}/>
           </TouchableOpacity>
           {Opens.people && 
             <FlatList
@@ -262,8 +258,9 @@ const SearchScreen = () => {
         }
         { searchResults?.restaurants?.length > 0 &&
         <View>
-          <TouchableOpacity onPress={()=>OpenClose({...Opens, places:!Opens.places})}>
+          <TouchableOpacity onPress={()=>OpenClose({...Opens, places:!Opens.places})} style={{flexDirection:'row',alignItems:'center'}}>
             <Text style={styles.sectionHeader}>Places</Text>
+            <Image source={images.tri} style={{...styles.sectionTri,transform: [{rotate: Opens.places ? '0deg' : '180deg' }]}}/>
           </TouchableOpacity>
             {Opens.places && 
               <FlatList
@@ -277,8 +274,9 @@ const SearchScreen = () => {
         }
         { searchResults?.posts?.length > 0 &&
           <View>
-            <TouchableOpacity onPress={()=>OpenClose({...Opens, posts:!Opens.posts})}>
+            <TouchableOpacity onPress={()=>OpenClose({...Opens, posts:!Opens.posts})} style={{flexDirection:'row',alignItems:'center'}}>
               <Text style={styles.sectionHeader}>Posts</Text>
+              <Image source={images.tri} style={{...styles.sectionTri,transform: [{rotate: Opens.posts ? '0deg' : '180deg' }]}}/>
             </TouchableOpacity>
           {Opens.posts && 
             <FlatList
@@ -303,8 +301,9 @@ const SearchScreen = () => {
         }
         { searchResults?.lists?.length > 0 &&
         <View>
-          <TouchableOpacity onPress={()=>OpenClose({...Opens, lists:!Opens.lists})}>
+          <TouchableOpacity onPress={()=>OpenClose({...Opens, lists:!Opens.lists})} style={{flexDirection:'row',alignItems:'center'}}>
             <Text style={styles.sectionHeader}>Lists</Text>
+            <Image source={images.tri} style={{...styles.sectionTri,transform: [{rotate: Opens.lists ? '0deg' : '180deg' }]}}/>
           </TouchableOpacity>
           {Opens.lists && 
             <FlatList
@@ -312,7 +311,7 @@ const SearchScreen = () => {
               data={searchResults.lists}
               keyExtractor={(item) => item.id}
               renderItem={({ item, index }) => (
-                <TouchableOpacity onPress={() => navigation.navigate('MyLists', { _user:null, _profileImageUrl: null, _userName: item.userName })}>
+                <TouchableOpacity onPress={() => navigation.navigate('MyLists', { _user:null, _profileImageUrl: null, _userName: item.userName })} >
                   <RenderList
                     EditTitle={() => null}
                     EditDescription={() => null}
@@ -325,8 +324,8 @@ const SearchScreen = () => {
                     plusorminus={false}
                     sidefunction={() => null}
                     loggedIn={false}
-                    
                   />
+                  <Image source={images.tri} style={{...styles.sidetri,position:'absolute',right:10,top:"40%"}}/>
                 </TouchableOpacity>
               )}
             />
@@ -426,7 +425,21 @@ const styles = StyleSheet.create({
   sectionHeader :{
     fontFamily :'Oswald-Medium',
     fontSize:25,
-    paddingVertical:5
+    paddingVertical:5,
+    flex:1,
+  },
+  sidetri :{
+    width:17,
+    height:9,
+    tintColor:secondaryColor,
+    transform: [{rotate: '90deg'}]
+  },
+  sectionTri :{
+    width:18,
+    height:10,
+    tintColor:'black',
+    right:5,
+    
   },
   postItem: {
     paddingVertical: 10,
