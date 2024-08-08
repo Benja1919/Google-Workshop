@@ -134,7 +134,6 @@ const UserProfileScreen = ({ route, navigation }) => {
     
   };
 
-
   const handleFollow = async (user) => {
     await firestoreDB().AddFriend(currentUser, user.userName);
   };
@@ -194,9 +193,9 @@ const UserProfileScreen = ({ route, navigation }) => {
                 <View style={styles.buttonsContainer}>
                   {isFollowing(user) ? (
                     <>
-                      <TouchableOpacity style={styles.followingButton}>
+                      {/* <TouchableOpacity style={styles.followingButton}>
                         <Text style={styles.followingButtonText}>Following</Text>
-                      </TouchableOpacity>
+                      </TouchableOpacity> */}
                       <TouchableOpacity
                         style={styles.unfollowButton}
                         onPress={() => handleUnfollow(user)}
@@ -223,7 +222,7 @@ const UserProfileScreen = ({ route, navigation }) => {
               style={styles.button}
               onPress={() => navigateToScreen(button.screen)}
             >
-              <Image source={buttons[index].icon} style={styles.icon} />
+              {/* <Image source={buttons[index].icon} style={styles.icon} /> */}
               <Text style={styles.buttonText}>{button.label}</Text>
             </TouchableOpacity>
           ))}
@@ -265,17 +264,26 @@ const styles = StyleSheet.create({
 
   buttonContainer: {
     flex: 1,
-    top: 40,
-    width: 200,
+    flexDirection: 'row',
+    // marginLeft: 40,
+    
     alignSelf:'center',
-    marginVertical: 5,
+    justifyContent: 'space-between',
     // backgroundColor: "green"
 
   },
 
   button:{
-    backgroundColor:"#E6D2AA",
-    marginTop: 10,
+    width: 100,
+    height: 90,
+    marginTop: 60,
+    marginHorizontal: 12,
+    borderRadius: 60,
+    backgroundColor: "#e5b28f",
+    // alignSelf: 'center',
+    paddingVertical: 30,
+    // paddingHorizontal: ,
+    // marginHorizontal: 10
   },
 
   header: {
@@ -286,10 +294,10 @@ const styles = StyleSheet.create({
     margin: 10,
     
   },
-  icon: {
-    width: 20,
-    height: 20,
-  },
+  // icon: {
+  //   width: 20,
+  //   height: 20,
+  // },
   profileContainer: {
     alignItems: 'center',
     marginTop: 0,
@@ -317,18 +325,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Oswald-Medium",
   },
-  followingButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    margin: 5,
-  },
-  followingButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: "Oswald-Medium",
-  },
+  // followingButton: {
+  //   backgroundColor: '#4CAF50',
+  //   borderRadius: 20,
+  //   paddingVertical: 8,
+  //   paddingHorizontal: 20,
+  //   margin: 5,
+  // },
+  // followingButtonText: {
+  //   color: '#fff',
+  //   fontSize: 16,
+  //   fontFamily: "Oswald-Medium",
+  // },
   unfollowButton: {
     backgroundColor: '#FF0000',
     borderRadius: 20,
@@ -369,17 +377,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Oswald-Medium',
     color: 'black',
   },
-  // circleButton: {
-  //   position: 'absolute',
-  //   width: 80,
-  //   height: 80,
-  //   borderRadius: 40,
-  //   backgroundColor: 'white',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   borderWidth: 1,
-  //   borderColor: '#282512',
-  // },
+
   icon: {
     width: 25,
     height: 25,
@@ -387,7 +385,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'black',
     textAlign: 'center',
-    fontSize: 13,
+    fontSize: 17,
     fontFamily: 'Oswald-Medium',
   },
 });
