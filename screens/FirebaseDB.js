@@ -298,7 +298,6 @@ export const firestoreDB = () => {
     const UpdateProfileName = async ({userName,newValue}) => {
         const user = await GetUserName(userName);
         const docRef = doc(firestore, 'users', user.id);
-
         await updateDoc(docRef, {
             profilename: newValue
         });
@@ -307,7 +306,7 @@ export const firestoreDB = () => {
     const GetUserName = async (userName) => {
         const userDocRef = doc(firestore, 'users', userName.toLowerCase());
         const userDoc = await getDoc(userDocRef);
-        return userDoc.exists() ? userDoc.data() : null;
+        return userDoc.exists() ? {...userDoc.data(), id:userDoc.id} : null;
     };
 
     const GetRestaurant = async (restaurantName) => {

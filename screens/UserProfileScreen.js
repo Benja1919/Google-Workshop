@@ -5,7 +5,7 @@ import myListsIcon from '../assets/icons/lists.png';
 import line from '../assets/line.png'
 import circle from '../assets/circle.png'
 import myNetworkIcon from '../assets/icons/network.png';
-import { firestoreDB } from './FirebaseDB';
+import { firestoreDB,DeleteImageByURI } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -116,9 +116,11 @@ const UserProfileScreen = ({ route, navigation }) => {
       const blob = await response.blob();
 
       await uploadBytes(storageRef, blob);
-
-      const downloadURL = await getDownloadURL(storageRef);
-      setNewImage(downloadURL);
+      
+      const newImage = await getDownloadURL(storageRef);
+      await DeleteImageByURI(user.profileImageUrl);
+      await firestoreDB().updateUserProfile(currentUser.userName, user.name, newImage || user.profileImageUrl);
+      setUser({ ...user, profileImageUrl: newImage || user.profileImageUrl });
     }
   };
 
@@ -167,7 +169,12 @@ const UserProfileScreen = ({ route, navigation }) => {
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={{flex: 1 }}>
         <View style={styles.container}>
-          <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
+          <TouchableOpacity disabled={!isYou} onPress={pickImage}  style={{zIndex:10 }}>
+            <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
+            {isYou &&
+            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'black',width:14,height:15,position:'absolute',bottom:5,right:5}} />
+            }
+          </TouchableOpacity>
           <Image source={line } style={styles.line} />
           <Image source={circle } style={styles.circle} />
           <View style={{flexDirection:'row',...styles.container}}>
@@ -179,25 +186,7 @@ const UserProfileScreen = ({ route, navigation }) => {
         </View>
 
         <View style={styles.profileContainer}>
-            {isYou ? (
-              <View style={styles.editButtonsContainer}>
-                {isEditing ? (
-                  <View>
-                    <TouchableOpacity onPress={pickImage} style={styles.actionButton}>
-                      <Text style={styles.actionButtonText}>Change Image</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={saveChanges} style={styles.actionButton}>
-                      <Text style={styles.actionButtonText}>Save</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.editButton}>
-                    <Text style={styles.editButtonText}>Edit Profile</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ) : (
-              currentUser && (
+            {!isYou &&
                 <View style={styles.buttonsContainer}>
                   {isFollowing(user) ? (
                     <>
@@ -220,8 +209,8 @@ const UserProfileScreen = ({ route, navigation }) => {
                     </TouchableOpacity>
                   )}
                 </View>
-              )
-            )}
+            
+            }
           </View>
         <View style={styles.buttonContainer}>
           {buttons.map((button, index) => (

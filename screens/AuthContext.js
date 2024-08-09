@@ -33,7 +33,6 @@ export const AuthProvider = ({ children }) => {
    * Function to log out the current user.
    */
   const logout = () => {
-    Alert.alert('Success', `Logged out from: ${currentUser.userName}`);
     setIsLoggedIn(false);
     setCurrentUser(null);
   };
