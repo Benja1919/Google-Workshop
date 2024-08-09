@@ -70,6 +70,7 @@ const SignUpScreen = ({ navigation }) => {
       profilename : profilename,
       password: password,
       email: email.toLocaleLowerCase(),
+      followers: [],
       friends: [],
       profileImageUrl: profileImageUrl,
       isRest: false,

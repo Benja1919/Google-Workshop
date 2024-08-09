@@ -439,29 +439,72 @@ export const firestoreDB = () => {
         });
     };
 
-    const AddFriend = async (user, friendUserName) => {
+    const AddFriend = async (curUser, friend) => {
         try {
-            const userDocRef = doc(firestore, 'users', user.userName.toLowerCase());
-            if(user && !user.friends.includes(friendUserName))
+            const userDocRef = doc(firestore, 'users', curUser.userName.toLowerCase());
+            if(curUser && !curUser.friends.includes(friend.userName))
             {
-                user.friends = [...user.friends, friendUserName];
-                await updateDoc(userDocRef, user);
+                curUser.friends = [...curUser.friends, friend.userName];
+                await updateDoc(userDocRef, curUser);
+            }
+            const friendDocRef = doc(firestore, 'users', friend.userName.toLowerCase());
+            if(friend && !friend.followers.includes(curUser.userName))
+            {
+                friend.followers = [...friend.followers, curUser.userName];
+                await updateDoc(friendDocRef, friend);
             }
         } catch (error) {
             console.error('Error following user:', error);
         }
     };
 
-    const RemoveFriend = async (user, friendUserName) => {
+    const RemoveFriend = async (curUser, friend) => {
         try {
-            const userDocRef = doc(firestore, 'users', user.userName.toLowerCase());
-            if(user && user.friends.includes(friendUserName))
+            const userDocRef = doc(firestore, 'users', curUser.userName.toLowerCase());
+            if(curUser && curUser.friends.includes(friend.userName))
             {
-                user.friends = user.friends.filter(user => user !== friendUserName);
-                await updateDoc(userDocRef, user);
+                curUser.friends = curUser.friends.filter(user => user !== friend.userName);
+                await updateDoc(userDocRef, curUser);
+            }
+            const friendDocRef = doc(firestore, 'users', friend.userName.toLowerCase());
+            if(friend && friend.followers.includes(curUser.userName))
+            {
+                friend.followers = friend.followers.filter(user => user !== curUser.userName);
+                await updateDoc(friendDocRef, friend);
             }
         } catch (error) {
             console.error('Error following user:', error);
+        }
+    };
+
+    const GetUserFollowers = async (userName) => {
+        try {
+            const userDocRef = doc(firestore, 'users', userName.toLowerCase());
+            const userDoc = await getDoc(userDocRef);
+
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const followersIds = userData.followers || [];
+                if (followersIds.length === 0) {
+                    return [];
+                }
+
+                const followersCollection = collection(firestore, 'users');
+                const followers = [];
+                for (const id of followersIds) {
+                    const followersDocRef = doc(followersCollection, id.toLowerCase());
+                    const followersDoc = await getDoc(followersDocRef);
+                    if (followersDoc.exists()) {
+                        followers.push({ id: followersDoc.id, ...followersDoc.data() });
+                    }
+                }
+                return followers;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.error('Error getting user friends:', error);
+            return [];
         }
     };
 
@@ -504,6 +547,7 @@ export const firestoreDB = () => {
         FetchPostsLimited,
         UpdateListFollowCount,
         UpdateProfileName,
+        GetUserFollowers,
     };
 };
 

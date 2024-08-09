@@ -135,11 +135,11 @@ const UserProfileScreen = ({ route, navigation }) => {
   };
 
   const handleFollow = async (user) => {
-    await firestoreDB().AddFriend(currentUser, user.userName);
+    await firestoreDB().AddFriend(currentUser, user);
   };
   
   const handleUnfollow = async (user) => {
-    await firestoreDB().RemoveFriend(currentUser, user.userName);
+    await firestoreDB().RemoveFriend(currentUser, user);
   };
 
   const isFollowing = (user) => {
