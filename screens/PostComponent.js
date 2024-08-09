@@ -57,7 +57,6 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
     : [{ url: post.mediaUrls[0], type: 'image' }];
 
     let dateDiff = (Date.now() / 1000) - post.creationTime.seconds;
-    console.log(dateDiff);
     let postDate;
     if (dateDiff < 60)
     {
