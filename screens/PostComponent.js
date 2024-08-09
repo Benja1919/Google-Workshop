@@ -4,17 +4,24 @@ import { AuthContext } from './AuthContext';
 import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
 import StarRating from 'react-native-star-rating-widget';
+import Carousel from 'react-native-reanimated-carousel';
+
 
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigateToLogin }) => {
     const [profileImageUrl, setProfileImageUrl] = useState('defaultProfileImageUri');
     const { currentUser } = useContext(AuthContext);
     const [userProfileLoaded, setUserProfileLoaded] = useState(false);
+    const [activeSlide, setActiveSlide] = useState(0);
+
     const [likesCount, setLikesCount] = useState(post.likes ? post.likes : 0);
     const [fontsLoaded] = useFonts({
         "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
         "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
         "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
     });
+
+    const { width: viewportWidth } = Dimensions.get('window');
+
 
     // Ensure post is defined and has essential properties
     if (!post || !post.userName || !post.mediaUrls || !post.creationTime) {
@@ -37,6 +44,17 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
 
         fetchProfileImage();
     }, [post.userName]);
+
+    const renderItem = ({ item }) => {
+            return <Image source={{ uri: item.url }}  style= {styles.backgroundImage}/>;
+        }
+
+    const mediaItems = Array.isArray(post.mediaUrls)
+    ? post.mediaUrls.map((url) => ({
+        url: url,
+        type: 'image'
+    }))
+    : [{ url: post.mediaUrls[0], type: 'image' }];
 
 
     const postDate = new Date(post.creationTime.seconds * 1000).toLocaleDateString();
@@ -68,7 +86,31 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
     return (
         <View style={styles.post}>
             <View style={styles.postCard}> 
-                <Image source={{ uri: post.mediaUrls[0] }} style={styles.backgroundImage} />
+            {mediaItems.length > 1 ? (
+                <>
+                    <Carousel
+                        data={mediaItems}
+                        renderItem={renderItem}
+                        width={viewportWidth}
+                       // height={200}
+                        pagingEnabled
+                    />
+                    <View style={styles.paginationContainer}>
+                        {mediaItems.map((_, index) => (
+                            <View
+                                key={index}
+                                style={[
+                                    styles.paginationDot,
+                                    { opacity: index === activeSlide ? 1 : 0.4 }
+                                ]}
+                            />
+                        ))}
+                    </View>
+                </>
+            ) : (
+                <Image source={{ uri: post.mediaUrls[0] }}  style= {styles.backgroundImage}/>
+            )}
+                
                 <View style={styles.textContainer}>
                     <TouchableOpacity style={styles.userContainer} onPress={() => navigateToProfile(post.userName)}>
                         <Image source={{ uri: profileImageUrl }} style={styles.userImage} />
