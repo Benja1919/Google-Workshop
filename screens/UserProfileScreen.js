@@ -10,7 +10,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFonts } from 'expo-font';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
-import {col2, primaryColor, secondaryColor} from '../App'
+import {primaryColor, secondaryColor} from '../Color'
 
 const UserProfileScreen = ({ route, navigation }) => {
   const storage = getStorage();

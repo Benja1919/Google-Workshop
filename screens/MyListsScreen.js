@@ -9,7 +9,7 @@ import RestaurantFinder from './components/RestaurantFinder';
 import { ScrollView, createNativeWrapper } from 'react-native-gesture-handler';
 import BottomBarComponent from './components/BottomBar';
 import ImprovedImageComponent from './components/ImprovedImage';
-import {primaryColor, secondaryColor} from '../App'
+import {primaryColor, secondaryColor} from '../Color'
 
 const iconData = [
   require('../assets/icons/favoritelist.png'),
