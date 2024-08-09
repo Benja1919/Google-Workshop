@@ -12,7 +12,7 @@ import {haversineDistance} from './components/RestaurantFinder';
 import { useFonts } from 'expo-font';
 import {RenderList} from './MyListsScreen';
 import StarRatingDisplay  from 'react-native-star-rating-widget';
-import {primaryColor, secondaryColor} from '../App'
+import {primaryColor, secondaryColor} from '../Color'
 
 const images = {
   tri : require("../assets/icons/triwhite.png"),

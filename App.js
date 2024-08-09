@@ -31,8 +31,7 @@ console.error = (...args) => {
   }
   originalError(...args);
 };
-export const primaryColor = '#ead5d2'; //'rgba(246, 225, 188, 0.5)
-export const secondaryColor = '#ba8178';
+
 
 const Stack = createStackNavigator();
 const AppHeaderTitle = () =>{
