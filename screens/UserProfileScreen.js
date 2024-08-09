@@ -19,7 +19,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newImage, setNewImage] = useState(null);
   const [followedUsers, setFollowedUsers] = useState(new Set());
-
+  const [ProfileNameText, setProfileNameText] = useState(null);
   const [fontsLoaded] = useFonts({
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
     "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
@@ -45,6 +45,7 @@ const UserProfileScreen = ({ route, navigation }) => {
       try {
         const userData = await firestoreDB().GetUserName(userName);
         setUser(userData);
+        setProfileNameText(userData.profilename);
 
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -143,7 +144,6 @@ const UserProfileScreen = ({ route, navigation }) => {
   const isFollowing = (user) => {
     return followedUsers.has(user.userName);
   };
-
   if (!user) {
     return (
       <View style={styles.container}>
@@ -155,6 +155,7 @@ const UserProfileScreen = ({ route, navigation }) => {
     const text = event.nativeEvent.text;
     firestoreDB().UpdateProfileName({userName:userName,newValue:text});
     setUser({...user,profilename: text});
+    setProfileNameText(text)
   };
   const buttons = [
     { label: 'Posts', screen: 'Posts' },
@@ -176,9 +177,9 @@ const UserProfileScreen = ({ route, navigation }) => {
           <Image source={circle } style={styles.circle} />
           <View style={{flexDirection:'row',...styles.container}}>
             {isYou &&
-            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'black',width:14,height:15,marginRight:5}} />
+            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'black',width:14,height:15,marginRight:5,marginTop:15}} />
             }
-            <TextInput placeholder={user.profilename} editable={isYou} onEndEditing={ChangeName} placeholderTextColor={'black'} style={{fontFamily:"Oswald-Medium",zIndex:10,fontSize:25,paddingTop:10}}/>
+            <TextInput value={ProfileNameText} onChangeText={(newText) => setProfileNameText(newText)} editable={isYou} onEndEditing={ChangeName} placeholderTextColor={'black'} style={{fontFamily:"Oswald-Medium",zIndex:10,fontSize:25,paddingTop:10}}/>
           </View>
         </View>
 
@@ -233,9 +234,6 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    // backgroundColor: "green"
-
-    // backgroundColor: 'white'
   },
 
   line:{
@@ -254,6 +252,25 @@ const styles = StyleSheet.create({
 
   },
 
+<<<<<<< HEAD
+=======
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignSelf:'center',
+    justifyContent: 'space-between',
+  },
+
+  button:{
+    width: 100,
+    height: 90,
+    marginTop: 60,
+    marginHorizontal: 12,
+    borderRadius: 60,
+    backgroundColor: "#e5b28f",
+    paddingVertical: 30,
+  },
+>>>>>>> 6729020854b5399ce6fe6ef7095c849c5e2d447e
 
   header: {
     fontSize: 24,
@@ -312,6 +329,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
 
   },
+<<<<<<< HEAD
 
   
   buttonContainer: {
@@ -374,6 +392,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Oswald-Medium',
     color: 'black',
   },
+=======
+>>>>>>> 6729020854b5399ce6fe6ef7095c849c5e2d447e
 
 
 });
