@@ -257,8 +257,7 @@ const styles = StyleSheet.create({
     height: 183,
     width: 183,
     top: -6.5,
-
-    // zIndex: 1
+    zIndex: 0
 
   },
 
@@ -314,40 +313,41 @@ const styles = StyleSheet.create({
     // marginBottom: 10,
   },
   followButton: {
-    backgroundColor: '#D36B00',
-    borderRadius: 20,
+    backgroundColor: '#ead5d2',
+    width: 100,
+    borderWidth: 3,
+    borderColor: "#ba8178",
+    borderRadius: 35,
     paddingVertical: 8,
     paddingHorizontal: 20,
     margin: 5,
+    zIndex: 3,
   },
   followButtonText: {
-    color: '#fff',
+    color: '#ba8178',
     fontSize: 16,
     fontFamily: "Oswald-Medium",
+    alignSelf: 'center'
   },
-  // followingButton: {
-  //   backgroundColor: '#4CAF50',
-  //   borderRadius: 20,
-  //   paddingVertical: 8,
-  //   paddingHorizontal: 20,
-  //   margin: 5,
-  // },
-  // followingButtonText: {
-  //   color: '#fff',
-  //   fontSize: 16,
-  //   fontFamily: "Oswald-Medium",
-  // },
+
   unfollowButton: {
-    backgroundColor: '#FF0000',
-    borderRadius: 20,
+    backgroundColor: '#ead5d2',
+    width: 100,
+    borderWidth: 3,
+    borderColor: "#ba8178",
+    borderRadius: 35,
     paddingVertical: 8,
     paddingHorizontal: 20,
     margin: 5,
+    zIndex: 3,
+
   },
   unfollowButtonText: {
-    color: '#fff',
+    color: '#ba8178',
     fontSize: 16,
     fontFamily: "Oswald-Medium",
+    alignSelf: 'center'
+
   },
   editButtonsContainer: {
     flexDirection: 'row',
