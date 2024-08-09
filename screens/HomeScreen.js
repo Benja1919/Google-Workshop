@@ -1,13 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Image, Alert } from 'react-native';
 import PostsScreen from './PostsScreen';
 import { AuthContext } from './AuthContext';
-import SearchScreen from './SearchScreen';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 const HomeScreen = ({ navigation }) => {
   const { isLoggedIn, currentUser} = useContext(AuthContext);
+
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -50) {
       if(isLoggedIn){
@@ -27,18 +28,19 @@ const HomeScreen = ({ navigation }) => {
       }
     }
   };
-  
 
+  const Tab = createMaterialTopTabNavigator();
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={styles.container}>
-        <View style={styles.postScreenContainer}>
-            <PostsScreen navigation={navigation} />
+        <Tab.Navigator>
+          {isLoggedIn && <Tab.Screen name="Friends Posts" component={PostsScreen} initialParams={{filterFriends: true}} /> }
+          <Tab.Screen name="All Posts" component={PostsScreen} />
+        </Tab.Navigator>
+        <View>
+          <BottomBarComponent navigation={navigation}/>
         </View>
-        <BottomBarComponent navigation={navigation}/>
-        
-
       </View>
     </PanGestureHandler>
   );

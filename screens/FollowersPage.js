@@ -13,7 +13,7 @@ import { AuthContext } from './AuthContext'; // Import AuthContext
 import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
 
-const FollowersScreen = ({ navigation, route }) => {
+const FollowersPage = ({ navigation, route }) => {
     const {userName} = route.params.userName;
     const { currentUser } = useContext(AuthContext); // Use AuthContext to get current user
     const [users, setUsers] = useState([]);
@@ -37,7 +37,7 @@ const FollowersScreen = ({ navigation, route }) => {
   // Function to fetch friends from DB
   const fetchFriends = async () => {
     try {
-      const followersList = await firestoreDB().GetUserFollowers(userName.toLowerCase()); // Fetch friends data
+      const followersList = await firestoreDB().GetUserFollowers(userName.toLowerCase());
       setUsers(followersList);
       const followedSet = new Set(currentUser?.friends || []);
       setFollowedUsers(followedSet);
@@ -288,4 +288,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FollowersScreen;
+export default FollowersPage;

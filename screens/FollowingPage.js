@@ -13,7 +13,7 @@ import { AuthContext } from './AuthContext'; // Import AuthContext
 import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
 
-const FollowingScreen = ({ navigation, route }) => {
+const FollowingPage = ({ navigation, route }) => {
     const {userName} = route.params.userName;
     const { currentUser } = useContext(AuthContext); // Use AuthContext to get current user
     const [users, setUsers] = useState([]);
@@ -288,4 +288,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FollowingScreen;
+export default FollowingPage;

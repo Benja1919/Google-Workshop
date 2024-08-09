@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import PostComponent from './PostComponent'; // Ensure the import path is correct
 import { firestoreDB } from './FirebaseDB';
-import BottomBarComponent from './components/BottomBar';
+import { AuthContext } from './AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
+import reactNativeConfig from '../react-native.config';
+
 
 
 /**
@@ -16,17 +19,22 @@ import BottomBarComponent from './components/BottomBar';
  * @returns {JSX.Element} The rendered posts screen component.
  */
 const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
+  const allPostsRef = React.useRef([]);
   const [posts, setPosts] = React.useState([]);
+  const { isLoggedIn, currentUser} = useContext(AuthContext);
 
   React.useEffect(() => {
     const loadPosts = async () => {
       try {
-        const allPosts = await firestoreDB().GetPosts();
+        const posts = await firestoreDB().GetPosts();
+        allPostsRef.current = posts;
         const filterRestaurantID = route?.params?.filterrestaurantID; // Optional chaining
         const filterUserName = route?.params?.filterUserName; // Optional chaining
-        let filteredPosts = allPosts;
+        const filterFriends = route?.params?.filterFriends;
+        let filteredPosts = posts;
 
         if (filterRestaurantID) {
+
           filteredPosts = filteredPosts.filter(post => post.RestaurantID === filterRestaurantID);
         }
 
@@ -34,6 +42,16 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
           filteredPosts = filteredPosts.filter(post => post.userName === filterUserName);
         }
 
+        if (filterFriends) {
+          if (isLoggedIn)
+          {
+            filteredPosts = filteredPosts.filter(post => currentUser.friends.includes(post.userName));
+          }
+          else
+          {
+            filteredPosts = [];
+          }
+        }
         setPosts(filteredPosts);
       } catch (error) {
         console.error('Error loading posts:', error);
@@ -43,12 +61,14 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
     loadPosts();
 
     // Set up real-time listener
-    const unsubscribe = firestoreDB().SubscribeToPosts((allPosts) => {
+    const unsubscribe = firestoreDB().SubscribeToPosts((posts) => {
+      allPostsRef.current = posts;
       const filterrestaurantID = route?.params?.filterrestaurantID;
       const filterUserName = route?.params?.filterUserName;
+      const filterFriends = route?.params?.filterFriends;
 
       
-      let filteredPosts = allPosts;
+      let filteredPosts = posts;
 
       if (filterrestaurantID) {
         filteredPosts = filteredPosts.filter(post => post.RestaurantID === filterrestaurantID);
@@ -58,11 +78,50 @@ const PostsScreen = ({ navigation, route, isScrollEnabled }) => {
         filteredPosts = filteredPosts.filter(post => post.userName === filterUserName);
       }
 
+      if (filterFriends) {
+        if (isLoggedIn)
+        {
+          filteredPosts = filteredPosts.filter(post => currentUser.friends.includes(post.userName));
+        }
+        else
+        {
+          filteredPosts = [];
+        }
+      }
       setPosts(filteredPosts);
     });
 
     return () => unsubscribe();
   }, [route]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const filterRestaurantID = route?.params?.filterrestaurantID; // Optional chaining
+        const filterUserName = route?.params?.filterUserName; // Optional chaining
+        const filterFriends = route?.params?.filterFriends;
+        let filteredPosts = allPostsRef.current;
+
+        if (filterRestaurantID) {
+          filteredPosts = filteredPosts.filter(post => post.RestaurantID === filterRestaurantID);
+        }
+
+        if (filterUserName) {
+          filteredPosts = filteredPosts.filter(post => post.userName === filterUserName);
+        }
+
+        if (filterFriends) {
+          if (isLoggedIn)
+          {
+            filteredPosts = filteredPosts.filter(post => currentUser.friends.includes(post.userName));
+          }
+          else
+          {
+            filteredPosts = [];
+          }
+        }
+        setPosts(filteredPosts);
+    }, [route])
+  );
 
   /**
    * navigateToProfile

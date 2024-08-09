@@ -2,16 +2,33 @@ import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import BottomBarComponent from './components/BottomBar';
-import FollowingScreen from './FollowingScreen';
-import FollowersScreen from './FollowersScreen';
+import FollowingPage from './FollowingPage';
+import FollowersPage from './FollowersPage';
+import { firestoreDB } from './FirebaseDB';
 
 const NetworkScreen = ({ navigation, route }) => {
-  const Tab = createMaterialTopTabNavigator();
+  const {userName} = route.params;
+  const [user, setUser] = useState([]);
+  useEffect(() => { 
+    const fetchUser = async () => {
+      try {
+        const user = await firestoreDB().GetUserName(userName.toLowerCase());
+        setUser(user);
+        console.log(user)
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+      }
+    };
+  
+    fetchUser();
+    }, [userName]); // Add userName as a dependency
+    console.log("TEST");
+    const Tab = createMaterialTopTabNavigator();
   return (
     <View style={styles.container}>
-      <Tab.Navigator style={styles.tabNavigator}>
-        <Tab.Screen name="Followers" component={FollowersScreen} initialParams={{userName: route.params}}/>
-        <Tab.Screen name="Following" component={FollowingScreen} initialParams={{userName: route.params}}/>
+      <Tab.Navigator>
+        <Tab.Screen name={`Followers (${user.followers ? user.followers.length : 0})`} component={FollowersPage} initialParams={{userName: route.params}}/>
+        <Tab.Screen name={`Following (${user.friends ? user.friends.length : 0})`} component={FollowingPage} initialParams={{userName: route.params}}/>
       </Tab.Navigator>
       <View>
       <BottomBarComponent navigation={navigation}/>
