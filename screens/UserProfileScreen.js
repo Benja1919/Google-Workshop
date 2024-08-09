@@ -171,14 +171,14 @@ const UserProfileScreen = ({ route, navigation }) => {
           <TouchableOpacity disabled={!isYou} onPress={pickImage}  style={{zIndex:10 }}>
             <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
             {isYou &&
-            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'#a38a8a',width:14,height:15,position:'absolute',bottom:5,right:5}} />
+            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:secondaryColor,width:16,height:17,position:'absolute',bottom:5,right:5}} />
             }
           </TouchableOpacity>
           <Image source={line } style={styles.line} />
           <Image source={circle } style={styles.circle} />
           <View style={{flexDirection:'row',...styles.container}}>
             {isYou &&
-            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'#a38a8a',width:14,height:15,marginRight:7,marginTop:15}} />
+            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:secondaryColor,width:16,height:17,marginRight:7,marginTop:15}} />
             }
             <TextInput value={ProfileNameText} onChangeText={(newText) => setProfileNameText(newText)} editable={isYou} onEndEditing={ChangeName} placeholderTextColor={'black'} style={{fontFamily:"Oswald-Medium",zIndex:10,fontSize:32,paddingTop:5,color:secondaryColor}}/>
           </View>
