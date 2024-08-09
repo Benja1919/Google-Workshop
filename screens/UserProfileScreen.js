@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions,BackHandler, TextInput } from 'react-native';
-import postsIcon from '../assets/icons/posts.png';
-import myListsIcon from '../assets/icons/lists.png';
 import line from '../assets/line.png'
 import circle from '../assets/circle.png'
-import myNetworkIcon from '../assets/icons/network.png';
 import { firestoreDB,DeleteImageByURI } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
@@ -160,14 +157,14 @@ const UserProfileScreen = ({ route, navigation }) => {
     setUser({...user,profilename: text});
   };
   const buttons = [
-    { label: 'Posts', screen: 'Posts', icon: postsIcon },
-    { label: 'My Lists', screen: 'MyLists', icon: myListsIcon },
-    { label: 'My Network', screen: 'Network', icon: myNetworkIcon },
+    { label: 'Posts', screen: 'Posts' },
+    { label: 'My Lists', screen: 'MyLists' },
+    { label: 'My Network', screen: 'Network' },
   ];
   const isYou = currentUser?.userName == userName;
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
-      <View style={{flex: 1 }}>
+      <View style={{flex: 1, backgroundColor:"#fffcfd" }}>
         <View style={styles.container}>
           <TouchableOpacity disabled={!isYou} onPress={pickImage}  style={{zIndex:10 }}>
             <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
@@ -219,7 +216,6 @@ const UserProfileScreen = ({ route, navigation }) => {
               style={styles.button}
               onPress={() => navigateToScreen(button.screen)}
             >
-              {/* <Image source={buttons[index].icon} style={styles.icon} /> */}
               <Text style={styles.buttonText}>{button.label}</Text>
             </TouchableOpacity>
           ))}
@@ -258,29 +254,6 @@ const styles = StyleSheet.create({
 
   },
 
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    // marginLeft: 40,
-    
-    alignSelf:'center',
-    justifyContent: 'space-between',
-    // backgroundColor: "green"
-
-  },
-
-  button:{
-    width: 100,
-    height: 90,
-    marginTop: 60,
-    marginHorizontal: 12,
-    borderRadius: 60,
-    backgroundColor: "#e5b28f",
-    // alignSelf: 'center',
-    paddingVertical: 30,
-    // paddingHorizontal: ,
-    // marginHorizontal: 10
-  },
 
   header: {
     fontSize: 24,
@@ -290,15 +263,10 @@ const styles = StyleSheet.create({
     margin: 10,
     
   },
-  // icon: {
-  //   width: 20,
-  //   height: 20,
-  // },
+
   profileContainer: {
     alignItems: 'center',
     marginTop: 0,
-    // backgroundColor: "red"
-
   },
   profileImage: {
     position: 'center',
@@ -306,8 +274,6 @@ const styles = StyleSheet.create({
     height: 170,
     borderRadius: 170,
     zIndex: 2,
-    
-    // marginBottom: 10,
   },
   followButton: {
     backgroundColor: '#ead5d2',
@@ -328,7 +294,7 @@ const styles = StyleSheet.create({
   },
 
   unfollowButton: {
-    backgroundColor: '#ead5d2',
+    backgroundColor: '#ba8178',
     width: 100,
     borderWidth: 3,
     borderColor: "#ba8178",
@@ -340,11 +306,44 @@ const styles = StyleSheet.create({
 
   },
   unfollowButtonText: {
-    color: '#ba8178',
+    color: '#ead5d2',
     fontSize: 16,
     fontFamily: "Oswald-Medium",
     alignSelf: 'center'
 
+  },
+
+  
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    margin: 40,
+    
+    alignSelf:'center',
+    justifyContent: 'space-between',
+
+  },
+
+  button:{
+    width: 100,
+    height: 80,
+    marginTop: 60,
+    marginHorizontal: 12,
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: "#ba8178",
+    backgroundColor: "#efe0e3",
+    alignContent: 'center',
+    justifyContent: 'center'
+
+  },
+
+  buttonText: {
+    color: '#ba8178',
+    textAlign: 'center',
+    fontSize: 17,
+    fontFamily: 'Oswald-Medium',
+    textAlign: 'center'
   },
   editButtonsContainer: {
     flexDirection: 'row',
@@ -376,16 +375,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 
-  icon: {
-    width: 25,
-    height: 25,
-  },
-  buttonText: {
-    color: 'black',
-    textAlign: 'center',
-    fontSize: 17,
-    fontFamily: 'Oswald-Medium',
-  },
+
 });
 
 export default UserProfileScreen;
