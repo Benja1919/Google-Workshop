@@ -171,16 +171,16 @@ const UserProfileScreen = ({ route, navigation }) => {
           <TouchableOpacity disabled={!isYou} onPress={pickImage}  style={{zIndex:10 }}>
             <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
             {isYou &&
-            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'black',width:14,height:15,position:'absolute',bottom:5,right:5}} />
+            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'#a38a8a',width:14,height:15,position:'absolute',bottom:5,right:5}} />
             }
           </TouchableOpacity>
           <Image source={line } style={styles.line} />
           <Image source={circle } style={styles.circle} />
           <View style={{flexDirection:'row',...styles.container}}>
             {isYou &&
-            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'black',width:14,height:15,marginRight:5,marginTop:15}} />
+            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'#a38a8a',width:14,height:15,marginRight:7,marginTop:15}} />
             }
-            <TextInput value={ProfileNameText} onChangeText={(newText) => setProfileNameText(newText)} editable={isYou} onEndEditing={ChangeName} placeholderTextColor={'black'} style={{fontFamily:"Oswald-Medium",zIndex:10,fontSize:25,paddingTop:10}}/>
+            <TextInput value={ProfileNameText} onChangeText={(newText) => setProfileNameText(newText)} editable={isYou} onEndEditing={ChangeName} placeholderTextColor={'black'} style={{fontFamily:"Oswald-Medium",zIndex:10,fontSize:32,paddingTop:5}}/>
           </View>
         </View>
 
@@ -188,10 +188,6 @@ const UserProfileScreen = ({ route, navigation }) => {
             {!isYou &&
                 <View style={styles.buttonsContainer}>
                   {isFollowing(user) ? (
-                    <>
-                      {/* <TouchableOpacity style={styles.followingButton}>
-                        <Text style={styles.followingButtonText}>Following</Text>
-                      </TouchableOpacity> */}
                       <TouchableOpacity
                       
                         style={styles.unfollowButton}
@@ -199,7 +195,6 @@ const UserProfileScreen = ({ route, navigation }) => {
                       >
                       <Text style={styles.unfollowButtonText}>Unfollow</Text>
                       </TouchableOpacity>
-                    </>
                   ) : (
                     <TouchableOpacity
                       style={styles.followButton}
@@ -219,7 +214,7 @@ const UserProfileScreen = ({ route, navigation }) => {
               style={styles.button}
               onPress={() => navigateToScreen(button.screen)}
             >
-              <Image source={icon} style={{height: 70, width:70, alignSelf: 'center'}}></Image>
+              <Image source={icon} style={styles.icon}></Image>
               <Text style={styles.buttonText}>{button.label}</Text>
             </TouchableOpacity>
           ))}
@@ -252,17 +247,6 @@ const styles = StyleSheet.create({
     width: 183,
     top: -6.5,
     zIndex: 0
-
-  },
-
-
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    fontFamily: "Oswald-Bold",
-    textAlign: 'center',
-    margin: 10,
-    
   },
 
   profileContainer: {
@@ -316,16 +300,12 @@ const styles = StyleSheet.create({
 
   
   buttonContainer: {
-    // flex: 0,
     flexDirection: 'column',
-    // margin: 0,
-    // backgroundColor: "black",
     justifyContent: 'space-evenly',
     alignItems: 'flex-start',
-    left: 40
-    
-
-  },
+    left: 40,
+    top: 25
+    },
 
   button:{
     width: 'auto',
@@ -335,7 +315,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     flexDirection: 'row',
+  },
 
+  icon:{
+    height: 70, 
+    width:70, 
+    alignSelf: 'center',
   },
 
   buttonText: {
