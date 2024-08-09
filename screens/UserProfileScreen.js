@@ -10,7 +10,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFonts } from 'expo-font';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
-
+import {col2, primaryColor, secondaryColor} from '../App'
 
 const UserProfileScreen = ({ route, navigation }) => {
   const storage = getStorage();
@@ -180,7 +180,7 @@ const UserProfileScreen = ({ route, navigation }) => {
             {isYou &&
             <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'#a38a8a',width:14,height:15,marginRight:7,marginTop:15}} />
             }
-            <TextInput value={ProfileNameText} onChangeText={(newText) => setProfileNameText(newText)} editable={isYou} onEndEditing={ChangeName} placeholderTextColor={'black'} style={{fontFamily:"Oswald-Medium",zIndex:10,fontSize:32,paddingTop:5}}/>
+            <TextInput value={ProfileNameText} onChangeText={(newText) => setProfileNameText(newText)} editable={isYou} onEndEditing={ChangeName} placeholderTextColor={'black'} style={{fontFamily:"Oswald-Medium",zIndex:10,fontSize:32,paddingTop:5,color:secondaryColor}}/>
           </View>
         </View>
 
@@ -261,10 +261,10 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   followButton: {
-    backgroundColor: '#ead5d2',
+    backgroundColor: primaryColor,
     width: 100,
     borderWidth: 3,
-    borderColor: "#ba8178",
+    borderColor: secondaryColor,
     borderRadius: 35,
     paddingVertical: 8,
     paddingHorizontal: 20,
@@ -272,17 +272,17 @@ const styles = StyleSheet.create({
     zIndex: 3,
   },
   followButtonText: {
-    color: '#ba8178',
+    color: secondaryColor,
     fontSize: 16,
     fontFamily: "Oswald-Medium",
     alignSelf: 'center'
   },
 
   unfollowButton: {
-    backgroundColor: '#ba8178',
+    backgroundColor: primaryColor,
     width: 100,
     borderWidth: 3,
-    borderColor: "#ba8178",
+    borderColor: secondaryColor,
     borderRadius: 35,
     paddingVertical: 8,
     paddingHorizontal: 20,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
 
   },
   unfollowButtonText: {
-    color: '#ead5d2',
+    color: primaryColor,
     fontSize: 16,
     fontFamily: "Oswald-Medium",
     alignSelf: 'center'
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#ba8178',
+    color: secondaryColor,
     textAlign: 'center',
     fontSize: 17,
     fontFamily: 'Oswald-Medium',

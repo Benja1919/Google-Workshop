@@ -12,9 +12,8 @@ import {haversineDistance} from './components/RestaurantFinder';
 import { useFonts } from 'expo-font';
 import {RenderList} from './MyListsScreen';
 import StarRatingDisplay  from 'react-native-star-rating-widget';
-const col2 = 'rgba(246, 225, 188, 0.3)';
-const secondaryColor = 'rgba(230, 180, 85, 0.8)';
-const col3 = '#f9f9f9';
+import {primaryColor, secondaryColor} from '../App'
+
 const images = {
   tri : require("../assets/icons/triwhite.png"),
 }
@@ -145,7 +144,7 @@ const SearchScreen = () => {
   const renderUser = ({ item }) => {
     return (
       <View style={{marginBottom:5}}>
-        <TouchableOpacity onPress={() => handleUserPress(item.userName)} style={{flexDirection:'row',backgroundColor:col2,padding:10,borderRadius:10,alignItems:'center'}}>
+        <TouchableOpacity onPress={() => handleUserPress(item.userName)} style={{flexDirection:'row',backgroundColor:primaryColor,padding:10,borderRadius:10,alignItems:'center'}}>
           
             <Image source={{ uri: item.profileImageUrl }} style={styles.profileImage} />
             <Text style={{fontFamily :'Oswald-Medium',fontSize:18,flex:1}}>{item.profilename}</Text>
@@ -158,7 +157,7 @@ const SearchScreen = () => {
   const renderRestaurant = ({item}) => {
     return (
       <View style={{marginBottom:5}}>
-        <TouchableOpacity style={{flexDirection:'row',backgroundColor:col2,padding:5,borderRadius:10}} onPress={() => navigation.navigate('Restaurant', { restaurantGID: item.id })}>
+        <TouchableOpacity style={{flexDirection:'row',backgroundColor:primaryColor,padding:5,borderRadius:10}} onPress={() => navigation.navigate('Restaurant', { restaurantGID: item.id })}>
           <View style={{flexDirection:'column'}}>
             <View style={{flexDirection:'row'}}>
               <Text style={{fontFamily :'Oswald-Medium',fontSize:18}}>{item.displayName.text}</Text>

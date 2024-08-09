@@ -9,8 +9,8 @@ import RestaurantFinder from './components/RestaurantFinder';
 import { ScrollView, createNativeWrapper } from 'react-native-gesture-handler';
 import BottomBarComponent from './components/BottomBar';
 import ImprovedImageComponent from './components/ImprovedImage';
-const col2 = 'rgba(246, 225, 188, 0.3)'; //'rgba(246, 225, 188, 0.5)'
-const secondaryColor = 'rgba(230, 180, 85, 0.8)';
+import {primaryColor, secondaryColor} from '../App'
+
 const iconData = [
   require('../assets/icons/favoritelist.png'),
   require('../assets/icons/wishlist.png'),
@@ -126,7 +126,7 @@ export const RenderList = ({item,EditTitle,EditDescription,index,isYou, Restaura
   };
   const buttonType = sideButtonType();
   return (
-    <View style={{backgroundColor: col2,borderRadius: 15,marginBottom:10}}>
+    <View style={{backgroundColor: primaryColor,borderRadius: 15,marginBottom:10}}>
       <View style={{flexDirection: 'row', alignItems: 'center',padding:5,marginLeft:10}}>
         <TouchableOpacity disabled={!(isYou && !foreign)} onPress={()=>ChangeImagePress()}>
           <Image source={iconData[item.Image]} style={{ width: 50, height: 50, borderRadius: 20, marginRight: 10 }} />
