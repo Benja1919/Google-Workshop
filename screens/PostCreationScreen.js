@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useContext,useCallback } from 'react';
-import { View, Text, TextInput, Button, Image, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, TextInput, Button, Image, StyleSheet, Alert, TouchableOpacity, FlatList, ScrollView, Modal } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import BottomBarComponent from './components/BottomBar';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 import { AuthContext } from './AuthContext';
-import { getStorage, ref, getDownloadURLm, uploadBytes,getDownloadURL  } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { firestoreDB } from './FirebaseDB';
 import { useFonts } from 'expo-font';
-import RestaurantFinder from './components/RestaurantFinder'
-
-const GOOGLE_PLACES_API_KEY = 'AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E'; // Replace with your Google Places API key
+import RestaurantFinder from './components/RestaurantFinder';
 
 const PostCreationScreen = ({ navigation }) => {
   const [restaurantName, setRestaurantName] = useState('');
@@ -26,26 +23,26 @@ const PostCreationScreen = ({ navigation }) => {
     "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
     "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
     "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
-  })
-  if (!fontsLoaded){
-    return undefined;
-  }
-  const {currentUser, isLoggedIn } = useContext(AuthContext);
+  });
+
+  const [isRateModalVisible, setRateModalVisible] = useState(false);
+
+  if (!fontsLoaded) return undefined;
+
+  const { currentUser, isLoggedIn } = useContext(AuthContext);
+
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -100) {
-      if(isLoggedIn){
-        const name = currentUser.userName
+      if (isLoggedIn) {
+        const name = currentUser.userName;
         navigation.navigate('UserProfile', { userName: name });
-      }
-      else{
+      } else {
         navigation.navigate('HomeScreen');
       }
-    }
-    else if (event.nativeEvent.translationX > 100) {
+    } else if (event.nativeEvent.translationX > 100) {
       navigation.navigate('HomeScreen');
     }
   };
-  
 
   useEffect(() => {
     (async () => {
@@ -59,40 +56,27 @@ const PostCreationScreen = ({ navigation }) => {
 
   const pickMedia = async (mediaTypes, type) => {
     try {
-      // בקשת רשות גישה לספריית התמונות
       const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!result.granted) {
         Alert.alert('Error', 'Permission to access gallery is required');
         return;
       }
-  
-      // בחירת תמונה או מדיה אחרת
+
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
       });
-  
-      // אם המשתמש לא ביטל את הבחירה
+
       if (!pickerResult.canceled) {
         const uri = pickerResult.assets[0].uri;
         const filename = uri.substring(uri.lastIndexOf('/') + 1);
-  
-        // יצירת התייחסות ל-Firebase Storage
         const storageRef = ref(storage, `images/${filename}`);
-  
-        // הורדת התמונה כ-blob
         const response = await fetch(uri);
         const blob = await response.blob();
-  
-        // העלאת התמונה ל-Firebase Storage
         await uploadBytes(storageRef, blob);
-  
-        // קבלת כתובת ה-URL להורדת התמונה
         const downloadURL = await getDownloadURL(storageRef);
-  
-        // הוספת ה-URI והסוג של המדיה
         setMediaUris([...mediaUris, downloadURL]);
         setMediaType(type);
       } else {
@@ -107,13 +91,11 @@ const PostCreationScreen = ({ navigation }) => {
 
   const pickImage = () => pickMedia(ImagePicker.MediaTypeOptions.Images, 'image');
   const pickVideo = () => pickMedia(ImagePicker.MediaTypeOptions.Videos, 'video');
-  const pickGif = () => pickMedia(ImagePicker.MediaTypeOptions.Images, 'gif');
 
   const pickLocation = async () => {
     try {
       let locationResult = await Location.getCurrentPositionAsync({});
       setLocation(locationResult);
-
       fetchPlaces(locationResult.coords.latitude, locationResult.coords.longitude);
     } catch (error) {
       Alert.alert('Error', 'Unable to fetch location');
@@ -131,10 +113,12 @@ const PostCreationScreen = ({ navigation }) => {
       Alert.alert('Error', 'Unable to fetch nearby places');
     }
   };
-  const ReceiveRestaurantData= ({ id, name }) => {
+
+  const ReceiveRestaurantData = ({ id, name }) => {
     setRestaurantName(name);
     setRestaurantID(id);
   };
+
   const handlePlaceSelect = (place) => {
     setLocation({
       coords: {
@@ -159,12 +143,12 @@ const PostCreationScreen = ({ navigation }) => {
       id: Math.random().toString(),
       userName: currentUser.userName,
       userprofile: currentUser.profilename,
-      restaurantName: restaurantName,
-      RestaurantID: RestaurantID,
-      stars: stars,
-      content: content,
+      restaurantName,
+      RestaurantID,
+      stars,
+      content,
       mediaUrls: mediaUris,
-      mediaType: mediaType,
+      mediaType,
       location: location ? `${location.coords.latitude}, ${location.coords.longitude}` : null,
     };
 
@@ -174,37 +158,32 @@ const PostCreationScreen = ({ navigation }) => {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
-      <View style={{flex:1}}>
+      <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.label}>Restaurant</Text>
-          <RestaurantFinder textinputstyle={styles.input} placeholder="Enter restaurant name" Complete={ReceiveRestaurantData} CompleteReset={false}/>
-
-          
-
-          <Text style={styles.label}>Rating</Text>
+        <View style={styles.profileRow}>
+        <Image source={{ uri: currentUser.profileImageUrl }} style={styles.mediaiconuser} />
+          <Text style={styles.label}>   Where did you eat?</Text>
+          </View>
+          <RestaurantFinder textinputstyle={styles.input} placeholder="Enter restaurant name" Complete={ReceiveRestaurantData} CompleteReset={false} />
+          <View style={styles.reviewRow}>
+          <Text style={styles.label}>How was it?     </Text>
           <StarRating
             rating={stars}
             onChange={setStars}
+            style = {styles.star}
           />
-
-          <Text style={styles.label}>Content</Text>
+          </View>
           <TextInput
-            style={[styles.input, { height: 100 }]}
+            style={[styles.input, { height: 125 }]}
             value={content}
             onChangeText={text => setContent(text)}
             placeholder="Enter your review"
             multiline
+            
           />
 
-          {/* Media Picker Bar */}
-          <View style={styles.mediaBar}>
-            <TouchableOpacity style={styles.mediaButton} onPress={pickImage}>
-              <Image source={require('../assets/icons/add_image.png')} style={styles.mediaicon} />
-            </TouchableOpacity>
-          </View>
-
-          
-
+  
+  
           <View style={styles.mediaContainer}>
             {mediaUris.map((uri, index) => (
               <View key={index} style={styles.mediaPreviewContainer}>
@@ -215,11 +194,11 @@ const PostCreationScreen = ({ navigation }) => {
               </View>
             ))}
           </View>
-
+  
           {location && (
             <Text>Location: {location.coords.latitude}, {location.coords.longitude}</Text>
           )}
-
+  
           {places.length > 0 && (
             <FlatList
               data={places}
@@ -231,14 +210,45 @@ const PostCreationScreen = ({ navigation }) => {
               )}
             />
           )}
-
-          <TouchableOpacity style={RestaurantID== null ? styles.submitButtondisabled : styles.submitButton} onPress={handleSubmit} disabled={RestaurantID== null}>
-            <Image source={require('../assets/icons/submit_button.png')} style={styles.mediaicon_submit} />
-          </TouchableOpacity>
-          <Text style={{fontSize:30}}></Text>
-          <View Push style={styles.Pusher}/>
         </ScrollView>
-        <BottomBarComponent navigation={navigation}/>
+  
+        <View style={styles.bottomBar}>
+        <TouchableOpacity style={styles.bottomBarButton} onPress={pickImage}>
+          <Image source={require('../assets/icons/add_image.png')} style={styles.mediaicon} />
+            <Text style={styles.buttonText}>Upload Images</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomBarButton} onPress={() => setRateModalVisible(true)}>
+          <Image source={require('../assets/icons/star_rating.png')} style={styles.mediaicon} />
+            <Text style={styles.buttonText}>Rate</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomBarButton} onPress={handleSubmit}>
+              <Image source={require('../assets/icons/submit_button.png')} style={styles.mediaicon} />
+              <Text style={styles.buttonText}>Post</Text>
+          </TouchableOpacity>
+
+        </View>
+
+        {/* Modal for selecting stars */}
+        <Modal
+          transparent={true}
+          visible={isRateModalVisible}
+          onRequestClose={() => setRateModalVisible(false)}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <StarRating
+                rating={stars}
+                onChange={setStars}
+              />
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setRateModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </PanGestureHandler>
   );
@@ -246,123 +256,114 @@ const PostCreationScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 10,
+    padding: 16,
   },
-  Pusher:{
-    flex: 1,
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  reviewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 16,
+  },
+  star: {
+    marginBottom: 15,
   },
   label: {
-    fontSize: 25,
-    //fontWeight: 'bold',
     fontFamily: 'Oswald-Medium',
-
-    marginBottom: 5,
+    fontSize: 18,
+    marginBottom: 8,
   },
   input: {
     borderWidth: 1,
+    fontFamily: 'Oswald-Light',
     borderColor: '#ccc',
-    fontFamily: 'Oswald-Medium',
-    backgroundColor: 'white',
-    borderRadius: 4,
-    padding: 10,
-    marginBottom: 10,
-  },
-  bottomBar: {
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff', // צבע רקע לפס הרציף
-    elevation: -300, // תיקוף על מנת ליצור גבוהה עבור הגבוהה
-  },
-  bottomBarButton: {
-    backgroundColor: '#fff',
-    paddingVertical: 7,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-  },
-  icon: {
-    width: 25,
-    height: 25,
-  },
-  mediaBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  mediaButton: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 70,
-    top: -230,
-    left: 130,
-  },
-  mediaicon: {
-    width: 65,
-    height: 65,
-  },
-  mediaicon_submit: {
-    width: 65,
-    height: 65,
-    borderRadius: 25,
-  },
-  buttonText: {
-    fontFamily: 'Oswald-Medium',
-
-    color: 'white',
-    //fontWeight: 'bold',
+    padding: 8,
+    marginBottom: 16,
   },
   mediaContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginVertical: 10,
   },
   mediaPreviewContainer: {
-    position: 'relative',
     marginRight: 10,
     marginBottom: 10,
+    position: 'relative',
   },
   previewImage: {
-    top: -70,
     width: 150,
     height: 150,
-    resizeMode: 'cover',
-    borderWidth: 1,
-    borderColor: '#ccc',
+  },
+  mediaicon: {
+    width: 40,
+    height: 40,
+  },
+  mediaiconuser: {
+    width: 60,
+    height: 60,
+    borderRadius: 60,
   },
   removeButton: {
     position: 'absolute',
-    top: -75,
+    top: 0,
     right: 0,
-    backgroundColor: 'rgba(255, 0, 0, 0.7)',
-    borderRadius: 10,
-    width: 30,
-    height: 30,
-    justifyContent: 'center', // Centers items vertically
-    alignItems: 'center', 
+    backgroundColor: 'red',
+    padding: 4,
+    borderRadius: 4,
   },
   removeButtonText: {
     color: 'white',
-    //fontWeight: 'bold',
-    fontFamily: 'Oswald-Medium',
-
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    justifyContent: 'space-around',
+    padding: 5,
+    borderTopWidth: 1,
+    borderColor: '#ccc',
+  },
+  bottomBarButton: {
+    flex: 1,
+    margin: 2,
+    padding: 1,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: 'black',
+    fontFamily: 'Oswald-Light',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: 300,
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButton: {
+    marginTop: 20,
+    padding: 12,
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    borderRadius: 8,
   },
   placeItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  submitButton: {
-    //marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
-    right: -300,
-    top: -30,
-  },
-  submitButtondisabled: {
-    //marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
-    right: -300,
-    top: -30,
+    borderColor: '#ccc',
   },
 });
 
