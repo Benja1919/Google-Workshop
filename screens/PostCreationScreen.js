@@ -199,16 +199,7 @@ const PostCreationScreen = ({ navigation }) => {
           {/* Media Picker Bar */}
           <View style={styles.mediaBar}>
             <TouchableOpacity style={styles.mediaButton} onPress={pickImage}>
-              <Image source={require('../assets/icons/image.png')} style={styles.mediaicon} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton} onPress={pickVideo}>
-              <Image source={require('../assets/icons/video.png')} style={styles.mediaicon} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton} onPress={pickGif}>
-              <Image source={require('../assets/icons/gif.png')} style={styles.mediaicon} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.mediaButton} onPress={pickLocation}>
-              <Image source={require('../assets/icons/location.png')} style={styles.mediaicon} />
+              <Image source={require('../assets/icons/add_image.png')} style={styles.mediaicon} />
             </TouchableOpacity>
           </View>
 
@@ -242,7 +233,7 @@ const PostCreationScreen = ({ navigation }) => {
           )}
 
           <TouchableOpacity style={RestaurantID== null ? styles.submitButtondisabled : styles.submitButton} onPress={handleSubmit} disabled={RestaurantID== null}>
-            <Text style={styles.submitButtonText}>Post</Text>
+            <Image source={require('../assets/icons/submit_button.png')} style={styles.mediaicon_submit} />
           </TouchableOpacity>
           <Text style={{fontSize:30}}></Text>
           <View Push style={styles.Pusher}/>
@@ -262,7 +253,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 18,
+    fontSize: 25,
     //fontWeight: 'bold',
     fontFamily: 'Oswald-Medium',
 
@@ -272,7 +263,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     fontFamily: 'Oswald-Medium',
-
+    backgroundColor: 'white',
     borderRadius: 4,
     padding: 10,
     marginBottom: 10,
@@ -304,11 +295,18 @@ const styles = StyleSheet.create({
   mediaButton: {
     backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 70,
+    top: -230,
+    left: 130,
   },
   mediaicon: {
-    width: 50,
-    height: 35,
+    width: 65,
+    height: 65,
+  },
+  mediaicon_submit: {
+    width: 65,
+    height: 65,
+    borderRadius: 25,
   },
   buttonText: {
     fontFamily: 'Oswald-Medium',
@@ -327,20 +325,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   previewImage: {
-    width: 100,
-    height: 100,
+    top: -70,
+    width: 150,
+    height: 150,
     resizeMode: 'cover',
     borderWidth: 1,
     borderColor: '#ccc',
   },
   removeButton: {
     position: 'absolute',
-    top: 0,
+    top: -75,
     right: 0,
     backgroundColor: 'rgba(255, 0, 0, 0.7)',
     borderRadius: 10,
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
     justifyContent: 'center', // Centers items vertically
     alignItems: 'center', 
   },
@@ -356,27 +355,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   submitButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: 'center', // מרכז את הכפתור במרכז האופקי של המסך
-    marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
+    //marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
+    right: -300,
+    top: -30,
   },
   submitButtondisabled: {
-    backgroundColor: '#cccccc',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: 'center', // מרכז את הכפתור במרכז האופקי של המסך
-    marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
-  },
-  submitButtonText: {
-    fontFamily: 'Oswald-Medium',
-
-    color: 'white',
-    //fontWeight: 'bold',
-    textAlign: 'center',
+    //marginTop: 20, // מוסיף מרווח בין הכפתור לרכיבים מעליו
+    right: -300,
+    top: -30,
   },
 });
 
