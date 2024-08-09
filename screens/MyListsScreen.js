@@ -34,6 +34,8 @@ const images = {
   editimage :require("../assets/icons/editwhite.png"),
   remove :require("../assets/icons/minuswhite.png"),
   add :require("../assets/icons/pluswhite.png"),
+  like: require("../assets/icons/heartoutlinewhite2.png"),
+  unlike: require("../assets/icons/heartwhite.png"),
 };
 
 /*
@@ -112,6 +114,18 @@ export const RenderList = ({item,EditTitle,EditDescription,index,isYou, Restaura
     setModalVisible(true);
   };
   const listowner = item.userName;
+  const sideButtonType = () =>{
+    if(!foreign && isYou){
+      return images.remove;
+    }
+    else if(plusorminus || !loggedIn){
+      return images.like;
+    }
+    else{
+      return images.unlike;
+    }
+  };
+  const buttonType = sideButtonType();
   return (
     <View style={{backgroundColor: col2,borderRadius: 15,marginBottom:10}}>
       <View style={{flexDirection: 'row', alignItems: 'center',padding:5,marginLeft:10}}>
@@ -127,11 +141,13 @@ export const RenderList = ({item,EditTitle,EditDescription,index,isYou, Restaura
           <TextInputWithImage editable={isYou} EndEdit={EndEditT} style={{fontFamily:'Oswald-Medium',fontSize:20}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listName}/>
           <TextInputWithImage editable={isYou} EndEdit={EndEditD} style={{fontFamily:'Oswald-Light',fontSize:16}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listDescription}/>
         </View>
-        { loggedIn &&
-          <TouchableOpacity style={{padding:5,right:0}} onPress={()=>sideButtonPress()}>
-            <Image source={plusorminus ? images.add : images.remove} style={{ width: 20, height: plusorminus ? 20 : 5.42,tintColor:secondaryColor,justifyContent: 'center',alignSelf:"center"}} />
+          { item.followers > 0 &&
+            <Text style={{color:secondaryColor,fontFamily:'Oswald-Medium',fontSize:20}}>{item.followers}</Text>
+          }
+          <TouchableOpacity style={{padding:5,right:0}} onPress={()=>sideButtonPress()} disabled={!loggedIn}>
+            <Image source={buttonType} style={{ width: 26, height: buttonType == images.remove ? 7 : 23,tintColor:secondaryColor,justifyContent: 'center',alignSelf:"center"}} />
           </TouchableOpacity>
-        }
+        
       </View>
       <ListDetails isE={isOpen} list={item} navigation={navigation} isYou={isYou} RestaurantFinderComplete={FinderComplete} ReRender={()=>ReRender(Math.random())}/>
       <View  >
@@ -356,9 +372,11 @@ const MyListsScreen = ({ route, navigation }) => {
       firestoreDB().DeleteListsbyID(lists[index].id);
       lists.splice(index,1);
     }
-    else if(isfromforeign && isYou){
+    else if(isfromforeign && isYou){//remove followed lis from profile
+      firestoreDB().UpdateListFollowCount({ListID:item.id,decrement:false});
       followedlists.splice(index,1);
       followedlistsids = [];
+      
       for (let index = 0; index < followedlists.length; index++) {
         followedlistsids.push(followedlists[index].id);
         
@@ -366,12 +384,16 @@ const MyListsScreen = ({ route, navigation }) => {
       CurrentUserFollow.splice(index,1);
       firestoreDB().UpdateUserFollowedLists(followedlistsids, currentUser.id)
     }
-    else if(!isYou && isfollowed){
+    else if(!isYou && isfollowed){//remove followed list from other profile
+      firestoreDB().UpdateListFollowCount({ListID:item.id,decrement:true});
+      item.followers--;
       const tempUserFollow = CurrentUserFollow.filter(x => x !== item.id);
       setCurrentUserFollow(tempUserFollow);
       firestoreDB().UpdateUserFollowedLists(tempUserFollow, currentUser.id)
     }
-    else if(!isYou && !isfollowed){
+    else if(!isYou && !isfollowed){//follow list
+      firestoreDB().UpdateListFollowCount({ListID:item.id,decrement:false});
+      item.followers++;
       const tempCurrentUserFollow = [...CurrentUserFollow,isfromforeign ? followedlists[index].id : lists[index].id];
       setCurrentUserFollow(tempCurrentUserFollow);
       firestoreDB().UpdateUserFollowedLists(tempCurrentUserFollow, currentUser.id)

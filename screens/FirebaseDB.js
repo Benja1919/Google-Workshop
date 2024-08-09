@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { collection, onSnapshot, getDocs, doc, getDoc, deleteDoc, addDoc, updateDoc, setDoc, query, where, orderBy,limit } from 'firebase/firestore';
+import { collection, onSnapshot, getDocs, doc, getDoc, deleteDoc, addDoc, updateDoc, setDoc, query, where, orderBy,limit, FieldValue } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyABWcyPdbh9dDautY3BjaL4FJQY94-at5E",
@@ -284,6 +284,17 @@ export const firestoreDB = () => {
         }));
         return documents;
       }
+    const UpdateListFollowCount = async ({ListID,prevValue,decrement}) => {
+        const docRef = doc(firestore, 'usersLists', ListID);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+            const currentData = docSnap.data();
+            await updateDoc(docRef, {
+                followers: currentData.followers + (decrement ? -1 : 1)
+            });
+        }
+    };
     const GetUserName = async (userName) => {
         const userDocRef = doc(firestore, 'users', userName.toLowerCase());
         const userDoc = await getDoc(userDocRef);
@@ -483,6 +494,7 @@ export const firestoreDB = () => {
         FetchListsbyName,
         FetchUsersbyName,
         FetchPostsLimited,
+        UpdateListFollowCount,
     };
 };
 
