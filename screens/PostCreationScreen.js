@@ -335,6 +335,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'black',
     fontFamily: 'Oswald-Light',
+    backgroundColor: 'white',
   },
   modalBackground: {
     flex: 1,
@@ -356,7 +357,7 @@ const styles = StyleSheet.create({
   modalButton: {
     marginTop: 20,
     padding: 12,
-    backgroundColor: '#007AFF',
+    backgroundColor: 'white',
     alignItems: 'center',
     borderRadius: 8,
   },
