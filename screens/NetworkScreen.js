@@ -14,7 +14,6 @@ const NetworkScreen = ({ navigation, route }) => {
       try {
         const user = await firestoreDB().GetUserName(userName.toLowerCase());
         setUser(user);
-        console.log(user)
       } catch (error) {
         console.error('Error fetching friends:', error);
       }
@@ -22,7 +21,6 @@ const NetworkScreen = ({ navigation, route }) => {
   
     fetchUser();
     }, [userName]); // Add userName as a dependency
-    console.log("TEST");
     const Tab = createMaterialTopTabNavigator();
   return (
     <View style={styles.container}>
