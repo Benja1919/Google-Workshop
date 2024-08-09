@@ -12,6 +12,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
     const { currentUser } = useContext(AuthContext);
     const [userProfileLoaded, setUserProfileLoaded] = useState(false);
     const [activeSlide, setActiveSlide] = useState(0);
+    const [postDate, setPostDate] = useState('');
 
     const [likesCount, setLikesCount] = useState(post.likes ? post.likes : 0);
     const [fontsLoaded] = useFonts({
@@ -45,6 +46,66 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
         fetchProfileImage();
     }, [post.userName]);
 
+    useEffect(() => {
+        const updatePostDate = () => {
+            let dateDiff = (Date.now() / 1000) - post.creationTime.seconds;
+            let postDate;
+            if (dateDiff < 60)
+            {
+                postDate = "Now"
+            }
+            else if (dateDiff < 3600)
+            {
+                cnt = Math.floor(dateDiff / 60);
+                postDate = cnt
+                if (cnt == 1)
+                {
+                    postDate += " minute ago";
+                }
+                else
+                {
+                    postDate += " minutes ago";
+                }
+            }
+            else if (dateDiff < 86400)
+            {
+                cnt = Math.floor(dateDiff / 3600);
+                postDate = cnt
+                if (cnt == 1)
+                {
+                    postDate += " hour ago";
+                }
+                else
+                {
+                    postDate += " hours ago";
+                }
+            }
+            else if (dateDiff < 604800)
+            {
+                cnt = Math.floor(dateDiff / 86400);
+                postDate = cnt
+                if (cnt == 1)
+                {
+                    postDate += " day ago";
+                }
+                else
+                {
+                    postDate += " days ago";
+                }
+            }
+            else
+            {
+                postDate = new Date(post.creationTime.seconds * 1000).toLocaleDateString();
+            }
+            setPostDate(postDate);
+        }
+        updatePostDate();
+        
+        const intervalId = setInterval(updatePostDate, 60000);
+
+        return () => clearInterval(intervalId);
+    }, [])
+    
     const renderItem = ({ item }) => {
             return <Image source={{ uri: item.url }}  style= {styles.backgroundImage}/>;
         }
@@ -55,56 +116,6 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
         type: 'image'
     }))
     : [{ url: post.mediaUrls[0], type: 'image' }];
-
-    let dateDiff = (Date.now() / 1000) - post.creationTime.seconds;
-    let postDate;
-    if (dateDiff < 60)
-    {
-        postDate = "Now"
-    }
-    else if (dateDiff < 3600)
-    {
-        cnt = Math.floor(dateDiff / 60);
-        postDate = cnt
-        if (cnt == 1)
-        {
-            postDate += " minute ago";
-        }
-        else
-        {
-            postDate += " minutes ago";
-        }
-    }
-    else if (dateDiff < 86400)
-    {
-        cnt = Math.floor(dateDiff / 3600);
-        postDate = cnt
-        if (cnt == 1)
-        {
-            postDate += " hour ago";
-        }
-        else
-        {
-            postDate += " hours ago";
-        }
-    }
-    else if (dateDiff < 604800)
-    {
-        cnt = Math.floor(dateDiff / 86400);
-        postDate = cnt
-        if (cnt == 1)
-        {
-            postDate += " day ago";
-        }
-        else
-        {
-            postDate += " days ago";
-        }
-    }
-    else
-    {
-        postDate = new Date(post.creationTime.seconds * 1000).toLocaleDateString();
-    }
 
     const toggleLike = async () => {
         if (!currentUser || !currentUser.userName) {
