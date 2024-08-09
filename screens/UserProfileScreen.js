@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions,BackHandler } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions,BackHandler, TextInput } from 'react-native';
 import postsIcon from '../assets/icons/posts.png';
 import myListsIcon from '../assets/icons/lists.png';
 import line from '../assets/line.png'
@@ -12,7 +12,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useFonts } from 'expo-font';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
-
 
 
 const UserProfileScreen = ({ route, navigation }) => {
@@ -153,13 +152,17 @@ const UserProfileScreen = ({ route, navigation }) => {
       </View>
     );
   }
-
+  const ChangeName = (event) =>{
+    const text = event.nativeEvent.text;
+    firestoreDB().UpdateProfileName({userName:userName,newValue:text});
+    setUser({...user,profilename: text});
+  };
   const buttons = [
     { label: 'Posts', screen: 'Posts', icon: postsIcon },
     { label: 'My Lists', screen: 'MyLists', icon: myListsIcon },
     { label: 'My Network', screen: 'Network', icon: myNetworkIcon },
   ];
-
+  const isYou = currentUser?.userName == userName;
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={{flex: 1 }}>
@@ -167,11 +170,16 @@ const UserProfileScreen = ({ route, navigation }) => {
           <Image source={{ uri: user.profileImageUrl }} style={styles.profileImage} />
           <Image source={line } style={styles.line} />
           <Image source={circle } style={styles.circle} />
-          <Text style={styles.header}>{user.profilename}</Text>
+          <View style={{flexDirection:'row',...styles.container}}>
+            {isYou &&
+            <Image source={require("../assets/icons/editwhite.png") } style={{tintColor:'black',width:14,height:15,marginRight:5}} />
+            }
+            <TextInput placeholder={user.profilename} editable={isYou} onEndEditing={ChangeName} placeholderTextColor={'black'} style={{fontFamily:"Oswald-Medium",zIndex:10,fontSize:25,paddingTop:10}}/>
+          </View>
         </View>
 
         <View style={styles.profileContainer}>
-            {currentUser && currentUser.userName === userName ? (
+            {isYou ? (
               <View style={styles.editButtonsContainer}>
                 {isEditing ? (
                   <View>
@@ -360,6 +368,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#e0e0e0',
     borderRadius: 5,
+    zIndex: 10,
   },
   editButtonText: {
     fontFamily: 'Oswald-Medium',

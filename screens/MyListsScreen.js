@@ -9,7 +9,6 @@ import RestaurantFinder from './components/RestaurantFinder';
 import { ScrollView, createNativeWrapper } from 'react-native-gesture-handler';
 import BottomBarComponent from './components/BottomBar';
 import ImprovedImageComponent from './components/ImprovedImage';
-
 const col2 = 'rgba(246, 225, 188, 0.3)'; //'rgba(246, 225, 188, 0.5)'
 const secondaryColor = 'rgba(230, 180, 85, 0.8)';
 const iconData = [
@@ -48,7 +47,7 @@ Image.prefetch(editimageUri);
 Image.prefetch(removeUri);
 Image.prefetch(addUri);
 */
-const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,valueTextColor, style, fontWeight, fontSize, ...rest }) => {
+export const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,valueTextColor, style, fontWeight, ImageStyle= {width:11,height:16,marginRight:3,tintColor:secondaryColor},fontSize, ...rest }) => {
   const [value, setValue] = useState('');
   const [placeholdertext, setPlaceholder] = useState(placeholder);
   const Complete = (event) =>{
@@ -64,7 +63,7 @@ const TextInputWithImage = ({editable,EndEdit,placeholder,placeholderTextColor,v
         {editable ?
         <Image
           source={images.editimage}
-          style={{width:11,height:16,marginRight:3,marginLeft:style.marginLeft,tintColor:secondaryColor}}
+          style={ImageStyle}
           resizeMode='contain'
         />
         : null}
@@ -434,7 +433,7 @@ const MyListsScreen = ({ route, navigation }) => {
             </TouchableOpacity>
             }
           </View>
-            <View style={{ ...styles.separator, marginBottom: 10 }} />
+            <Image style={{ ...styles.separator, marginBottom: 10 }} />
               <View >
                 <FlatList
                   data={lists}

@@ -295,6 +295,15 @@ export const firestoreDB = () => {
             });
         }
     };
+    const UpdateProfileName = async ({userName,newValue}) => {
+        const user = await GetUserName(userName);
+        const docRef = doc(firestore, 'users', user.id);
+
+        await updateDoc(docRef, {
+            profilename: newValue
+        });
+        
+    };
     const GetUserName = async (userName) => {
         const userDocRef = doc(firestore, 'users', userName.toLowerCase());
         const userDoc = await getDoc(userDocRef);
@@ -495,6 +504,7 @@ export const firestoreDB = () => {
         FetchUsersbyName,
         FetchPostsLimited,
         UpdateListFollowCount,
+        UpdateProfileName,
     };
 };
 
