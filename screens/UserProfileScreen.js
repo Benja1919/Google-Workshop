@@ -185,27 +185,26 @@ const UserProfileScreen = ({ route, navigation }) => {
         </View>
 
         <View style={styles.profileContainer}>
-            {!isYou &&
-                <View style={styles.buttonsContainer}>
-                  {isFollowing(user) ? (
-                      <TouchableOpacity
-                      
-                        style={styles.unfollowButton}
-                        onPress={() => handleUnfollow(user)}
-                      >
-                      <Text style={styles.unfollowButtonText}>Unfollow</Text>
-                      </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      style={styles.followButton}
-                      onPress={() => handleFollow(user)}
-                    >
-                      <Text style={styles.followButtonText}>Follow</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-            
-            }
+          {!isYou && currentUser && (
+           <View style={styles.buttonsContainer}>
+              {isFollowing(user) ? (
+            <TouchableOpacity
+                style={styles.unfollowButton}
+                onPress={() => handleUnfollow(user)}
+            >
+                <Text style={styles.unfollowButtonText}>Unfollow</Text>
+            </TouchableOpacity>
+        ) : (
+            <TouchableOpacity
+                style={styles.followButton}
+                onPress={() => handleFollow(user)}
+            >
+                <Text style={styles.followButtonText}>Follow</Text>
+            </TouchableOpacity>
+        )}
+    </View>
+)}
+
           </View>
         <View style={styles.buttonContainer}>
           {buttons.map((button, index) => (
@@ -291,7 +290,7 @@ const styles = StyleSheet.create({
 
   },
   unfollowButtonText: {
-    color: primaryColor,
+    color: 'white',
     fontSize: 16,
     fontFamily: "Oswald-Medium",
     alignSelf: 'center'
