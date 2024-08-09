@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions,BackHandler, TextInput } from 'react-native';
 import line from '../assets/line.png'
 import circle from '../assets/circle.png'
+import icon from '../assets/icons/icon.png'
 import { firestoreDB,DeleteImageByURI } from './FirebaseDB';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
@@ -192,10 +193,11 @@ const UserProfileScreen = ({ route, navigation }) => {
                         <Text style={styles.followingButtonText}>Following</Text>
                       </TouchableOpacity> */}
                       <TouchableOpacity
+                      
                         style={styles.unfollowButton}
                         onPress={() => handleUnfollow(user)}
                       >
-                        <Text style={styles.unfollowButtonText}>Unfollow</Text>
+                      <Text style={styles.unfollowButtonText}>Unfollow</Text>
                       </TouchableOpacity>
                     </>
                   ) : (
@@ -217,6 +219,7 @@ const UserProfileScreen = ({ route, navigation }) => {
               style={styles.button}
               onPress={() => navigateToScreen(button.screen)}
             >
+              <Image source={icon} style={{height: 70, width:70, alignSelf: 'center'}}></Image>
               <Text style={styles.buttonText}>{button.label}</Text>
             </TouchableOpacity>
           ))}
@@ -252,25 +255,6 @@ const styles = StyleSheet.create({
 
   },
 
-<<<<<<< HEAD
-=======
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignSelf:'center',
-    justifyContent: 'space-between',
-  },
-
-  button:{
-    width: 100,
-    height: 90,
-    marginTop: 60,
-    marginHorizontal: 12,
-    borderRadius: 60,
-    backgroundColor: "#e5b28f",
-    paddingVertical: 30,
-  },
->>>>>>> 6729020854b5399ce6fe6ef7095c849c5e2d447e
 
   header: {
     fontSize: 24,
@@ -329,30 +313,28 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
 
   },
-<<<<<<< HEAD
 
   
   buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    margin: 40,
+    // flex: 0,
+    flexDirection: 'column',
+    // margin: 0,
+    // backgroundColor: "black",
+    justifyContent: 'space-evenly',
+    alignItems: 'flex-start',
+    left: 40
     
-    alignSelf:'center',
-    justifyContent: 'space-between',
 
   },
 
   button:{
-    width: 100,
+    width: 'auto',
     height: 80,
-    marginTop: 60,
-    marginHorizontal: 12,
+    marginTop: 20,
     borderRadius: 40,
-    borderWidth: 2,
-    borderColor: "#ba8178",
-    backgroundColor: "#efe0e3",
-    alignContent: 'center',
-    justifyContent: 'center'
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'row',
 
   },
 
@@ -392,8 +374,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Oswald-Medium',
     color: 'black',
   },
-=======
->>>>>>> 6729020854b5399ce6fe6ef7095c849c5e2d447e
 
 
 });
