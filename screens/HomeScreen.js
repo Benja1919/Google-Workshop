@@ -4,10 +4,20 @@ import PostsScreen from './PostsScreen';
 import { AuthContext } from './AuthContext';
 import BottomBarComponent from './components/BottomBar';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { useFonts } from 'expo-font';
+
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 const HomeScreen = ({ navigation }) => {
   const { isLoggedIn, currentUser} = useContext(AuthContext);
+  const [fontsLoaded] = useFonts({
+    "Oswald-Bold": require("../assets/fonts/Oswald-Bold.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf")
+  })
+  if (!fontsLoaded){
+    return undefined;
+  }
 
   const onGestureEvent = (event) => {
     if (event.nativeEvent.translationX < -50) {
@@ -34,8 +44,15 @@ const HomeScreen = ({ navigation }) => {
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent} minDist={80}>
       <View style={styles.container}>
-        <Tab.Navigator>
-          {isLoggedIn && <Tab.Screen name="Friends Posts" component={PostsScreen} initialParams={{filterFriends: true}} /> }
+        <Tab.Navigator
+              screenOptions={{
+          tabBarLabelStyle: {
+            fontFamily: 'Oswald-Medium',
+            fontSize: 13, // אתה יכול לשנות את הגודל בהתאם לצורך
+          },
+        }}
+      >
+          {isLoggedIn && <Tab.Screen name="Friends Posts" component={PostsScreen} initialParams={{filterFriends: true}}/> }
           <Tab.Screen name="All Posts" component={PostsScreen} />
         </Tab.Navigator>
         <View>
