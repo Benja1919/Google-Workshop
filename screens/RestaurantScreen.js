@@ -8,6 +8,8 @@ import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import BasicMap ,{GetPlaceDetails, getPhotoUri} from './components/Maps';
 import OpeningTimes from './components/OpeningTimeViewer';
 import {ParseGoogleOpeningTime} from './components/AddRestaurant';
+import BottomBarComponent from './components/BottomBar';
+
 const col2 = '#fbfbfb';
 const AdditionalDetailsComponent = ({restaurant}) =>{
   
@@ -103,7 +105,12 @@ const RestaurantScreen = ({ route, navigation }) => {
   if (loading || Details == null || !Exists) {
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>LOADING</Text>
+        <View style={styles.container}>
+          <Text style={styles.header}>LOADING</Text>
+        </View>
+        <View>
+          <BottomBarComponent navigation={navigation}/>
+        </View>
       </View>
     );
   }
@@ -111,7 +118,12 @@ const RestaurantScreen = ({ route, navigation }) => {
   if (!restaurant) {
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>Restaurant not found</Text>
+        <View style={styles.container}>
+          <Text style={styles.header}>Restaurant not found</Text>
+        </View>
+        <View>
+          <BottomBarComponent navigation={navigation}/>
+        </View>
       </View>
     );
   }
@@ -152,97 +164,102 @@ const RestaurantScreen = ({ route, navigation }) => {
   Details.servesBeer ? TagArray.push("Beer") : '';
   Details.servesVegetarianFood ? TagArray.push("Vegetarian food") : '';
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>{Details.displayName.text}</Text>
-      <Image source={{ uri: ProfileURI}} style={styles.profileImage} />
-      <Text style={styles.sectionTitle}>Photos</Text>
-      <View style={{...styles.item,padding: 10}}>
-        <FlatList
-          data={PhotoURIArray}
-          renderItem={({ item, index }) => (
-            <View style={{padding:5}}>
-              <Image source={{ uri: item }} style={styles.photo} />
-            </View>
-          )}
-          keyExtractor={item => item.toString()}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={true}
-          snapToAlignment="center"
-          decelerationRate="fast"
-        />
-      </View>
-      <Text style={styles.sectionTitle}>Location</Text>
-      <View style={{...styles.item,padding: 10}}> 
-        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left'}}>
-            <Image
-              source={require('../assets/icons/LocationIcon.png')}
-              style={{...styles.icon,marginRight:3,marginLeft:1}}
-              resizeMode="center"
-            />
-          <Text style={{...styles.details}}>{Address} </Text>
+    <View style={styles.container}>
+      <ScrollView style={styles.container}>
+        <Text style={styles.header}>{Details.displayName.text}</Text>
+        <Image source={{ uri: ProfileURI}} style={styles.profileImage} />
+        <Text style={styles.sectionTitle}>Photos</Text>
+        <View style={{...styles.item,padding: 10}}>
+          <FlatList
+            data={PhotoURIArray}
+            renderItem={({ item, index }) => (
+              <View style={{padding:5}}>
+                <Image source={{ uri: item }} style={styles.photo} />
+              </View>
+            )}
+            keyExtractor={item => item.toString()}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={true}
+            snapToAlignment="center"
+            decelerationRate="fast"
+          />
         </View>
-        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left'}} onPress={() =>setLocationMap(!isLocationMapEnbaled)}>
-          <View style={{flexDirection: 'row',flex: 1,alignItems: 'center'}}>
-            <Image
-                source={require('../assets/icons/mapicon2.png')}
+        <Text style={styles.sectionTitle}>Location</Text>
+        <View style={{...styles.item,padding: 10}}> 
+          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left'}}>
+              <Image
+                source={require('../assets/icons/LocationIcon.png')}
                 style={{...styles.icon,marginRight:3,marginLeft:1}}
                 resizeMode="center"
-            />
-            <Text style={{...styles.details}}>N {Details.location.latitude}, W {Details.location.longitude}</Text>
+              />
+            <Text style={{...styles.details}}>{Address} </Text>
           </View>
-            <Image source={images.tri}
-              style={{...styles.icon,alignSelf: 'flex-end',transform: [{rotate: isLocationMapEnbaled ? '0deg' : '180deg' }]}}
-              resizeMode="center"/>
-        </TouchableOpacity>
-        <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={Details.location}/>
-      </View>
-      <Text style={styles.sectionTitle}>Opening Times</Text>
-          <OpeningTimes restaurant={restaurant} Globaloh={OpeningTime} isGlobalOpen={OpenNow} isEditable ={false}/>
-      {(Phone || Website) && 
-      <Text style={styles.sectionTitle}>Contact</Text>
-      }
-      <View style={{...styles.item,padding:5}} >
-        {Phone && 
-          <TouchableOpacity  onPress={()=>{Linking.openURL(`tel:${Phone}`)}} >
-            <Text style={{...styles.details,marginLeft:10,padding:2}}>Phone: {Phone}</Text>
+          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'left'}} onPress={() =>setLocationMap(!isLocationMapEnbaled)}>
+            <View style={{flexDirection: 'row',flex: 1,alignItems: 'center'}}>
+              <Image
+                  source={require('../assets/icons/mapicon2.png')}
+                  style={{...styles.icon,marginRight:3,marginLeft:1}}
+                  resizeMode="center"
+              />
+              <Text style={{...styles.details}}>N {Details.location.latitude}, W {Details.location.longitude}</Text>
+            </View>
+              <Image source={images.tri}
+                style={{...styles.icon,alignSelf: 'flex-end',transform: [{rotate: isLocationMapEnbaled ? '0deg' : '180deg' }]}}
+                resizeMode="center"/>
           </TouchableOpacity>
+          <BasicMap isEnabled={isLocationMapEnbaled} initialMarkerCoords={Details.location}/>
+        </View>
+        <Text style={styles.sectionTitle}>Opening Times</Text>
+            <OpeningTimes restaurant={restaurant} Globaloh={OpeningTime} isGlobalOpen={OpenNow} isEditable ={false}/>
+        {(Phone || Website) && 
+        <Text style={styles.sectionTitle}>Contact</Text>
         }
-        {Website && 
-          <TouchableOpacity  onPress={()=>{Linking.openURL(Website)}} >
-            <Text style={{...styles.details,marginLeft:10,padding:2}}>Website: {Website}</Text>
-          </TouchableOpacity>
-        }
-      </View>
-      
-      <Text style={styles.sectionTitle}>Rating</Text>
-      <View style={{...styles.item,padding:10}}>
-        <Text style={{...styles.details,marginLeft:10}}>CommunEATy: {restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>
-        <Text style={{...styles.details,marginLeft:10}}>Google: {GoogleReviewsCount > 0 ? GoogleReviews : "No Reviews"} {GoogleReviewsCount > 0 ? `(${GoogleReviewsCount})` : ''}</Text>
-      </View>
-      <AdditionalDetailsComponent restaurant={restaurant}/>
-      <Text style={styles.sectionTitle}>Tags</Text>
-      <FlatList
-        data={TagArray}
-        renderItem={({ item, index }) => (
-            <Text style={{fontSize:16}}>{item}{index === TagArray.length -1 ? '      ' : ', '}</Text>
-        )}
-        keyExtractor={(tag, index) => index.toString()}
-        horizontal
-        style={{...styles.item,padding:15}}
-      />
-      
-      <Text style={styles.sectionTitle}>Posts</Text>
+        <View style={{...styles.item,padding:5}} >
+          {Phone && 
+            <TouchableOpacity  onPress={()=>{Linking.openURL(`tel:${Phone}`)}} >
+              <Text style={{...styles.details,marginLeft:10,padding:2}}>Phone: {Phone}</Text>
+            </TouchableOpacity>
+          }
+          {Website && 
+            <TouchableOpacity  onPress={()=>{Linking.openURL(Website)}} >
+              <Text style={{...styles.details,marginLeft:10,padding:2}}>Website: {Website}</Text>
+            </TouchableOpacity>
+          }
+        </View>
+        
+        <Text style={styles.sectionTitle}>Rating</Text>
+        <View style={{...styles.item,padding:10}}>
+          <Text style={{...styles.details,marginLeft:10}}>CommunEATy: {restaurant.reviewcount > 0 ? restaurant.starcount / restaurant.reviewcount : "No Reviews"} {restaurant.reviewcount > 0 ? `(${restaurant.reviewcount})` : ''}</Text>
+          <Text style={{...styles.details,marginLeft:10}}>Google: {GoogleReviewsCount > 0 ? GoogleReviews : "No Reviews"} {GoogleReviewsCount > 0 ? `(${GoogleReviewsCount})` : ''}</Text>
+        </View>
+        <AdditionalDetailsComponent restaurant={restaurant}/>
+        <Text style={styles.sectionTitle}>Tags</Text>
+        <FlatList
+          data={TagArray}
+          renderItem={({ item, index }) => (
+              <Text style={{fontSize:16}}>{item}{index === TagArray.length -1 ? '      ' : ', '}</Text>
+          )}
+          keyExtractor={(tag, index) => index.toString()}
+          horizontal
+          style={{...styles.item,padding:15}}
+        />
+        
+        <Text style={styles.sectionTitle}>Posts</Text>
 
-      {/* Display posts for the specific restaurant */}
-      <PostsScreen navigation={navigation} route={{ params: { filterrestaurantID: RestaurantID } }} isScrollEnabled={false}/>
-      <Text style={{fontSize:30}}></Text>
-    </ScrollView>
+        {/* Display posts for the specific restaurant */}
+        <PostsScreen navigation={navigation} route={{ params: { filterrestaurantID: RestaurantID } }} isScrollEnabled={false}/>
+        <Text style={{fontSize:30}}></Text>
+      </ScrollView>
+      <View>
+        <BottomBarComponent navigation={navigation}/>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: { flex: 1},
   profileImage: {
     width: 150,
     height: 150,
