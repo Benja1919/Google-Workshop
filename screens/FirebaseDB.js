@@ -316,7 +316,21 @@ export const firestoreDB = () => {
         const restaurantDoc = querySnapshot.docs[0];
         return restaurantDoc != undefined ? restaurantDoc.data() : null;
     };
-
+    const FetchUsersProfileName = async (userNameArray) =>{
+        const promises = userNameArray.map(id => getDoc(doc(firestore, 'users', id.toLowerCase())));
+        const snapshots = await Promise.all(promises);
+        
+        // Map the results to a format you need (e.g., { id: doc.id, data: doc.data() })
+        const results = snapshots.map(snapshot => {
+        if (snapshot.exists()) {
+            return snapshot.data().profilename;
+        } else {
+            return null;
+        }
+        });
+    
+        return results;
+    };
     const GetRestaurantbyOwner = async (user) => {
         const restaurantDoc = doc(firestore, 'restaurants', user.RestaurantID);
         const restaurantSnapshot = await getDoc(restaurantDoc);
@@ -548,6 +562,7 @@ export const firestoreDB = () => {
         UpdateListFollowCount,
         UpdateProfileName,
         GetUserFollowers,
+        FetchUsersProfileName,
     };
 };
 

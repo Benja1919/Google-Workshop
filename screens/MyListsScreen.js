@@ -137,7 +137,7 @@ export const RenderList = ({item,EditTitle,EditDescription,index,isYou, Restaura
         </TouchableOpacity>
         }
         <View style={{flexDirection: 'column',justifyContent: 'center', flex:1}}>
-          <TextInputWithImage editable={isYou} EndEdit={EndEditT} style={{fontFamily:'Oswald-Medium',fontSize:20}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={foreign ? `${item.userName}'s ${item.listName}` : item.listName}/>
+          <TextInputWithImage editable={isYou} EndEdit={EndEditT} style={{fontFamily:'Oswald-Medium',fontSize:20}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={foreign ? `${item.profilename}'s ${item.listName}` : item.listName}/>
           <TextInputWithImage editable={isYou} EndEdit={EndEditD} style={{fontFamily:'Oswald-Light',fontSize:16}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listDescription}/>
         </View>
           { item.followers > 0 &&
@@ -307,6 +307,15 @@ const MyListsScreen = ({ route, navigation }) => {
             
             const newListIds = listsids.filter(item => !not_exists.includes(item));
             firestoreDB().UpdateUserFollowedLists(newListIds, currentUser.id)
+          }
+          const listUserNames = [];
+          for (let index = 0; index < flists.length; index++) {
+            listUserNames.push(flists[index].userName);
+            
+          }
+          const profileNames = await firestoreDB().FetchUsersProfileName(listUserNames);
+          for (let index = 0; index < flists.length; index++) {
+            flists[index] = {...flists[index],profilename: profileNames[index]};
           }
           setFollowedLists(flists);
         }
