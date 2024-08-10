@@ -137,7 +137,7 @@ export const RenderList = ({item,EditTitle,EditDescription,index,isYou, Restaura
         </TouchableOpacity>
         }
         <View style={{flexDirection: 'column',justifyContent: 'center', flex:1}}>
-          <TextInputWithImage editable={isYou} EndEdit={EndEditT} style={{fontFamily:'Oswald-Medium',fontSize:20}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listName}/>
+          <TextInputWithImage editable={isYou} EndEdit={EndEditT} style={{fontFamily:'Oswald-Medium',fontSize:20}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={foreign ? `${item.userName}'s ${item.listName}` : item.listName}/>
           <TextInputWithImage editable={isYou} EndEdit={EndEditD} style={{fontFamily:'Oswald-Light',fontSize:16}} placeholderTextColor={'black'} valueTextColor={'black'} placeholder={item.listDescription}/>
         </View>
           { item.followers > 0 &&

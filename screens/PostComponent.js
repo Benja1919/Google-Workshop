@@ -9,6 +9,7 @@ import Carousel from 'react-native-reanimated-carousel';
 
 const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigateToLogin }) => {
     const [profileImageUrl, setProfileImageUrl] = useState('defaultProfileImageUri');
+    const [profileName, setProfileName] = useState('unknown');
     const { currentUser } = useContext(AuthContext);
     const [userProfileLoaded, setUserProfileLoaded] = useState(false);
     const [activeSlide, setActiveSlide] = useState(0);
@@ -35,9 +36,11 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
                 if (!post.userName) return;  // Early return if userName is not defined
                 const user = await firestoreDB().GetUserName(post.userName.toLowerCase()) || {};
                 setProfileImageUrl(user.profileImageUrl || 'defaultProfileImageUri');
+                setProfileName(user.profilename || 'unknown');
             } catch (error) {
                 console.error('Error fetching profile image:', error);
                 setProfileImageUrl('defaultProfileImageUri'); // Set default image URI on error
+                setProfileName('unknown');
             } finally {
                 setUserProfileLoaded(true);
             }
@@ -172,7 +175,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
                 <View style={styles.textContainer}>
                     <TouchableOpacity style={styles.userContainer} onPress={() => navigateToProfile(post.userName)}>
                         <Image source={{ uri: profileImageUrl }} style={styles.userImage} />
-                        <Text style={styles.userName}>{post.userprofile}</Text>
+                        <Text style={styles.userName}>{profileName}</Text>
                     </TouchableOpacity>
                     <StarRating rating={post.stars} onChange={() => {}} starSize={22} color={'#FFF'} starStyle={{ marginHorizontal: 0 }}/>
                 </View>
