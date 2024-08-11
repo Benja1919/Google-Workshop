@@ -164,7 +164,7 @@ const RestaurantScreen = ({ route, navigation }) => {
   Details.servesBeer ? TagArray.push("Beer") : '';
   Details.servesVegetarianFood ? TagArray.push("Vegetarian food") : '';
   return (
-    <View style={styles.container}>
+    <View style={{padding:10,...styles.container}}>
       <ScrollView style={styles.container}>
         <Text style={styles.header}>{Details.displayName.text}</Text>
         <Image source={{ uri: ProfileURI}} style={styles.profileImage} />

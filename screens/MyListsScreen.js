@@ -218,7 +218,7 @@ const ListDetails = ({list,isE,isYou,RestaurantFinderComplete, navigation,ReRend
               <View style={{flex:1}}/>
               {isYou ? 
                 <TouchableOpacity onPress={() =>handleDeletePress(index)}>
-                  <Image source={images.remove} style={{tintColor:secondaryColor,width:15,height:4.3,marginRight:13,resizeMode:'cover'}}/>
+                  <Image source={images.remove} style={{tintColor:secondaryColor,width:17,height:4.3,marginRight:14,resizeMode:'cover'}}/>
                 </TouchableOpacity>
               : null}
             </View>
@@ -496,7 +496,7 @@ const MyListsScreen = ({ route, navigation }) => {
               />
             </View>
             )} 
-          <Text style={{fontSize:50}}/>
+          <Text style={{fontSize:70}}/>
         </ScrollView>
       <BottomBarComponent navigation={navigation}/>
     </View>
