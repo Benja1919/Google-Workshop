@@ -153,8 +153,8 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
                         data={mediaItems}
                         renderItem={renderItem}
                         width={viewportWidth}
-                       // height={200}
                         pagingEnabled
+                        onSnapToItem={index => setActiveSlide(index)}
                     />
                     <View style={styles.paginationContainer}>
                         {mediaItems.map((_, index) => (
@@ -295,6 +295,19 @@ const styles = StyleSheet.create({
         fontFamily: 'Oswald-Medium',
         fontSize: 22,
         marginBottom: 0, // Adds some spacing at the bottom
+    },
+    paginationContainer: {
+        flexDirection: 'row',
+        position: 'absolute',
+        bottom: 10,
+        alignSelf: 'center',
+    },
+    paginationDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        marginHorizontal: 2,
+        backgroundColor: 'black',
     },
 });
 
