@@ -161,7 +161,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   const buttons = [
     { label: 'Posts', screen: 'Posts' },
     { label: 'My Lists', screen: 'MyLists' },
-    { label: 'My Network', screen: 'Network' },
+    { label: 'Friends', screen: 'Network' },
   ];
   const isYou = currentUser?.userName == userName;
   return (
