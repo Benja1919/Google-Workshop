@@ -65,7 +65,6 @@ const PostCreationScreen = ({ navigation }) => {
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes,
         allowsEditing: true,
-        aspect: [4, 3],
         quality: 1,
       });
 
