@@ -82,6 +82,7 @@ const Landing = () => {
           >
             <Text style={styles.ctaText}>Join Now</Text>
           </TouchableOpacity>
+          
         </ImageBackground>
         
         <ImageBackground 
@@ -99,6 +100,12 @@ const Landing = () => {
       </View>
       
       <View style={styles.footer}>
+      <TouchableOpacity
+            style={styles.ctaButton}
+            onPress={() => navigation.navigate('HomeScreen')} // Navigate to Sign Up Screen
+          >
+            <Text style={styles.guestText}>Try as a Guest</Text>
+          </TouchableOpacity>
         <Text style={styles.footerText}>© 2024 CommunEATy. All rights reserved.</Text>
       </View>
     </ImageBackground>
@@ -160,7 +167,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Oswald-Light',
   },
   footer: {
-    padding: 20,
+    padding: 10,
     alignItems: 'center',
   },
   footerText: {
@@ -168,15 +175,20 @@ const styles = StyleSheet.create({
     color: '#666',
     fontFamily: 'Oswald-Medium',
   },
+  guestText: {
+    fontSize: 17,
+    color: '#666',
+    fontFamily: 'Oswald-Medium',
+  },
   bottomBox: {
     position: 'center',
-    bottom: 0,
+    bottom: -10,
     borderRadius: 10,
     width: '100%',
     paddingVertical: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 40,
+    paddingHorizontal: 43,
   },
   buttonImageBackground: {
     flex: 1,
@@ -194,7 +206,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   ctaText: {
-    color: '#fff',
+    color: '#ffff',
     fontSize: 16,
     fontFamily: 'Oswald-Medium',
   },
