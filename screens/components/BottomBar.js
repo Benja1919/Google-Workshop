@@ -46,14 +46,7 @@ const BottomBarComponent = ({ navigation }) => {
   };
 
   const navigateToHome = () => {
-    if (isLoggedIn)
-    {
-      navigation.navigate('Friends Posts');
-    }
-    else
-    {
-      navigation.navigate('All Posts');
-    }
+    navigation.navigate('HomeScreen');
   };
 
   let isinownprofile = false;
