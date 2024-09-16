@@ -231,7 +231,7 @@ const SearchScreen = () => {
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Enter search query"
+            placeholder="Search"
             onEndEditing={event => {
               event.persist();
               setSearchQuery(event.nativeEvent.text);
@@ -372,6 +372,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 5,
     fontFamily :'Oswald-Light',
+    borderRadius: 10
     
   },
   searchButton: {
