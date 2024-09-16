@@ -39,7 +39,6 @@ const Landing = () => {
               <View style={styles.textBlock}>
                 <Text style={styles.sectionText}>Discover New Flavors</Text>
                 <Text style={styles.smallText}>Discover the best dishes and hidden gems from foodies around the world!</Text>
-
               </View>
             </View>
 
@@ -55,9 +54,8 @@ const Landing = () => {
 
               {/* Section: Plan */}
               <View style={styles.textBlock}>
-                <Text style={styles.sectionText}> Save and Share!</Text>
+                <Text style={styles.sectionText}>Save and Share!</Text>
                 <Text style={styles.smallText}>Save the restaurants you want to visit. Organize your list and share it with friends effortlessly.</Text>
-
               </View>
 
               {/* Image Pic 3 */}
@@ -72,19 +70,33 @@ const Landing = () => {
         </ScrollView>
       </SafeAreaView>
 
-      <TouchableOpacity
-        style={styles.ctaButton}
-        onPress={() => navigation.navigate('SignUpScreen')} // Navigate to Sign Up Screen
-      >
-        <Text style={styles.ctaText}>Join Now</Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity
-        style={styles.loginButton}
-        onPress={() => navigation.navigate('LoginScreen')} // Navigate to Login Screen
-      >
-        <Text style={styles.ctaText}>Sign In</Text>
-      </TouchableOpacity>
+      <View style={styles.bottomBox}>
+        <ImageBackground 
+          source={require('../assets/buttonBackLeft.png')}
+          style={styles.buttonImageBackground}
+          imageStyle={{ borderRadius: 20 }}
+        >
+          <TouchableOpacity
+            style={styles.ctaButton}
+            onPress={() => navigation.navigate('SignUp')} // Navigate to Sign Up Screen
+          >
+            <Text style={styles.ctaText}>Join Now</Text>
+          </TouchableOpacity>
+        </ImageBackground>
+        
+        <ImageBackground 
+          source={require('../assets/buttonBackRight.png')} // 
+          style={styles.buttonImageBackground}
+          imageStyle={{ borderRadius: 20 }} 
+        >
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => navigation.navigate('LoginScreen')} // Navigate to Login Screen
+          >
+            <Text style={styles.ctaText}>Sign In</Text>
+          </TouchableOpacity>
+        </ImageBackground>
+      </View>
       
       <View style={styles.footer}>
         <Text style={styles.footerText}>© 2024 CommunEATy. All rights reserved.</Text>
@@ -102,13 +114,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 50,
+    paddingHorizontal: 10,
+    paddingBottom: 0,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 50,
+    marginTop: 25,
   },
   column: {
     width: "45%",
@@ -117,14 +129,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   textBlock: {
-    flex: 1, // Extend vertically
-    //backgroundColor: '#f0f0f0',
-    justifyContent: 'center', // Center the text vertically
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
     borderRadius: 10,
     marginBottom: 50,
-    height: 250, // You can adjust this for desired height
+    height: 250,
   },
   imageBlock: {
     justifyContent: 'center',
@@ -137,12 +148,11 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 10,
   },
-
   sectionText: {
     fontSize: 23,
     color: '#333',
     fontFamily: 'Oswald-Medium',
-    marginBottom: 10
+    marginBottom: 10,
   },
   smallText: {
     fontSize: 19,
@@ -158,25 +168,30 @@ const styles = StyleSheet.create({
     color: '#666',
     fontFamily: 'Oswald-Medium',
   },
+  bottomBox: {
+    position: 'center',
+    bottom: 0,
+    borderRadius: 10,
+    width: '100%',
+    paddingVertical: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 40,
+  },
+  buttonImageBackground: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
   ctaButton: {
-    position: 'absolute',
-    bottom: 60,
-    left: 40,
-    backgroundColor: '#ebcca8',
-    borderRadius: 2,
-    borderColor:'#FFFFF',
     paddingVertical: 10,
     paddingHorizontal: 30,
-    borderRadius: 5,
   },
   loginButton: {
-    position: 'absolute',
-    bottom: 60,
-    right: 40,
-    backgroundColor: '#ebcca8',
     paddingVertical: 10,
     paddingHorizontal: 30,
-    borderRadius: 5,
   },
   ctaText: {
     color: '#fff',
