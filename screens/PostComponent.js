@@ -177,7 +177,7 @@ const PostComponent = ({ post, navigateToProfile, navigateToRestaurant, navigate
                         <Image source={{ uri: profileImageUrl }} style={styles.userImage} />
                         <Text style={styles.userName}>{profileName}</Text>
                     </TouchableOpacity>
-                    <StarRating rating={post.stars} onChange={() => {}} starSize={22} color={'#FFF'} starStyle={{ marginHorizontal: 0 }}/>
+                    <StarRating rating={post.stars} onChange={() => {}} starSize={22} color={'#eee1c4'} starStyle={{ marginHorizontal: 0 }}/>
                 </View>
             </View>
 
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         height: '100%',
-        resizeMode: 'contain',
+        resizeMode: 'cover',
     },
     textContainer: {
         flexDirection: 'row',

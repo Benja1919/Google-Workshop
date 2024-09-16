@@ -65,6 +65,7 @@ const PostCreationScreen = ({ navigation }) => {
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes,
         allowsEditing: true,
+        aspect: [4, 3],
         quality: 1,
       });
 
@@ -170,6 +171,7 @@ const PostCreationScreen = ({ navigation }) => {
             rating={stars}
             onChange={setStars}
             style = {styles.star}
+            color={'#eee1c4'}
           />
           </View>
           <TextInput
@@ -238,6 +240,7 @@ const PostCreationScreen = ({ navigation }) => {
               <StarRating
                 rating={stars}
                 onChange={setStars}
+                color={'#eee1c4'}
               />
               <TouchableOpacity
                 style={styles.modalButton}
