@@ -2,7 +2,7 @@ import React, { useContext, useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert} from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
-apiKey = 'AIzaSyD6nDtPRXSBhTCkYemwC9fJ4YUxnAqnC1E';
+apiKey = 'insert API Key';
 Geocoder.init(apiKey);
 //conversions Address <--> Coordinates(N,W)
 export const useCoordToAddress = (latitude, longitude) => {
